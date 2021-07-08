@@ -2210,6 +2210,7 @@ def move_robots_away(target_location):
                         info(f"Moving {team['color']} player {number} from {initial_pos} to {pos}")
                         # Pose of the robot is not changed
                         player['robot'].getField('translation').setSFVec3f(dst_t.tolist())
+                        player['position'] = dst_t.tolist()
                         break
 
 
