@@ -183,11 +183,11 @@
             },
             {
                 "target" : "BLUE_PLAYER_2",
-                "position" : [-2.4, -0.2, 0.24]
+                "position" : [-2.8, -0.2, 0.24]
             },
             {
                 "target" : "BLUE_PLAYER_3",
-                "position" : [-2.4, 0.2, 0.24]
+                "position" : [-2.8, 0.2, 0.24]
             }
         ]
     },
@@ -224,7 +224,7 @@
             {
                 "name" : "Positioning for penalty: attacking goalkeeper on defender's goal line",
                 "target" : "BLUE_PLAYER_1",
-                "penalty" : 0
+                "penalty" : 34
             },
             {
                 "name" : "Positioning for penalty: striker behind penalty mark near ball",
