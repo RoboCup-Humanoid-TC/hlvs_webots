@@ -2012,9 +2012,9 @@ def interruption(interruption_type, team=None, location=None, is_goalkeeper_ball
                 interruption_type = 'INDIRECT_FREEKICK'
             else:
                 interruption_type = 'PENALTYKICK'
-                ball_reset_location = [game.field.penalty_mark_x, 0]
+                game.ball_kick_translation = [game.field.penalty_mark_x, 0, 0.08]
                 if location[0] < 0:
-                    ball_reset_location[0] *= -1
+                    game.ball_kick_translation[0] *= -1
         else:
             interruption_type = 'DIRECT_FREEKICK'
         game.can_score = interruption_type != 'INDIRECT_FREEKICK'
