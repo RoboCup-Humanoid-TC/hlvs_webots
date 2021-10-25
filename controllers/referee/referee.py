@@ -957,7 +957,8 @@ def update_team_contacts(team):
             for i in range(l2):
                 sum[i] += v[i]
         player['velocity'] = [s / l1 for s in sum]
-        n = robot.getNumberOfContactPoints(True)
+        contact_points = robot.getContactPoints(True)
+        n = len(contact_points)
         player['contact_points'] = []
         if n == 0:  # robot is asleep
             player['asleep'] = True
@@ -980,8 +981,8 @@ def update_team_contacts(team):
             outside_turf = False
             fallen = True
         for i in range(n):
-            point = robot.getContactPoint(i)
-            node = robot.getContactPointNode(i)
+            point = contact_points[i].point
+            node = supervisor.getFromId(contact_points[i].node_id)
             if not node:
                 continue
             name_field = node.getField('name')
@@ -1070,8 +1071,9 @@ def update_team_contacts(team):
 
 def update_ball_contacts():
     game.ball.contact_points = []
-    for i in range(game.ball.getNumberOfContactPoints()):
-        point = game.ball.getContactPoint(i)
+    new_contact_points = game.ball.getContactPoints()
+    for contact in new_contact_points:
+        point = contact.point
         if point[2] <= game.field.turf_depth:  # contact with the ground
             continue
         game.ball.contact_points.append(point)
