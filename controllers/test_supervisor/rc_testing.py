@@ -1,3 +1,17 @@
+# Copyright 1996-2021 Cyberbotics Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 from abc import ABC, abstractmethod
 
 import numpy as np
@@ -306,6 +320,7 @@ class Test:
         self._score = score
         self._kick_off_team = kick_off_team
         self._critical = critical
+        self._abs_tol = POS_ABS_TOL
         self._msg = []
         self._success = True
 
@@ -374,7 +389,11 @@ class Test:
         t._score = dic.get("score")
         t._kick_off_team = dic.get("kick_off_team")
         t._critical = dic.get("critical", False)
+        t._abs_tol = dic.get("abs_tol", POS_ABS_TOL)
         return t
+
+    def _getAbsTol(self):
+        return self._abs_tol
 
     def _getTargetGCData(self, status):
         splitted_target = self._target.split("_")
@@ -393,7 +412,7 @@ class Test:
             raise RuntimeError("{self._name} tests position and has no target")
         target = supervisor.getFromDef(self._target)
         received_pos = target.getField('translation').getSFVec3f()
-        if not np.allclose(self._position, received_pos, atol=POS_ABS_TOL):
+        if not np.allclose(self._position, received_pos, atol=self._getAbsTol()):
             failure_msg = f"Position Invalid at {status.getFormattedTime()}: "\
                 f"expecting {self._position}, received {received_pos}"
             print(f"Failure in test {self._name}\n\t{failure_msg}")

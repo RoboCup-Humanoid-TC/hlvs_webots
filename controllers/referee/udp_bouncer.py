@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-#
 # Copyright 1996-2021 Cyberbotics Ltd.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -103,10 +101,11 @@ def on_queue_update():
                                                              args=[client, UDP_TEAM_SEND_PORT, current_package[3]])
                             client_thread.start()
                 elif current_package[1] in robots_red:
-                    if client != current_package[1]:
-                        client_thread = threading.Thread(target=send_message_to_client,
-                                                         args=[client, UDP_TEAM_SEND_PORT, current_package[3]])
-                        client_thread.start()
+                    for client in robots_red:
+                        if client != current_package[1]:
+                            client_thread = threading.Thread(target=send_message_to_client,
+                                                             args=[client, UDP_TEAM_SEND_PORT, current_package[3]])
+                            client_thread.start()
                 else:
                     log("We received a message on the team communication port from a robot not registered with one of the"
                         " teams. This should not happen.")
