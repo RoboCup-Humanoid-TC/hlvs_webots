@@ -79,6 +79,8 @@ BALL_HOLDING_RATIO = 1.0/3                # The ratio of the radius used to comp
 GAME_INTERRUPTION_PLACEMENT_NB_STEPS = 5  # The maximal number of steps allowed when moving ball or player away
 STATUS_PRINT_PERIOD = 20                  # Real time between two status updates in seconds
 DISABLE_ACTUATORS_MIN_DURATION = 1.0      # The minimal simulated time [s] until enabling actuators again after a reset
+FONT_SIZE = 0.096
+FONT = 'Lucida Console'
 
 # game interruptions requiring a free kick procedure
 GAME_INTERRUPTIONS = {
@@ -219,166 +221,6 @@ def spawn_team(team, red_on_right, children):
              f'{halfTimeStartingTranslation[0]} {halfTimeStartingTranslation[1]} {halfTimeStartingTranslation[2]}), ' +
              f'rotation ({halfTimeStartingRotation[0]} {halfTimeStartingRotation[1]} {halfTimeStartingRotation[2]} ' +
              f'{halfTimeStartingRotation[3]}).')
-
-
-def format_time(s):
-    seconds = str(s % 60)
-    minutes = str(int(s / 60))
-    if len(minutes) == 1:
-        minutes = '0' + minutes
-    if len(seconds) == 1:
-        seconds = '0' + seconds
-    return minutes + ':' + seconds
-
-
-def update_time_display():
-    if game.state:
-        s = game.state.seconds_remaining
-        if s < 0:
-            s = -s
-            sign = '-'
-        else:
-            sign = ' '
-        value = format_time(s)
-    else:
-        sign = ' '
-        value = '--:--'
-    supervisor.setLabel(6, sign + value, 0, 0, game.font_size, 0x000000, 0.2, game.font)
-
-
-def update_state_display():
-    if game.state:
-        state = game.state.game_state[6:]
-        if state == 'READY' or state == 'SET':  # kickoff
-            color = RED_COLOR if game.kickoff == game.red.id else BLUE_COLOR
-        else:
-            color = 0x000000
-    else:
-        state = ''
-        color = 0x000000
-    supervisor.setLabel(7, ' ' * 41 + state, 0, 0, game.font_size, color, 0.2, game.font)
-    update_details_display()
-
-
-def update_score_display():
-    if game.state:
-        red = 0 if game.state.teams[0].team_color == 'RED' else 1
-        blue = 1 if red == 0 else 0
-        red_score = str(game.state.teams[red].score)
-        blue_score = str(game.state.teams[blue].score)
-    else:
-        red_score = '0'
-        blue_score = '0'
-    if game.side_left == game.blue.id:
-        offset = 21 if len(blue_score) == 2 else 22
-        score = ' ' * offset + blue_score + '-' + red_score
-    else:
-        offset = 21 if len(red_score) == 2 else 22
-        score = ' ' * offset + red_score + '-' + blue_score
-    supervisor.setLabel(5, score, 0, 0, game.font_size, BLACK_COLOR, 0.2, game.font)
-
-
-def update_team_details_display(team, side, strings):
-    for n in range(len(team['players'])):
-        robot_info = game.state.teams[side].players[n]
-        strings.background += '█  '
-        if robot_info.number_of_warnings > 0:  # a robot can have both a warning and a yellow card
-            strings.warning += '■  '
-            strings.yellow_card += ' ■ ' if robot_info.number_of_yellow_cards > 0 else '   '
-        else:
-            strings.warning += '   '
-            strings.yellow_card += '■  ' if robot_info.number_of_yellow_cards > 0 else '   '
-        strings.red_card += '■  ' if robot_info.number_of_red_cards > 0 else '   '
-        strings.white += str(n + 1) + '██'
-        strings.foreground += f'{robot_info.secs_till_unpenalized:02d} ' if robot_info.secs_till_unpenalized != 0 else '   '
-
-
-def update_details_display():
-    if not game.state:
-        return
-    red = 0 if game.state.teams[0].team_color == 'RED' else 1
-    blue = 1 if red == 0 else 0
-    if game.side_left == game.red.id:
-        left = red
-        right = blue
-        left_team = red_team
-        right_team = blue_team
-        left_color = RED_COLOR
-        right_color = BLUE_COLOR
-    else:
-        left = blue
-        right = red
-        left_team = blue_team
-        right_team = red_team
-        left_color = BLUE_COLOR
-        right_color = RED_COLOR
-
-    class StringObject:
-        pass
-
-    strings = StringObject()
-    strings.foreground = ' ' + format_time(game.state.secondary_seconds_remaining) + '  ' \
-                         if game.state.secondary_seconds_remaining > 0 else ' ' * 8
-    strings.background = ' ' * 7
-    strings.warning = strings.background
-    strings.yellow_card = strings.background
-    strings.red_card = strings.background
-    strings.white = '█' * 7
-    update_team_details_display(left_team, left, strings)
-    strings.left_background = strings.background
-    strings.background = ' ' * 28
-    space = 21 - len(left_team['players']) * 3
-    strings.white += '█' * space
-    strings.warning += ' ' * space
-    strings.yellow_card += ' ' * space
-    strings.red_card += ' ' * space
-    strings.foreground += ' ' * space
-    update_team_details_display(right_team, right, strings)
-    strings.right_background = strings.background
-    del strings.background
-    space = 12 - 3 * len(right_team['players'])
-    strings.white += '█' * (22 + space)
-    secondary_state = ' ' * 41 + game.state.secondary_state[6:]
-    sr = IN_PLAY_TIMEOUT - game.interruption_seconds + game.state.seconds_remaining \
-        if game.interruption_seconds is not None else 0
-    if sr > 0:
-        secondary_state += ' ' + format_time(sr)
-    if game.state.secondary_state[6:] != 'NORMAL' or game.state.secondary_state_info[1] != 0:
-        secondary_state += ' [' + str(game.state.secondary_state_info[1]) + ']'
-    if game.interruption_team is not None:  # interruption
-        secondary_state_color = RED_COLOR if game.interruption_team == game.red.id else BLUE_COLOR
-    else:
-        secondary_state_color = BLACK_COLOR
-    y = 0.0465  # vertical position of the second line
-    supervisor.setLabel(10, strings.left_background, 0, y, game.font_size, left_color, 0.2, game.font)
-    supervisor.setLabel(11, strings.right_background, 0, y, game.font_size, right_color, 0.2, game.font)
-    supervisor.setLabel(12, strings.white, 0, y, game.font_size, WHITE_COLOR, 0.2, game.font)
-    supervisor.setLabel(13, strings.warning, 0, 2 * y, game.font_size, 0x0000ff, 0.2, game.font)
-    supervisor.setLabel(14, strings.yellow_card, 0, 2 * y, game.font_size, 0xffff00, 0.2, game.font)
-    supervisor.setLabel(15, strings.red_card, 0, 2 * y, game.font_size, 0xff0000, 0.2, game.font)
-    supervisor.setLabel(16, strings.foreground, 0, y, game.font_size, BLACK_COLOR, 0.2, game.font)
-    supervisor.setLabel(17, secondary_state, 0, y, game.font_size, secondary_state_color, 0.2, game.font)
-
-
-def update_team_display():
-    # red and blue backgrounds
-    left_color = RED_COLOR if game.side_left == game.red.id else BLUE_COLOR
-    right_color = BLUE_COLOR if game.side_left == game.red.id else RED_COLOR
-    supervisor.setLabel(2, ' ' * 7 + '█' * 14, 0, 0, game.font_size, left_color, 0.2, game.font)
-    supervisor.setLabel(3, ' ' * 26 + '█' * 14, 0, 0, game.font_size, right_color, 0.2, game.font)
-    # white background and names
-    left_team = red_team if game.side_left == game.red.id else blue_team
-    right_team = red_team if game.side_left == game.blue.id else blue_team
-    team_names = 7 * '█' + (13 - len(left_team['name'])) * ' ' + left_team['name'] + \
-        ' █████ ' + right_team['name'] + ' ' * (13 - len(right_team['name'])) + '█' * 22
-    supervisor.setLabel(4, team_names, 0, 0, game.font_size, WHITE_COLOR, 0.2, game.font)
-    update_score_display()
-
-
-def setup_display():
-    update_team_display()
-    update_time_display()
-    update_state_display()
 
 
 def team_index(color):
@@ -2255,6 +2097,10 @@ except KeyError:
     error('JAVA_HOME environment variable not set, unable to launch GameController.')
     clean_exit()
 
+time = SimTime()
+game = Game()
+blackboard = Blackboard(supervisor, game, time)
+
 toss_a_coin_if_needed('side_left')
 toss_a_coin_if_needed('kickoff')
 
@@ -2265,11 +2111,11 @@ ball_size = 1 if field_size == 'kid' else 5
 children.importMFNodeFromString(-1, f'DEF BALL RobocupSoccerBall {{ translation 100 100 0.5 size {ball_size} }}')
 
 game.state = None
-game.font_size = 0.096
-game.font = 'Lucida Console'
 spawn_team(red_team, game.side_left == game.blue.id, children)
 spawn_team(blue_team, game.side_left == game.red.id, children)
-setup_display()
+
+display = Display(blackboard, FONT_SIZE, FONT)
+display.setup_display()
 
 SIMULATED_TIME_INTERRUPTION_PHASE_0 = int(SIMULATED_TIME_INTERRUPTION_PHASE_0 * 1000 / time_step)
 SIMULATED_TIME_BEFORE_PLAY_STATE = int(SIMULATED_TIME_BEFORE_PLAY_STATE * 1000 / time_step)
