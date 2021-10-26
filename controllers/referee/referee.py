@@ -15,8 +15,9 @@
 from gamestate import GameState
 from field import Field
 from forceful_contact_matrix import ForcefulContactMatrix
+from logging import info, warning, error, close
 
-from controller import Supervisor, AnsiCodes, Node
+from controller import Supervisor, Node
 
 import copy
 import json
@@ -89,31 +90,7 @@ GAME_INTERRUPTIONS = {
 
 GOAL_HALF_WIDTH = GOAL_WIDTH / 2
 
-global supervisor, game, red_team, blue_team, log_file, time_count, time_step, game_controller_udp_filter
-
-
-def log(message, msg_type, force_flush=True):
-    if type(message) is list:
-        for m in message:
-            log(m, msg_type, False)
-        if log_file and force_flush:
-            log_file.flush()
-        return
-    if msg_type == 'Warning':
-        console_message = f'{AnsiCodes.YELLOW_FOREGROUND}{AnsiCodes.BOLD}{message}{AnsiCodes.RESET}'
-    elif msg_type == 'Error':
-        console_message = f'{AnsiCodes.RED_FOREGROUND}{AnsiCodes.BOLD}{message}{AnsiCodes.RESET}'
-    else:
-        console_message = message
-    print(console_message, file=sys.stderr if msg_type == 'Error' else sys.stdout)
-    if log_file:
-        real_time = int(1000 * (time.time() - log.real_time)) / 1000
-        log_file.write(f'[{real_time:08.3f}|{time_count / 1000:08.3f}] {msg_type}: {message}\n')  # log real and virtual times
-        if force_flush:
-            log_file.flush()
-
-
-log.real_time = time.time()
+global supervisor, game, red_team, blue_team, time_count, time_step, game_controller_udp_filter
 
 
 def announce_final_score():
@@ -167,26 +144,9 @@ def clean_exit():
             info("Encoding finished")
     info("Exiting webots properly")
 
-    if log_file:
-        log_file.close()
-
     # Note: If supervisor.step is not called before the 'simulationQuit', information is not shown
     supervisor.step(time_step)
     supervisor.simulationQuit(0)
-
-
-def info(message):
-    log(message, 'Info')
-
-
-def warning(message):
-    log(message, 'Warning')
-
-
-def error(message, fatal=False):
-    log(message, 'Error')
-    if fatal:
-        clean_exit()
 
 
 def perform_status_update():
@@ -605,25 +565,29 @@ def game_controller_send(message):
                     if int(id) == sent_id:
                         answered = True
                 except ValueError:
-                    error(f'Cannot split {answer}', fatal=True)
+                    error(f'Cannot split {answer}')
+                    clean_exit()
                 try:
                     answered_message = game_controller_send.unanswered[int(id)]
                     del game_controller_send.unanswered[int(id)]
                 except KeyError:
-                    error(f'Received acknowledgment message for unknown message: {id}', fatal=True)
-                    continue
+                    error(f'Received acknowledgment message for unknown message: {id}')
+                    clean_exit()
                 if result == 'OK':
                     continue
                 if result == 'INVALID':
-                    error(f'Received invalid answer from GameController for message {answered_message}.', fatal=True)
+                    error(f'Received invalid answer from GameController for message {answered_message}.')
+                    clean_exit()
                 elif result == 'ILLEGAL':
                     info_msg = f"Received illegal answer from GameController for message {answered_message}."
                     if "YELLOW" in message:
                         warning(info_msg)
                     else:
-                        error(info_msg, fatal=True)
+                        error(info_msg)
+                        clean_exit()
                 else:
-                    error(f'Received unknown answer from GameController: {answer}.', fatal=True)
+                    error(f'Received unknown answer from GameController: {answer}.')
+                    clean_exit()
         except BlockingIOError:
             if answered or ':CLOCK:' in message:
                 break
@@ -697,8 +661,8 @@ def list_player_solids(player, color, number):
     append_solid(robot, solids, player['tagged_solids'])
     if len(solids) != 4:
         info(f"Tagged solids: {player['tagged_solids']}")
-        error(f'{color} player {number}: invalid number of [hand]+[foot], received {len(solids)}, expected 4.',
-              fatal=True)
+        error(f'{color} player {number}: invalid number of [hand]+[foot], received {len(solids)}, expected 4.')
+        clean_exit()
 
 
 def list_team_solids(team):
@@ -2302,7 +2266,8 @@ def read_team(json_path):
                         raise RuntimeError(f"Missing field {field_name} in player {p_key}")
                 count += 1
     except Exception:
-        error(f"Failed to read file {json_path} with the following error:\n{traceback.format_exc()}", fatal=True)
+        error(f"Failed to read file {json_path} with the following error:\n{traceback.format_exc()}")
+        clean_exit()
     return team
 
 
@@ -2311,13 +2276,12 @@ supervisor = Supervisor()
 time_step = int(supervisor.getBasicTimeStep())
 time_count = 0
 
-log_file = open('log.txt', 'w')
-
 # determine configuration file name
 game_config_file = os.environ['WEBOTS_ROBOCUP_GAME'] if 'WEBOTS_ROBOCUP_GAME' in os.environ \
     else os.path.join(os.getcwd(), 'game.json')
 if not os.path.isfile(game_config_file):
-    error(f'Cannot read {game_config_file} game config file.', fatal=True)
+    error(f'Cannot read {game_config_file} game config file.')
+    clean_exit()
 
 # read configuration files
 with open(game_config_file) as json_file:
@@ -2339,7 +2303,8 @@ if game.minimum_real_time_factor == 0:  # speed up non-real time tests
 if not hasattr(game, 'press_a_key_to_terminate'):
     game.press_a_key_to_terminate = False
 if game.type not in ['NORMAL', 'KNOCKOUT', 'PENALTY']:
-    error(f'Unsupported game type: {game.type}.', fatal=True)
+    error(f'Unsupported game type: {game.type}.')
+    clean_exit()
 game.penalty_shootout = game.type == 'PENALTY'
 info(f'Minimum real time factor is set to {game.minimum_real_time_factor}.')
 if game.minimum_real_time_factor == 0:
@@ -2373,8 +2338,9 @@ try:
     try:
         GAME_CONTROLLER_HOME = os.environ['GAME_CONTROLLER_HOME']
         if not os.path.exists(GAME_CONTROLLER_HOME):
-            error(f'{GAME_CONTROLLER_HOME} (GAME_CONTROLLER_HOME) folder not found.', fatal=True)
+            error(f'{GAME_CONTROLLER_HOME} (GAME_CONTROLLER_HOME) folder not found.')
             game.controller_process = None
+            clean_exit()
         else:
             path = os.path.join(GAME_CONTROLLER_HOME, 'build', 'jar', 'config', f'hl_sim_{field_size}', 'teams.cfg')
             red_line = f'{game.red.id}={red_team["name"]}\n'
@@ -2400,12 +2366,14 @@ try:
     except KeyError:
         GAME_CONTROLLER_HOME = None
         game.controller_process = None
-        error('GAME_CONTROLLER_HOME environment variable not set, unable to launch GameController.', fatal=True)
+        error('GAME_CONTROLLER_HOME environment variable not set, unable to launch GameController.')
+        clean_exit()
 except KeyError:
     JAVA_HOME = None
     GAME_CONTROLLER_HOME = None
     game.controller_process = None
-    error('JAVA_HOME environment variable not set, unable to launch GameController.', fatal=True)
+    error('JAVA_HOME environment variable not set, unable to launch GameController.')
+    clean_exit()
 
 toss_a_coin_if_needed('side_left')
 toss_a_coin_if_needed('kickoff')
@@ -2492,8 +2460,9 @@ try:
                     time.sleep(retry)  # give some time to allow the GameControllerSimulator to start-up
                     supervisor.step(0)
                 else:
-                    error('Could not connect to GameController at localhost:8750.', fatal=True)
+                    error('Could not connect to GameController at localhost:8750.')
                     game.controller = None
+                    clean_exit()
                     break
         info('Connected to GameControllerSimulator at localhost:8750.')
         try:
@@ -2511,7 +2480,8 @@ try:
     else:
         game.controller = None
 except Exception:
-    error(f"Failed connecting to GameController with the following exception {traceback.format_exc()}", fatal=True)
+    error(f"Failed connecting to GameController with the following exception {traceback.format_exc()}")
+    clean_exit()
 
 try:
     update_state_display()
@@ -2536,7 +2506,8 @@ try:
         kickoff()
         game_controller_send(f'KICKOFF:{game.kickoff}')
 except Exception:
-    error(f"Failed setting initial state: {traceback.format_exc()}", fatal=True)
+    error(f"Failed setting initial state: {traceback.format_exc()}")
+    clean_exit()
 
 if hasattr(game, 'record_simulation'):
     try:
@@ -2550,7 +2521,8 @@ if hasattr(game, 'record_simulation'):
         else:
             raise RuntimeError(f"Unknown extension for record_simulation: {game.record_simulation}")
     except Exception:
-        error(f"Failed to start recording with exception: {traceback.format_exc()}", fatal=True)
+        error(f"Failed to start recording with exception: {traceback.format_exc()}")
+        clean_exit()
 
 try:
     previous_real_time = time.time()
@@ -2674,7 +2646,8 @@ try:
                             info('End of knockout second half.')
                             game.finished_overtime = True
                     else:
-                        error(f'Unsupported game type: {game.type}.', fatal=True)
+                        error(f'Unsupported game type: {game.type}.')
+                        clean_exit()
             if (game.interruption_countdown == 0 and game.ready_countdown == 0 and
                 game.ready_real_time is None and not game.throw_in and
                 (game.ball_position[1] - game.ball_radius >= game.field.size_y or
@@ -3010,6 +2983,7 @@ try:
                                 else:
                                     info('The winer is the blue team.')
 except Exception:
-    error(f"Unexpected exception in main referee loop: {traceback.format_exc()}", fatal=True)
+    error(f"Unexpected exception in main referee loop: {traceback.format_exc()}")
+    clean_exit()
 
 clean_exit()

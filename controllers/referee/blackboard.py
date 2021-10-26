@@ -1,0 +1,3 @@
+
+class Blackboard:
+    pass
