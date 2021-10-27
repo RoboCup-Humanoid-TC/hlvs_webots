@@ -65,13 +65,13 @@ class Referee:
         self.config.GOAL_HALF_WIDTH = self.config.GOAL_WIDTH / 2
 
         # determine configuration file name
-        game_config_file = os.environ['WEBOTS_ROBOCUP_GAME'] if 'WEBOTS_ROBOCUP_GAME' in os.environ \
+        self.game_config_file = os.environ['WEBOTS_ROBOCUP_GAME'] if 'WEBOTS_ROBOCUP_GAME' in os.environ \
             else os.path.join(os.getcwd(), 'game.json')
-        if not os.path.isfile(game_config_file):
-            error(f'Cannot read {game_config_file} game config file.')
+        if not os.path.isfile(self.game_config_file):
+            error(f'Cannot read {self.game_config_file} game config file.')
             self.clean_exit()
         # read configuration files
-        with open(game_config_file) as json_file:
+        with open(self.game_config_file) as json_file:
             self.game = json.loads(json_file.read(), object_hook=lambda d: Game(**d))
         self.red_team = self.read_team(self.game.red.config)
         self.blue_team = self.read_team(self.game.blue.config)
@@ -1939,14 +1939,14 @@ class Referee:
                         command_line.append('--fast')
                     command_line.append('--minimized')
                     command_line.append('--config')
-                    command_line.append(game_config_file)
+                    command_line.append(self.game_config_file)
                     if hasattr(self.game, 'game_controller_extra_args'):
                         for arg in self.game.game_controller_extra_args:
                             command_line.append(arg)
                     if hasattr(self.game, 'use_bouncing_server') and self.game.use_bouncing_server:
                         command_line.append('-b')
                         command_line.append(self.game.host)
-                        udp_bouncer_process = subprocess.Popen(["python3", "udp_bouncer.py", game_config_file])
+                        udp_bouncer_process = subprocess.Popen(["python3", "udp_bouncer.py", self.game_config_file])
                     else:
                         udp_bouncer_process = None
                     self.game.controller_process = subprocess.Popen(command_line, cwd=os.path.join(GAME_CONTROLLER_HOME, 'build', 'jar'))
