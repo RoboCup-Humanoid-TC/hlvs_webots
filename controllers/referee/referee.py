@@ -74,7 +74,7 @@ class Referee:
             self.game = json.loads(json_file.read(), object_hook=lambda d: Game(**d))
         self.red_team = self.read_team(game.red.config)
         self.blue_team = self.read_team(game.blue.config)
-        self.blackboard = Blackboard(supervisor, self.game, self.sim_time, self.config)
+        self.blackboard = Blackboard(self.supervisor, self.game, self.sim_time, self.config)
         self.others = []
         self.game_controller_send_id = 0
         self.game_controller_send_unanswered = {}
