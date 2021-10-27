@@ -11,15 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from gamestate import GameState
-from field import Field
-from forceful_contact_matrix import ForcefulContactMatrix
-from logging import info, warning, error, close
-from geometry import distance2, rotate_along_z, aabb_circle_collision, polygon_circle_collision, update_aabb
-
-from controller import Supervisor, Node
-
 import copy
 import json
 import math
@@ -28,16 +19,21 @@ import os
 import random
 import socket
 import subprocess
-import sys
 import time
 import traceback
-import transforms3d
 import yaml
 
 from scipy.spatial import ConvexHull
 
 from types import SimpleNamespace
 
+from controller import Supervisor, Node
+
+from gamestate import GameState
+from field import Field
+from forceful_contact_matrix import ForcefulContactMatrix
+from logging import info, warning, error, close
+from geometry import distance2, rotate_along_z, aabb_circle_collision, polygon_circle_collision, update_aabb
 from display import Display
 from sim_time import SimTime
 from blackboard import Blackboard
@@ -83,7 +79,6 @@ class Referee:
         # TODO: store and print score before penalty shootouts
         info(f"FINAL SCORE: {red_score}-{blue_score}")
 
-
     def clean_exit(self):
         """Save logs and clean all subprocesses"""
         self.announce_final_score()
@@ -128,7 +123,6 @@ class Referee:
         supervisor.step(time_step)
         supervisor.simulationQuit(0)
 
-
     def perform_status_update(self):
         now = time.time()
         if not hasattr(game, "last_real_time"):
@@ -152,7 +146,6 @@ class Referee:
             game.last_real_time = now
             game.last_time_count = time_count
 
-
     def toss_a_coin_if_needed(self, attribute):  # attribute should be either "side_left" or "kickoff"
         # If game.json contains such an attribute, use it to determine field side and kick-off
         # Supported values are "red", "blue" and "random". Default value is "random".
@@ -168,7 +161,6 @@ class Referee:
             setattr(game, attribute, 'random')
         if getattr(game, attribute) == 'random':  # toss a coin to determine a random team
             setattr(game, attribute, game.red.id if bool(random.getrandbits(1)) else game.blue.id)
-
 
     def spawn_team(self, team, red_on_right, children):
         color = team['color']
@@ -199,7 +191,6 @@ class Referee:
                  f'rotation ({halfTimeStartingRotation[0]} {halfTimeStartingRotation[1]} {halfTimeStartingRotation[2]} ' +
                  f'{halfTimeStartingRotation[3]}).')
 
-
     def team_index(self, color):
         if color not in ['red', 'blue']:
             raise RuntimeError(f'Wrong color passed to team_index(): \'{color}\'.')
@@ -208,7 +199,6 @@ class Referee:
         if game.state.teams[index].team_number != id:
             raise RuntimeError(f'Wrong team number set in team_index(): {id} != {game.state.teams[index].team_number}')
         return index
-
 
     def game_controller_receive(self):
         data = None
@@ -446,7 +436,6 @@ class Referee:
                     continue
                 self.append_solid(solid, solids, tagged_solids, None)  # active tag is reset after a joint
 
-
     def list_player_solids(self, player, color, number):
         robot = player['robot']
         player['solids'] = []
@@ -465,7 +454,6 @@ class Referee:
     def list_solids(self):
         self.list_team_solids(red_team)
         self.list_team_solids(blue_team)
-
 
     def show_polygon(self, vertices):
         polygon = supervisor.getFromDef('POLYGON')
@@ -487,7 +475,6 @@ class Referee:
         shape = f'DEF POLYGON Shape {{ appearance {appearance} geometry {geometry} castShadows FALSE isPickable FALSE }}'
         children = supervisor.getRoot().getField('children')
         children.importMFNodeFromString(-1, shape)
-
 
     def update_team_ball_holding(self, team):
         players_close_to_the_ball = []
@@ -564,11 +551,9 @@ class Referee:
             team['goalkeeper_hold_ball'] = time_count
             info(f'{color.capitalize()} goalkeeper is holding the ball.')
 
-
     def update_ball_holding(self):
         self.update_team_ball_holding(red_team)
         self.update_team_ball_holding(blue_team)
-
 
     def init_team(self, team):
         # check validity of team files
@@ -591,7 +576,6 @@ class Referee:
             player['velocity_buffer'] = [[0] * 6] * window_size
             player['ball_handling_start'] = None
             player['ball_handling_last'] = None
-
 
     def update_team_contacts(self, team):
         early_game_interruption = self.is_early_game_interruption()
@@ -719,7 +703,6 @@ class Referee:
             else:
                 player['left_turf_time'] = None
 
-
     def update_ball_contacts(self):
         game.ball.contact_points = []
         for i in range(game.ball.getNumberOfContactPoints()):
@@ -729,20 +712,17 @@ class Referee:
             game.ball.contact_points.append(point)
             break
 
-
     def update_contacts(self):
         """Only updates the contact of objects which are not asleep"""
         self.update_ball_contacts()
         self.update_team_contacts(red_team)
         self.update_team_contacts(blue_team)
 
-
     def find_robot_contact(self, team, point):
         for number in team['players']:
             if point in team['players'][number]['contact_points']:
                 return number
         return None
-
 
     def update_team_robot_contacts(self, team):
         for number in team['players']:
@@ -768,12 +748,10 @@ class Referee:
                              f'{opponent_team["color"]} player {opponent_number}.')
                     fcm.set_contact(red_number, blue_number, time_count)
 
-
     def update_robot_contacts(self):
         game.forceful_contact_matrix.clear(time_count)
         self.update_team_robot_contacts(red_team)
         self.update_team_robot_contacts(blue_team)
-
 
     def update_histories(self):
         for team in [red_team, blue_team]:
@@ -789,7 +767,6 @@ class Referee:
                     own_goal_area = player['inside_own_side'] and not player['outside_goal_area']
                     entry = (time_count, {"ball_distance": ball_dist, "own_goal_area": own_goal_area})
                     player['history'].append(entry)
-
 
     def update_team_penalized(self, team):
         color = team['color']
@@ -827,15 +804,12 @@ class Referee:
                     if 'penalized' in player:
                         del player['penalized']
 
-
     def update_penalized(self):
         self.update_team_penalized(red_team)
         self.update_team_penalized(blue_team)
 
-
     def already_penalized(self, player):
         return 'penalized' in player
-
 
     def send_penalty(self, player, penalty, reason, log=None):
         if 'yellow_card' not in player and self.already_penalized(player):
@@ -844,7 +818,6 @@ class Referee:
         player['penalty_reason'] = reason
         if log is not None:
             info(log)
-
 
     def forceful_contact_foul(self, team, number, opponent_team, opponent_number, distance_to_ball, message):
         player = team['players'][number]
@@ -871,14 +844,12 @@ class Referee:
             offence_location = team['players'][number]['position']
             self.interruption('FREEKICK', freekick_team_id, offence_location)
 
-
     def goalkeeper_inside_own_goal_area(self, team, number):
         if self.is_goalkeeper(team, number):
             goalkeeper = team['players'][number]
             if not goalkeeper['outside_goal_area'] and goalkeeper['inside_own_side']:
                 return True
         return False
-
 
     def moves_to_ball(self, player, velocity, velocity_squared):
         if velocity_squared < self.config.FOUL_SPEED_THRESHOLD * self.config.FOUL_SPEED_THRESHOLD:
@@ -890,11 +861,9 @@ class Referee:
         angle = math.acos((rx * vx + ry * vy) / (math.sqrt(rx * rx + ry * ry) * math.sqrt(vx * vx + vy * vy)))
         return angle < self.config.FOUL_DIRECTION_THRESHOLD
 
-
     def readable_number_list(self, number_list, width=5, nb_digits=2):
         fmt = f"%{width}.{nb_digits}f"
         return f"[{' '.join([fmt % elem for elem in number_list])}]"
-
 
     def check_team_forceful_contacts(self, team, number, opponent_team, opponent_number):
         p1 = team['players'][number]
@@ -959,7 +928,6 @@ class Referee:
             return True
         return False
 
-
     def check_forceful_contacts(self):
         self.update_robot_contacts()
         fcm = game.forceful_contact_matrix
@@ -971,7 +939,6 @@ class Referee:
                     continue
                 if self.check_team_forceful_contacts(blue_team, blue_number, red_team, red_number):
                     continue
-
 
     def check_team_ball_holding(self, team):
         color = team['color']
@@ -986,7 +953,6 @@ class Referee:
             return True
         return False
 
-
     def check_ball_holding(self):  # return the team id which gets a free kick in case of ball holding from the other team
         if self.check_team_ball_holding(red_team):
             return game.blue.id
@@ -994,11 +960,9 @@ class Referee:
             return game.red.id
         return None
 
-
     def reset_ball_handling(self, player):
         player['ball_handling_start'] = None
         player['ball_handling_last'] = None
-
 
     def check_team_ball_handling(self, team):
         for number in team['players']:
@@ -1054,14 +1018,12 @@ class Referee:
                 return True  # a freekick will be awarded
         return False  # not free kick awarded
 
-
     def check_ball_handling(self):  # return the team id which gets a free kick in case of wrong ball handling by a goalkeeper
         if self.check_team_ball_handling(red_team):
             return game.blue.id
         if self.check_team_ball_handling(blue_team):
             return game.red.id
         return None
-
 
     def check_team_fallen(self, team):
         color = team['color']
@@ -1081,12 +1043,10 @@ class Referee:
                 penalty = True
         return penalty
 
-
     def check_fallen(self):
         red = self.check_team_fallen(red_team)
         blue = self.check_team_fallen(blue_team)
         return red or blue
-
 
     def check_team_inactive_goalkeeper(self, team):
         # Since there is only one goalkeeper, we can safely return once we have a 'proof' that the goalkeeper is not inactive
@@ -1115,11 +1075,9 @@ class Referee:
             info(f'Goalkeeper did not move toward the ball over the last {self.config.INACTIVE_GOALKEEPER_TIMEOUT} seconds')
             self.send_penalty(player, 'INCAPABLE', 'Inactive goalkeeper')
 
-
     def check_inactive_goalkeepers(self):
         self.check_team_inactive_goalkeeper(red_team)
         self.check_team_inactive_goalkeeper(blue_team)
-
 
     def check_team_away_from_ball(self, team, distance):
         for number in team['players']:
@@ -1132,7 +1090,6 @@ class Referee:
                 self.send_penalty(player, 'INCAPABLE', f'too close to ball: {d:.2f} m., should be at least {distance:.2f} m.' +
                                  f'{color.capitalize()} player {number} is too close to the ball: ' +
                                  f'({d:.2f} m., should be at least {distance:.2f} m.)')
-
 
     def check_penalty_kick_positions(self):
         for team in [red_team, blue_team]:
@@ -1166,7 +1123,6 @@ class Referee:
                         has_striker = True
                         info(f"Player {team['color']} {number} is considered as striker")
 
-
     def check_team_start_position(self, team):
         penalty = False
         for number in team['players']:
@@ -1181,12 +1137,10 @@ class Referee:
                 penalty = True
         return penalty
 
-
     def check_start_position(self):
         red = self.check_team_start_position(red_team)
         blue = self.check_team_start_position(blue_team)
         return red or blue
-
 
     def check_team_kickoff_position(self, team):
         color = team['color']
@@ -1207,12 +1161,10 @@ class Referee:
                 penalty = True
         return penalty
 
-
     def check_kickoff_position(self):
         red = self.check_team_kickoff_position(red_team)
         blue = self.check_team_kickoff_position(blue_team)
         return red or blue
-
 
     def check_team_dropped_ball_position(self, team):
         for number in team['players']:
@@ -1224,11 +1176,9 @@ class Referee:
             elif not player['inside_own_side']:
                 self.send_penalty(player, 'INCAPABLE', 'outside team side during dropped ball')
 
-
     def check_dropped_ball_position(self):
         self.check_team_dropped_ball_position(red_team)
         self.check_team_dropped_ball_position(blue_team)
-
 
     def check_team_outside_turf(self, team):
         color = team['color']
@@ -1247,11 +1197,9 @@ class Referee:
                 self.send_penalty(player, 'INCAPABLE', f'left the field for more than {self.config.OUTSIDE_TURF_TIMEOUT} seconds',
                                  f'{color.capitalize()} player {number} left the field for more than {self.config.OUTSIDE_TURF_TIMEOUT} seconds.')
 
-
     def check_outside_turf(self):
         self.check_team_outside_turf(red_team)
         self.check_team_outside_turf(blue_team)
-
 
     def check_team_penalized_in_field(self, team):
         color = team['color']
@@ -1271,12 +1219,10 @@ class Referee:
             penalty = True
         return penalty
 
-
     def check_penalized_in_field(self):
         red = self.check_team_penalized_in_field(red_team)
         blue = self.check_team_penalized_in_field(blue_team)
         return red or blue
-
 
     def check_circle_entrance(self, team):
         penalty = False
@@ -1290,7 +1236,6 @@ class Referee:
                                   f'{color.capitalize()} player {number} entering circle during opponent\'s kick-off.')
                 penalty = True
         return penalty
-
 
     def check_ball_must_kick(self, team):
         if game.ball_last_touch_team is None:
@@ -1309,7 +1254,6 @@ class Referee:
             break
         return True
 
-
     def set_ball_touched(self, team_color, player_number):
         game.ball_previous_touch_team = game.ball_last_touch_team
         game.ball_previous_touch_player_number = game.ball_last_touch_player_number
@@ -1317,19 +1261,16 @@ class Referee:
         game.ball_last_touch_player_number = player_number
         game.dropped_ball = False
 
-
     def reset_ball_touched(self):
         game.ball_previous_touch_team = None
         game.ball_previous_touch_player_number = None
         game.ball_last_touch_team = None
         game.ball_last_touch_player_number = None
 
-
     def is_game_interruption(self):
         if not hasattr(game, "state"):
             return False
         return game.state.secondary_state[6:] in GAME_INTERRUPTIONS
-
 
     def is_early_game_interruption(self):
         """
@@ -1338,7 +1279,6 @@ class Referee:
         Note: During this step, robots are allowed to commit some infringements such as touching a ball that is not in play.
         """
         return self.is_game_interruption() and game.state.secondary_state_info[1] == 0
-
 
     def game_interruption_touched(self, team, number):
         """
@@ -1363,7 +1303,6 @@ class Referee:
             self.game_controller_send(f'{game.interruption}:{game.interruption_team}:ABORT')
         self.game_controller_send(f'CARD:{team_id}:{number}:WARN')
 
-
     def get_first_available_spot(self, team_color, number, reentry_pos):
         """Return the first available spot to enter on one side of the field given the reentry_pos"""
         if not self.is_other_robot_near(team_color, number, reentry_pos, game.field.robot_radius):
@@ -1382,7 +1321,6 @@ class Referee:
                 if not self.is_other_robot_near(team_color, number, current_pos, game.field.robot_radius):
                     return current_pos.tolist()
         return None
-
 
     def place_player_at_penalty(self, player, team, number):
         color = team['color']
@@ -1403,7 +1341,6 @@ class Referee:
             if pos is None:
                 raise RuntimeError("No spot available, this should not be possible")
         self.reset_player(color, number, None, pos, r)
-
 
     def send_team_penalties(self, team):
         color = team['color']
@@ -1427,11 +1364,9 @@ class Referee:
                 player['outside_field'] = True
                 info(f'{penalty} penalty for {color} player {number}: {reason}.')
 
-
     def send_penalties(self):
         self.send_team_penalties(red_team)
         self.send_team_penalties(blue_team)
-
 
     def stabilize_team_robots(self, team):
         color = team['color']
@@ -1450,16 +1385,13 @@ class Referee:
                 else:
                     player['stabilize'] -= 1
 
-
     def stabilize_robots(self):
         self.stabilize_team_robots(red_team)
         self.stabilize_team_robots(blue_team)
 
-
     def flip_pose(self, pose):
         pose['translation'][0] = -pose['translation'][0]
         pose['rotation'][3] = math.pi - pose['rotation'][3]
-
 
     def flip_poses(self, player):
         self.flip_pose(player['halfTimeStartingPose'])
@@ -1467,14 +1399,12 @@ class Referee:
         self.flip_pose(player['shootoutStartingPose'])
         self.flip_pose(player['goalKeeperStartingPose'])
 
-
     def flip_sides(self):  # flip sides (no need to notify GameController, it does it automatically)
         game.side_left = game.red.id if game.side_left == game.blue.id else game.blue.id
         for team in [red_team, blue_team]:
             for number in team['players']:
                 self.flip_poses(team['players'][number])
         self.update_team_display()
-
 
     def reset_player(self, color, number, pose, custom_t=None, custom_r=None):
         team = red_team if color == 'red' else blue_team
@@ -1501,19 +1431,16 @@ class Referee:
         robot.getField('customData').setSFString('penalized')
         player['enable_actuators_at'] = time_count + int(self.config.DISABLE_ACTUATORS_MIN_DURATION * 1000)
 
-
     def reset_teams(self, pose):
         for number in red_team['players']:
             self.reset_player('red', str(number), pose)
         for number in blue_team['players']:
             self.reset_player('blue', str(number), pose)
 
-
     def is_goalkeeper(self, team, id):
         n = game.state.teams[0].team_number
         index = 0 if (n == game.red.id and team == red_team) or (n == game.blue.id and team == blue_team) else 1
         return game.state.teams[index].players[int(id) - 1].goalkeeper
-
 
     def get_penalty_attacking_team(self):
         first_team = game.penalty_shootout_count % 2 == 0
@@ -1521,24 +1448,20 @@ class Referee:
             return red_team
         return blue_team
 
-
     def get_penalty_defending_team(self):
         first_team = game.penalty_shootout_count % 2 == 0
         if first_team == (game.kickoff != game.red.id):
             return red_team
         return blue_team
 
-
     def player_has_red_card(self, player):
         return 'penalized' in player and player['penalized'] == 'red_card'
-
 
     def is_penalty_kicker(self, team, id):
         for number in team['players']:
             if self.player_has_red_card(team['players'][number]):
                 continue
             return id == number
-
 
     def penalty_kicker_player(self):
         default = game.penalty_shootout_count % 2 == 0
@@ -1550,7 +1473,6 @@ class Referee:
             return player
         return None
 
-
     def get_penalty_shootout_msg(self):
         trial = game.penalty_shootout_count + 1
         name = "penalty shoot-out"
@@ -1558,7 +1480,6 @@ class Referee:
             name = f"extended {name}"
             trial -= 10
         return f"{name} {trial}/10"
-
 
     def set_penalty_positions(self):
         info(f"Setting positions for {self.get_penalty_shootout_msg()}")
@@ -1601,7 +1522,6 @@ class Referee:
         game.ball_kick_translation[1] = 0
         game.ball_translation.setSFVec3f(game.ball_kick_translation)
 
-
     def stop_penalty_shootout(self):
         info(f"End of {self.get_penalty_shootout_msg()}")
         if game.penalty_shootout_count == 20:  # end of extended penalty shootout
@@ -1626,7 +1546,6 @@ class Referee:
                 return True
         return False
 
-
     def next_penalty_shootout(self):
         game.penalty_shootout_count += 1
         if not game.penalty_shootout_goal and game.state.game_state[:8] != "FINISHED":
@@ -1650,7 +1569,6 @@ class Referee:
             self.next_penalty_shootout()
         return
 
-
     def check_penalty_goal_line(self):
         """
         Checks that the goalkeepers of both teams respect the goal line rule and apply penalties if required
@@ -1672,7 +1590,6 @@ class Referee:
                 elif time_count - player['invalidGoalkeeperStart'] > self.config.INVALID_GOALKEEPER_TIMEOUT * 1000:
                     info(f'Goalkeeper of team {defending_team["color"]} is not on goal line since {self.config.INVALID_GOALKEEPER_TIMEOUT} sec')
                     self.send_penalty(player, 'INCAPABLE', "Not on goal line during penalty")
-
 
     def interruption(self, interruption_type, team=None, location=None, is_goalkeeper_ball_manipulation=False):
         if location is not None:
@@ -1722,7 +1639,6 @@ class Referee:
         info(f'{GAME_INTERRUPTIONS[interruption_type].capitalize()} awarded to {color} team.')
         self.game_controller_send(f'{game.interruption}:{game.interruption_team}')
 
-
     def throw_in(self, left_side):
         # set the ball on the touch line for throw in
         sign = -1 if left_side else 1
@@ -1733,7 +1649,6 @@ class Referee:
         game.throw_in_ball_was_lifted = False
         self.interruption('THROWIN')
 
-
     def corner_kick(self, left_side):
         # set the ball in the right corner for corner kick
         sign = -1 if left_side else 1
@@ -1743,7 +1658,6 @@ class Referee:
         game.can_score = True
         self.interruption('CORNERKICK')
 
-
     def goal_kick(self):
         # set the ball at intersection between the centerline and touchline
         game.ball_kick_translation[0] = 0
@@ -1752,14 +1666,12 @@ class Referee:
         game.can_score = True
         self.interruption('GOALKICK')
 
-
     def move_ball_away(self):
         """Places ball far away from field for phases where the referee is supposed to hold it in it's hand"""
         target_location = [100, 100, game.ball_radius + 0.05]
         game.ball.resetPhysics()
         game.ball_translation.setSFVec3f(target_location)
         info("Moved ball out of the field temporarily")
-
 
     def kickoff(self):
         color = 'red' if game.kickoff == game.red.id else 'blue'
@@ -1779,7 +1691,6 @@ class Referee:
         self.move_ball_away()
         info(f'Ball not in play, will be kicked by a player from the {game.ball_must_kick_team} team.')
 
-
     def dropped_ball(self):
         info(f'The ball didn\'t move for the past {self.config.DROPPED_BALL_TIMEOUT} seconds.')
         game.ball_last_move = time_count
@@ -1794,14 +1705,12 @@ class Referee:
         game.can_score = True
         game.can_score_own = False
 
-
     def is_robot_near(self, position, min_dist):
         for team in [red_team, blue_team]:
             for number in team['players']:
                 if distance2(position, team['players'][number]['position']) < min_dist:
                     return True
         return False
-
 
     def is_other_robot_near(self, robot_color, robot_number, position, min_dist):
         """Test if another robot than the robot defined by team_color and number is closer than min_dist from position"""
@@ -1813,14 +1722,12 @@ class Referee:
                     return True
         return False
 
-
     def reset_pos_penalized_robots_near(self, position, min_dist):
         for team in [red_team, blue_team]:
             for number in team['players']:
                 player = team['players'][number]
                 if 'penalized' in player and distance2(position, player['position']) < min_dist:
                     self.place_player_at_penalty(player, team, number)
-
 
     def penalize_fallen_robots_near(self, position, min_dist):
         for team in [red_team, blue_team]:
@@ -1830,7 +1737,6 @@ class Referee:
                     # If we wait for the end of the tick, the rest of the game interruption procedure will ignore the penalty
                     self.place_player_at_penalty(player, team, number)
                     self.send_penalty(player, "INCAPABLE", "Fallen close to ball during GameInterruption")
-
 
     def get_alternative_ball_locations(self, original_pos):
         prefered_x_dir = 1 if (game.interruption_team == game.red.id) ^ (game.side_left == game.blue.id) else -1
@@ -1852,7 +1758,6 @@ class Referee:
                 locations.append(original_pos - offset_x * dist_mult)
         return locations
 
-
     def get_obstacles_positions(self, team, number):
         """Returns the list of potential obstacles in case the indicated robot is moved"""
         # TODO: add goal posts for safety
@@ -1863,7 +1768,6 @@ class Referee:
                     continue
                 obstacles.append(o_team['players'][o_number]['position'])
         return obstacles
-
 
     def move_robots_away(self, target_location):
         for team in [blue_team, red_team]:
@@ -1898,7 +1802,6 @@ class Referee:
                             player['position'] = dst_t.tolist()
                             break
 
-
     def game_interruption_place_ball(self, target_location, enforce_distance=True):
         if enforce_distance:
             target_location[2] = 0  # Set position along z-axis to 0 for all 'game.field.point_inside' checks
@@ -1930,7 +1833,6 @@ class Referee:
         game.ball_set_kick = False
         self.reset_ball_touched()
         info(f'Ball respawned at {target_location[0]} {target_location[1]} {target_location[2]}.')
-
 
     def read_team(self, json_path):
         team = None
