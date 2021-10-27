@@ -1946,9 +1946,9 @@ class Referee:
                     if hasattr(self.game, 'use_bouncing_server') and self.game.use_bouncing_server:
                         command_line.append('-b')
                         command_line.append(self.game.host)
-                        udp_bouncer_process = subprocess.Popen(["python3", "udp_bouncer.py", self.game_config_file])
+                        self.udp_bouncer_process = subprocess.Popen(["python3", "udp_bouncer.py", self.game_config_file])
                     else:
-                        udp_bouncer_process = None
+                        self.udp_bouncer_process = None
                     self.game.controller_process = subprocess.Popen(command_line, cwd=os.path.join(GAME_CONTROLLER_HOME, 'build', 'jar'))
             except KeyError:
                 GAME_CONTROLLER_HOME = None
