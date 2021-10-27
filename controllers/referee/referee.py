@@ -74,12 +74,15 @@ class Referee:
             error(f'Cannot read {self.game_config_file} game config file.')
             self.clean_exit()
         # read configuration files
+        self.blackboard = Blackboard(supervisor=self.supervisor, sim_time=self.sime_time, config=self.config)
         with open(self.game_config_file) as json_file:
-            self.game = json.loads(json_file.read(), object_hook=lambda d: Game(**d))
+            game_data = json.loads(json_file.read())
+        game_data['blackboard'] = self.blackboard
+        self.game = Game(**game_data)
+        self.blackboard.game = self.game
         self.red_team = self.read_team(self.game.red.config)
         self.blue_team = self.read_team(self.game.blue.config)
 
-        self.blackboard = Blackboard(self.supervisor, self.game, self.sim_time, self.config)
         self.display = Display(self.blackboard)
         self.display.setup_display()
         self.others = []
