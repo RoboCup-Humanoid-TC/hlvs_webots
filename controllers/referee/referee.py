@@ -1907,7 +1907,6 @@ class Referee:
         field_size = getattr(self.game, 'class').lower()
         self.game.field = Field(field_size)
 
-
         red_team['color'] = 'red'
         blue_team['color'] = 'blue'
         self.init_team(red_team)
@@ -1985,7 +1984,6 @@ class Referee:
         red_team['goalkeeper_holding_time_window'] = np.zeros(goalkeeper_ball_holding_time_window_size, dtype=bool)
         blue_team['players_holding_time_window'] = np.zeros(players_ball_holding_time_window_size, dtype=bool)
         blue_team['goalkeeper_holding_time_window'] = np.zeros(goalkeeper_ball_holding_time_window_size, dtype=bool)
-
 
         self.list_solids()  # prepare lists of solids to monitor in each robot to compute the convex hulls
 
@@ -2374,7 +2372,7 @@ class Referee:
                             self.check_start_position()
                             self.game_controller_send('STATE:READY')
                     elif not self.game.state.first_half:
-                        self.game_type = ''
+                        game_type = ''
                         if self.game.overtime:
                             game_type = 'overtime '
                         info(f'Beginning of {game_type}second half.')
@@ -2398,7 +2396,7 @@ class Referee:
                         ball_holding = self.check_ball_holding()       # check for ball holding fouls
                         if ball_holding:
                             self.interruption('FREEKICK', ball_holding, self.game.ball_position)
-                    ball_handling = check_ball_handling()  # return team id if ball handling is performed by goalkeeper
+                    ball_handling = self.check_ball_handling()  # return team id if ball handling is performed by goalkeeper
                     if ball_handling and not self.game.penalty_shootout:
                         self.interruption('FREEKICK', ball_handling, self.game.ball_position, is_goalkeeper_ball_manipulation=True)
                 self.check_penalized_in_field()                    # check for penalized robots inside the field
