@@ -1,4 +1,4 @@
-from time import format_time
+from types import SimpleNamespace
 
 class Display:
     def __init__(self, blackboard, font_size, font):
@@ -9,16 +9,10 @@ class Display:
     def update_time_display(self):
         if self.blackboard.game.state:
             s = self.blackboard.game.state.seconds_remaining
-            if s < 0:
-                s = -s
-                sign = '-'
-            else:
-                sign = ' '
             value = format_time(s)
         else:
-            sign = ' '
-            value = '--:--'
-        self.blackboard.supervisor.setLabel(6, sign + value, 0, 0, self.font_size, 0x000000, 0.2, self.font)
+            value = ' --:--'
+        self.blackboard.supervisor.setLabel(6, value, 0, 0, self.font_size, 0x000000, 0.2, self.font)
 
     def update_state_display(self):
         if self.blackboard.game.state:
@@ -31,7 +25,7 @@ class Display:
             state = ''
             color = 0x000000
         self.blackboard.supervisor.setLabel(7, ' ' * 41 + state, 0, 0, self.font_size, color, 0.2, self.font)
-        update_details_display()
+        self.update_details_display()
 
     def update_score_display(self):
         if self.blackboard.game.state:
@@ -72,22 +66,19 @@ class Display:
         if self.blackboard.game.side_left == self.blackboard.game.red.id:
             left = red
             right = blue
-            left_team = red_team
-            right_team = blue_team
+            left_team = self.blackboard.red_team
+            right_team = self.blackboard.blue_team
             left_color = RED_COLOR
             right_color = BLUE_COLOR
         else:
             left = blue
             right = red
-            left_team = blue_team
-            right_team = red_team
+            left_team = self.blackboard.blue_team
+            right_team = self.blackboard.red_team
             left_color = BLUE_COLOR
             right_color = RED_COLOR
 
-        class StringObject:
-            pass
-
-        strings = StringObject()
+        strings = SimpleNamespace()
         strings.foreground = ' ' + format_time(self.blackboard.game.state.secondary_seconds_remaining) + '  ' \
             if self.blackboard.game.state.secondary_seconds_remaining > 0 else ' ' * 8
         strings.background = ' ' * 7
@@ -95,7 +86,7 @@ class Display:
         strings.yellow_card = strings.background
         strings.red_card = strings.background
         strings.white = '█' * 7
-        update_team_details_display(left_team, left, strings)
+        self.update_team_details_display(left_team, left, strings)
         strings.left_background = strings.background
         strings.background = ' ' * 28
         space = 21 - len(left_team['players']) * 3
@@ -104,18 +95,18 @@ class Display:
         strings.yellow_card += ' ' * space
         strings.red_card += ' ' * space
         strings.foreground += ' ' * space
-        update_team_details_display(right_team, right, strings)
+        self.update_team_details_display(right_team, right, strings)
         strings.right_background = strings.background
         del strings.background
         space = 12 - 3 * len(right_team['players'])
         strings.white += '█' * (22 + space)
-        secondary_state = ' ' * 41 + self.blackboard.game.state.secondary_state[6:]
+        strings.secondary_state = ' ' * 41 + self.blackboard.game.state.secondary_state[6:]
         sr = IN_PLAY_TIMEOUT - self.blackboard.game.interruption_seconds + self.blackboard.game.state.seconds_remaining \
             if self.blackboard.game.interruption_seconds is not None else 0
         if sr > 0:
-            secondary_state += ' ' + format_time(sr)
+            strings.secondary_state += ' ' + format_time(sr)
         if self.blackboard.game.state.secondary_state[6:] != 'NORMAL' or self.blackboard.game.state.secondary_state_info[1] != 0:
-            secondary_state += ' [' + str(self.blackboard.game.state.secondary_state_info[1]) + ']'
+            strings.secondary_state += ' [' + str(self.blackboard.game.state.secondary_state_info[1]) + ']'
         if self.blackboard.game.interruption_team is not None:  # interruption
             secondary_state_color = RED_COLOR if self.blackboard.game.interruption_team == self.blackboard.game.red.id else BLUE_COLOR
         else:
@@ -128,7 +119,7 @@ class Display:
         self.blackboard.supervisor.setLabel(14, strings.yellow_card, 0, 2 * y, self.font_size, 0xffff00, 0.2, self.font)
         self.blackboard.supervisor.setLabel(15, strings.red_card, 0, 2 * y, self.font_size, 0xff0000, 0.2, self.font)
         self.blackboard.supervisor.setLabel(16, strings.foreground, 0, y, self.font_size, BLACK_COLOR, 0.2, self.font)
-        self.blackboard.supervisor.setLabel(17, secondary_state, 0, y, self.font_size, secondary_state_color, 0.2, self.font)
+        self.blackboard.supervisor.setLabel(17, strings.secondary_state, 0, y, self.font_size, secondary_state_color, 0.2, self.font)
 
     def update_team_display(self):
         # red and blue backgrounds
@@ -142,9 +133,25 @@ class Display:
         team_names = 7 * '█' + (13 - len(left_team['name'])) * ' ' + left_team['name'] + \
                      ' █████ ' + right_team['name'] + ' ' * (13 - len(right_team['name'])) + '█' * 22
         self.blackboard.supervisor.setLabel(4, team_names, 0, 0, self.font_size, WHITE_COLOR, 0.2, self.font)
-        update_score_display()
+        self.update_score_display()
 
     def setup_display(self):
         self.update_team_display()
         self.update_time_display()
         self.update_state_display()
+
+
+def format_time(s):
+    if s < 0:
+        s = -s
+        sign = '-'
+    else:
+        sign = ' '
+    seconds = str(s % 60)
+    minutes = str(int(s / 60))
+    if len(minutes) == 1:
+        minutes = '0' + minutes
+    if len(seconds) == 1:
+        seconds = '0' + seconds
+    return sign + minutes + ':' + seconds
+
