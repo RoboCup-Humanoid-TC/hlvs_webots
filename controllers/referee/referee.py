@@ -63,6 +63,9 @@ class Referee:
             config = yaml.load(f)
         self.config = SimpleNamespace(**config)
         self.config.GOAL_HALF_WIDTH = self.config.GOAL_WIDTH / 2
+        self.config.SIMULATED_TIME_INTERRUPTION_PHASE_0 = int(self.config.SIMULATED_TIME_INTERRUPTION_PHASE_0 * 1000 / time_step)
+        self.config.SIMULATED_TIME_BEFORE_PLAY_STATE = int(self.config.SIMULATED_TIME_BEFORE_PLAY_STATE * 1000 / time_step)
+        self.config.SIMULATED_TIME_SET_PENALTY_SHOOTOUT = int(self.config.SIMULATED_TIME_SET_PENALTY_SHOOTOUT * 1000 / time_step)
 
         # determine configuration file name
         self.game_config_file = os.environ['WEBOTS_ROBOCUP_GAME'] if 'WEBOTS_ROBOCUP_GAME' in os.environ \
@@ -1888,8 +1891,8 @@ class Referee:
         if not hasattr(self.game, 'minimum_real_time_factor'):
             self.game.minimum_real_time_factor = 3  # we garantee that each time step lasts at least 3x simulated time
         if self.game.minimum_real_time_factor == 0:  # speed up non-real time tests
-            REAL_TIME_BEFORE_FIRST_READY_STATE = 5
-            HALF_TIME_BREAK_REAL_TIME_DURATION = 2
+            self.config.REAL_TIME_BEFORE_FIRST_READY_STATE = 5
+            self.config.HALF_TIME_BREAK_REAL_TIME_DURATION = 2
         if not hasattr(self.game, 'press_a_key_to_terminate'):
             self.game.press_a_key_to_terminate = False
         if self.game.type not in ['NORMAL', 'KNOCKOUT', 'PENALTY']:
@@ -1976,9 +1979,6 @@ class Referee:
         self.spawn_team(red_team, self.game.side_left == self.game.blue.id, children)
         self.spawn_team(blue_team, self.game.side_left == self.game.red.id, children)
 
-        SIMULATED_TIME_INTERRUPTION_PHASE_0 = int(self.config.SIMULATED_TIME_INTERRUPTION_PHASE_0 * 1000 / time_step)
-        SIMULATED_TIME_BEFORE_PLAY_STATE = int(self.config.SIMULATED_TIME_BEFORE_PLAY_STATE * 1000 / time_step)
-        SIMULATED_TIME_SET_PENALTY_SHOOTOUT = int(self.config.SIMULATED_TIME_SET_PENALTY_SHOOTOUT * 1000 / time_step)
         players_ball_holding_time_window_size = int(1000 * self.config.PLAYERS_BALL_HOLDING_TIMEOUT / time_step)
         goalkeeper_ball_holding_time_window_size = int(1000 * self.config.GOALKEEPER_BALL_HOLDING_TIMEOUT / time_step)
         red_team['players_holding_time_window'] = np.zeros(players_ball_holding_time_window_size, dtype=bool)
