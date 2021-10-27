@@ -2097,9 +2097,9 @@ except KeyError:
     error('JAVA_HOME environment variable not set, unable to launch GameController.')
     clean_exit()
 
-time = SimTime()
+sim_time = SimTime()
 game = Game()
-blackboard = Blackboard(supervisor, game, time)
+blackboard = Blackboard(supervisor, game, sim_time)
 
 toss_a_coin_if_needed('side_left')
 toss_a_coin_if_needed('kickoff')
