@@ -49,7 +49,7 @@ GAME_INTERRUPTIONS = {
     'THROWIN': 'throw in'
 }
 
-global game, red_team, blue_team, time_count, time_step, game_controller_udp_filter
+global game, red_team, blue_team, time_count, time_step
 
 
 class Referee:
@@ -80,6 +80,8 @@ class Referee:
         self.game_controller_send_id = 0
         self.game_controller_send_unanswered = {}
         self.game_controller_send_sent_once = None
+        self.game_controller_udp_filter = os.environ['GAME_CONTROLLER_UDP_FILTER'] if 'GAME_CONTROLLER_UDP_FILTER' in os.environ else None
+
 
         self.setup()
         self.main_loop()
@@ -219,13 +221,13 @@ class Referee:
         data = None
         ip = None
         while True:
-            if game_controller_udp_filter and ip and ip not in self.others:
+            if self.game_controller_udp_filter and ip and ip not in self.others:
                 self.others.append(ip)
-                warning(f'Ignoring UDP packets from {ip} not matching GAME_CONTROLLER_UDP_FILTER={game_controller_udp_filter}.')
+                warning(f'Ignoring UDP packets from {ip} not matching GAME_CONTROLLER_UDP_FILTER={self.game_controller_udp_filter}.')
             try:
                 data, peer = game.udp.recvfrom(GameState.sizeof())
                 ip, port = peer
-                if game_controller_udp_filter is None or game_controller_udp_filter == ip:
+                if self.game_controller_udp_filter is None or self.game_controller_udp_filter == ip:
                     break
                 else:
                     continue
@@ -1916,8 +1918,6 @@ class Referee:
         host = socket.gethostbyname(socket.gethostname())
         if host != '127.0.0.1' and host != game.host:
             warning(f'Host is not correctly defined in game.json file, it should be {host} instead of {game.host}.')
-
-        game_controller_udp_filter = os.environ['GAME_CONTROLLER_UDP_FILTER'] if 'GAME_CONTROLLER_UDP_FILTER' in os.environ else None
 
         try:
             JAVA_HOME = os.environ['JAVA_HOME']
