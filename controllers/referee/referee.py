@@ -49,14 +49,14 @@ GAME_INTERRUPTIONS = {
     'THROWIN': 'throw in'
 }
 
-global supervisor, game, red_team, blue_team, time_count, time_step, game_controller_udp_filter
+global game, red_team, blue_team, time_count, time_step, game_controller_udp_filter
 
 
 class Referee:
     def __init__(self):
         # start the webots supervisor
         self.supervisor = Supervisor()
-        self.time_step = int(supervisor.getBasicTimeStep())
+        self.time_step = int(self.supervisor.getBasicTimeStep())
         self.sim_time = SimTime()
         with open('referee_config.yaml') as f:
             config = yaml.load(f)
@@ -74,6 +74,7 @@ class Referee:
             self.game = json.loads(json_file.read(), object_hook=lambda d: Game(**d))
         self.red_team = self.read_team(game.red.config)
         self.blue_team = self.read_team(game.blue.config)
+
         self.blackboard = Blackboard(self.supervisor, self.game, self.sim_time, self.config)
         self.others = []
         self.game_controller_send_id = 0
@@ -109,33 +110,33 @@ class Referee:
             info("Game is over")
             if hasattr(game, 'press_a_key_to_terminate') and game.press_a_key_to_terminate:
                 print('Press a key to terminate')
-                keyboard = supervisor.getKeyboard()
+                keyboard = self.supervisor.getKeyboard()
                 keyboard.enable(time_step)
-                while supervisor.step(time_step) != -1:
+                while self.supervisor.step(time_step) != -1:
                     if keyboard.getKey() != -1:
                         break
             else:
                 waiting_steps = self.config.END_OF_GAME_TIMEOUT * 1000 / time_step
                 info(f"Waiting {waiting_steps} simulation steps before exiting")
                 while waiting_steps > 0:
-                    supervisor.step(time_step)
+                    self.supervisor.step(time_step)
                     waiting_steps -= 1
                 info("Finished waiting")
         if hasattr(game, 'record_simulation'):
             if game.record_simulation.endswith(".html"):
                 info("Stopping animation recording")
-                supervisor.animationStopRecording()
+                self.supervisor.animationStopRecording()
             elif game.record_simulation.endswith(".mp4"):
                 info("Starting encoding")
-                supervisor.movieStopRecording()
-                while not supervisor.movieIsReady():
-                    supervisor.step(time_step)
+                self.supervisor.movieStopRecording()
+                while not self.supervisor.movieIsReady():
+                    self.supervisor.step(time_step)
                 info("Encoding finished")
         info("Exiting webots properly")
 
-        # Note: If supervisor.step is not called before the 'simulationQuit', information is not shown
-        supervisor.step(time_step)
-        supervisor.simulationQuit(0)
+        # Note: If self.supervisor.step is not called before the 'simulationQuit', information is not shown
+        self.supervisor.step(time_step)
+        self.supervisor.simulationQuit(0)
 
     def perform_status_update(self):
         now = time.time()
@@ -198,7 +199,7 @@ class Referee:
                 string += f', "{h}"'
             string += '] }}'
             children.importMFNodeFromString(-1, string)
-            player['robot'] = supervisor.getFromDef(defname)
+            player['robot'] = self.supervisor.getFromDef(defname)
             player['position'] = player['robot'].getCenterOfMass()
             info(f'Spawned {defname} {model} on port {port} at halfTimeStartingPose: translation (' +
                  f'{halfTimeStartingTranslation[0]} {halfTimeStartingTranslation[1]} {halfTimeStartingTranslation[2]}), ' +
@@ -470,7 +471,7 @@ class Referee:
         self.list_team_solids(blue_team)
 
     def show_polygon(self, vertices):
-        polygon = supervisor.getFromDef('POLYGON')
+        polygon = self.supervisor.getFromDef('POLYGON')
         if polygon:
             polygon.remove()
         material = 'Material { diffuseColor 1 1 0 }'
@@ -487,7 +488,7 @@ class Referee:
         coordIndex += ' -1 ]'
         geometry = f'IndexedFaceSet {{ coord {coord} coordIndex {coordIndex} }}'
         shape = f'DEF POLYGON Shape {{ appearance {appearance} geometry {geometry} castShadows FALSE isPickable FALSE }}'
-        children = supervisor.getRoot().getField('children')
+        children = self.supervisor.getRoot().getField('children')
         children.importMFNodeFromString(-1, shape)
 
     def update_team_ball_holding(self, team):
@@ -1963,7 +1964,7 @@ class Referee:
         self.toss_a_coin_if_needed('side_left')
         self.toss_a_coin_if_needed('kickoff')
 
-        children = supervisor.getRoot().getField('children')
+        children = self.supervisor.getRoot().getField('children')
         children.importMFNodeFromString(-1, f'RobocupSoccerField {{ size "{field_size}" }}')
         ball_size = 1 if field_size == 'kid' else 5
         # the ball is initially very far away from the field
@@ -1994,10 +1995,10 @@ class Referee:
         game.penalty_shootout_time_to_score = [None, None, None, None, None, None, None, None, None, None]
         game.penalty_shootout_time_to_reach_goal_area = [None, None, None, None, None, None, None, None, None, None]
         game.penalty_shootout_time_to_touch_ball = [None, None, None, None, None, None, None, None, None, None]
-        game.ball = supervisor.getFromDef('BALL')
+        game.ball = self.supervisor.getFromDef('BALL')
         game.ball_radius = 0.07 if field_size == 'kid' else 0.1125
         game.ball_kick_translation = [0, 0, game.ball_radius + game.field.turf_depth]  # initial position of ball before kick
-        game.ball_translation = supervisor.getFromDef('BALL').getField('translation')
+        game.ball_translation = self.supervisor.getFromDef('BALL').getField('translation')
         game.ball_exit_translation = None
         self.reset_ball_touched()
         game.ball_last_touch_time = 0
@@ -2043,7 +2044,7 @@ class Referee:
                         if retry <= 10:
                             warning(f'Could not connect to GameController at localhost:8750: {msg}. Retrying ({retry}/10)...')
                             time.sleep(retry)  # give some time to allow the GameControllerSimulator to start-up
-                            supervisor.step(0)
+                            self.supervisor.step(0)
                         else:
                             error('Could not connect to GameController at localhost:8750.')
                             game.controller = None
@@ -2097,11 +2098,11 @@ class Referee:
         if hasattr(game, 'record_simulation'):
             try:
                 if game.record_simulation.endswith(".html"):
-                    supervisor.animationStartRecording(game.record_simulation)
+                    self.supervisor.animationStartRecording(game.record_simulation)
                 elif game.record_simulation.endswith(".mp4"):
-                    supervisor.movieStartRecording(game.record_simulation, width=1280, height=720, codec=0, quality=100,
+                    self.supervisor.movieStartRecording(game.record_simulation, width=1280, height=720, codec=0, quality=100,
                                                    acceleration=1, caption=False)
-                    if supervisor.movieFailed():
+                    if self.supervisor.movieFailed():
                         raise RuntimeError("Failed to Open Movie")
                 else:
                     raise RuntimeError(f"Unknown extension for record_simulation: {game.record_simulation}")
@@ -2112,7 +2113,7 @@ class Referee:
     def main_loop(self):
         try:
             previous_real_time = time.time()
-            while supervisor.step(time_step) != -1 and not game.over:
+            while self.supervisor.step(time_step) != -1 and not game.over:
                 if hasattr(game, 'max_duration') and (time.time() - log.real_time) > game.max_duration:
                     info(f'Interrupting game automatically after {game.max_duration} seconds')
                     break
