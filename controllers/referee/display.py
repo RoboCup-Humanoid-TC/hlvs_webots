@@ -1,10 +1,10 @@
 from types import SimpleNamespace
 
 class Display:
-    def __init__(self, blackboard, font_size, font):
+    def __init__(self, blackboard):
         self.blackboard = blackboard
-        self.font_size = font_size
-        self.font = font
+        self.font_size = blackboard.config.FONT_SIZE
+        self.font = blackboard.config.FONT
 
     def update_time_display(self):
         if self.blackboard.game.state:
