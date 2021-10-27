@@ -37,50 +37,11 @@ from scipy.spatial import ConvexHull
 
 from types import SimpleNamespace
 
-OUTSIDE_TURF_TIMEOUT = 20                 # a player outside the turf for more than 20 seconds gets a removal penalty
-INVALID_GOALKEEPER_TIMEOUT = 1            # 1 second
-INACTIVE_GOALKEEPER_TIMEOUT = 20          # a goalkeeper is penalized if inactive for 20 seconds while the ball is in goal area
-INACTIVE_GOALKEEPER_DIST = 0.5            # if goalkeeper is farther than this distance it can't be inactive
-INACTIVE_GOALKEEPER_PROGRESS = 0.05       # the minimal distance to move toward the ball in order to be considered active
-DROPPED_BALL_TIMEOUT = 120                # wait 2 simulated minutes if the ball doesn't move before starting dropped ball
-SIMULATED_TIME_INTERRUPTION_PHASE_0 = 5   # waiting time of 5 simulated seconds in phase 0 of interruption
-SIMULATED_TIME_INTERRUPTION_PHASE_1 = 15  # waiting time of 15 simulated seconds in phase 1 of interruption
-SIMULATED_TIME_BEFORE_PLAY_STATE = 5      # wait 5 simulated seconds in SET state before sending the PLAY state
-SIMULATED_TIME_SET_PENALTY_SHOOTOUT = 15  # wait 15 simulated seconds in SET state before sending the PLAY state
-HALF_TIME_BREAK_REAL_TIME_DURATION = 15   # the half-time break lasts 15 real seconds
-REAL_TIME_BEFORE_FIRST_READY_STATE = 120  # wait 2 real minutes before sending the first READY state
-IN_PLAY_TIMEOUT = 10                      # time after which the ball is considered in play even if it was not kicked
-FALLEN_TIMEOUT = 20                       # if a robot is down (fallen) for more than this amount of time, it gets penalized
-REMOVAL_PENALTY_TIMEOUT = 30              # removal penalty lasts for 30 seconds
-GOALKEEPER_BALL_HOLDING_TIMEOUT = 6       # a goalkeeper may hold the ball up to 6 seconds on the ground
-PLAYERS_BALL_HOLDING_TIMEOUT = 1          # field players may hold the ball up to 1 second
-BALL_HANDLING_TIMEOUT = 10                # a player throwing in or a goalkeeper may hold the ball up to 10 seconds in hands
-BALL_LIFT_THRESHOLD = 0.05                # during a throw-in with the hands, the ball must be lifted by at least 5 cm
-GOALKEEPER_GROUND_BALL_HANDLING = 6       # a goalkeeper may handle the ball on the ground for up to 6 seconds
-END_OF_GAME_TIMEOUT = 5                   # Once the game is finished, let the referee run for 5 seconds before closing game
-BALL_IN_PLAY_MOVE = 0.05                  # the ball must move 5 cm after interruption or kickoff to be considered in play
-FOUL_PUSHING_TIME = 1                     # 1 second
-FOUL_PUSHING_PERIOD = 2                   # 2 seconds
-FOUL_VINCITY_DISTANCE = 2                 # 2 meters
-FOUL_DISTANCE_THRESHOLD = 0.1             # 0.1 meter
-FOUL_SPEED_THRESHOLD = 0.2                # 0.2 m/s
-FOUL_DIRECTION_THRESHOLD = math.pi / 6    # 30 degrees
-FOUL_BALL_DISTANCE = 1                    # if the ball is more than 1 m away from an offense, a removal penalty is applied
-FOUL_PENALTY_IMMUNITY = 2                 # after a foul, a player is immune to penalty for a period of 2 seconds
-GOAL_WIDTH = 2.6                          # width of the goal
-RED_COLOR = 0xd62929                      # red team color used for the display
-BLUE_COLOR = 0x2943d6                     # blue team color used for the display
-WHITE_COLOR = 0xffffff                    # white color used for the display
-BLACK_COLOR = 0x000000                    # black color used for the display
-STATIC_SPEED_EPS = 1e-2                   # The speed below which an object is considered as static [m/s]
-DROPPED_BALL_TEAM_ID = 128                # The team id used for dropped ball
-BALL_DIST_PERIOD = 1                      # seconds. The period at which distance to the ball is checked
-BALL_HOLDING_RATIO = 1.0/3                # The ratio of the radius used to compute minimal distance to the convex hull
-GAME_INTERRUPTION_PLACEMENT_NB_STEPS = 5  # The maximal number of steps allowed when moving ball or player away
-STATUS_PRINT_PERIOD = 20                  # Real time between two status updates in seconds
-DISABLE_ACTUATORS_MIN_DURATION = 1.0      # The minimal simulated time [s] until enabling actuators again after a reset
-FONT_SIZE = 0.096
-FONT = 'Lucida Console'
+
+sim_time = SimTime()
+game = Game()
+blackboard = Blackboard(supervisor, game, sim_time)
+
 
 # game interruptions requiring a free kick procedure
 GAME_INTERRUPTIONS = {
@@ -89,9 +50,10 @@ GAME_INTERRUPTIONS = {
     'PENALTYKICK': 'penalty kick',
     'CORNERKICK': 'corner kick',
     'GOALKICK': 'goal kick',
-    'THROWIN': 'throw in'}
+    'THROWIN': 'throw in'
+}
 
-GOAL_HALF_WIDTH = GOAL_WIDTH / 2
+GOAL_HALF_WIDTH = blackboard.config.GOAL_WIDTH / 2
 
 global supervisor, game, red_team, blue_team, time_count, time_step, game_controller_udp_filter
 
@@ -129,7 +91,7 @@ def clean_exit():
                 if keyboard.getKey() != -1:
                     break
         else:
-            waiting_steps = END_OF_GAME_TIMEOUT * 1000 / time_step
+            waiting_steps = blackboard.config.END_OF_GAME_TIMEOUT * 1000 / time_step
             info(f"Waiting {waiting_steps} simulation steps before exiting")
             while waiting_steps > 0:
                 supervisor.step(time_step)
@@ -157,7 +119,7 @@ def perform_status_update():
     if not hasattr(game, "last_real_time"):
         game.last_real_time = now
         game.last_time_count = time_count
-    elif now - game.last_real_time > STATUS_PRINT_PERIOD:
+    elif now - game.last_real_time > blackboard.config.STATUS_PRINT_PERIOD:
         elapsed_real = now - game.last_real_time
         elapsed_simulation = (time_count - game.last_time_count) / 1000
         speed_factor = elapsed_simulation / elapsed_real
@@ -329,7 +291,7 @@ def game_controller_receive():
             game.interruption_step_time = time_count
             info(f'Awarding a {GAME_INTERRUPTIONS[kick]}.')
         elif (step == 1 and game.interruption_step != step and game.state.secondary_seconds_remaining <= 0 and
-              delay >= SIMULATED_TIME_INTERRUPTION_PHASE_1):
+              delay >= blackboard.config.SIMULATED_TIME_INTERRUPTION_PHASE_1):
             game.interruption_step = step
             game_controller_send(f'{kick}:{secondary_state_info[0]}:PREPARE')
             game.interruption_step_time = time_count
@@ -550,11 +512,11 @@ def update_team_ball_holding(team):
             points[i] = [position[0], position[1]]
             i += 1
         # check for collision between AABB of goalkeeper and ball
-        if aabb_circle_collision(aabb, game.ball_position[0], game.ball_position[1], game.ball_radius * BALL_HOLDING_RATIO):
+        if aabb_circle_collision(aabb, game.ball_position[0], game.ball_position[1], game.ball_radius * blackboard.config.BALL_HOLDING_RATIO):
             hull = ConvexHull(points)
             hull_vertices = np.take(points, hull.vertices, 0)
             goalkeeper_hold_ball = polygon_circle_collision(hull_vertices, game.ball_position,
-                                                            game.ball_radius * BALL_HOLDING_RATIO)
+                                                            game.ball_radius * blackboard.config.BALL_HOLDING_RATIO)
 
     n = len(players_close_to_the_ball)
     hold_ball = False
@@ -569,10 +531,10 @@ def update_team_ball_holding(team):
                 points[i] = [position[0], position[1]]
                 i += 1
         # check for collision between AABB of players and ball
-        if aabb_circle_collision(aabb, game.ball_position[0], game.ball_position[1], game.ball_radius * BALL_HOLDING_RATIO):
+        if aabb_circle_collision(aabb, game.ball_position[0], game.ball_position[1], game.ball_radius * blackboard.config.BALL_HOLDING_RATIO):
             hull = ConvexHull(points)
             hull_vertices = np.take(points, hull.vertices, 0)
-            hold_ball = polygon_circle_collision(hull_vertices, game.ball_position, game.ball_radius * BALL_HOLDING_RATIO)
+            hold_ball = polygon_circle_collision(hull_vertices, game.ball_position, game.ball_radius * blackboard.config.BALL_HOLDING_RATIO)
     players_holding_time_window = team['players_holding_time_window']
     index = int(time_count / time_step) % len(players_holding_time_window)
     players_holding_time_window[index] = hold_ball
@@ -817,10 +779,10 @@ def update_histories():
             player = team['players'][number]
             # Remove old ball_distances
             if len(player['history']) > 0 \
-               and (time_count - player['history'][0][0]) > INACTIVE_GOALKEEPER_TIMEOUT * 1000:
+               and (time_count - player['history'][0][0]) > blackboard.config.INACTIVE_GOALKEEPER_TIMEOUT * 1000:
                 player['history'].pop(0)
             # If enough time has elapsed, add an entry
-            if len(player['history']) == 0 or (time_count - player['history'][-1][0]) > BALL_DIST_PERIOD * 1000:
+            if len(player['history']) == 0 or (time_count - player['history'][-1][0]) > blackboard.config.BALL_DIST_PERIOD * 1000:
                 ball_dist = distance2(player['position'], game.ball_position)
                 own_goal_area = player['inside_own_side'] and not player['outside_goal_area']
                 entry = (time_count, {"ball_distance": ball_dist, "own_goal_area": own_goal_area})
@@ -892,11 +854,11 @@ def forceful_contact_foul(team, number, opponent_team, opponent_number, distance
          f'{opponent_team["color"]} player {opponent_number} ({message}) {area}.')
     game.forceful_contact_matrix.clear_all()
     opponent = opponent_team['players'][opponent_number]
-    immunity_timeout = time_count + FOUL_PENALTY_IMMUNITY * 1000
+    immunity_timeout = time_count + blackboard.config.FOUL_PENALTY_IMMUNITY * 1000
     opponent['penalty_immunity'] = immunity_timeout
     player['penalty_immunity'] = immunity_timeout
     freekick_team_id = game.blue.id if team['color'] == "red" else game.red.id
-    foul_far_from_ball = distance_to_ball > FOUL_BALL_DISTANCE
+    foul_far_from_ball = distance_to_ball > blackboard.config.FOUL_BALL_DISTANCE
     if game.penalty_shootout and is_penalty_kicker(team, number):
         info(f'Kicker {team["color"]} {number} performed forceful contact during penaltykick -> end of trial')
         next_penalty_shootout()
@@ -917,14 +879,14 @@ def goalkeeper_inside_own_goal_area(team, number):
 
 
 def moves_to_ball(player, velocity, velocity_squared):
-    if velocity_squared < FOUL_SPEED_THRESHOLD * FOUL_SPEED_THRESHOLD:
+    if velocity_squared < blackboard.config.FOUL_SPEED_THRESHOLD * blackboard.config.FOUL_SPEED_THRESHOLD:
         return True
     rx = game.ball_position[0] - player['position'][0]
     ry = game.ball_position[1] - player['position'][1]
     vx = velocity[0]
     vy = velocity[1]
     angle = math.acos((rx * vx + ry * vy) / (math.sqrt(rx * rx + ry * ry) * math.sqrt(vx * vx + vy * vy)))
-    return angle < FOUL_DIRECTION_THRESHOLD
+    return angle < blackboard.config.FOUL_DIRECTION_THRESHOLD
 
 
 def readable_number_list(number_list, width=5, nb_digits=2):
@@ -958,10 +920,10 @@ def check_team_forceful_contacts(team, number, opponent_team, opponent_number):
         red_number = opponent_number
         blue_number = number
     if game.forceful_contact_matrix.long_collision(red_number, blue_number):
-        if d1 < FOUL_VINCITY_DISTANCE and d1 - d2 > FOUL_DISTANCE_THRESHOLD:
+        if d1 < blackboard.config.FOUL_VINCITY_DISTANCE and d1 - d2 > blackboard.config.FOUL_DISTANCE_THRESHOLD:
             collision_time = game.forceful_contact_matrix.get_collision_time(red_number, blue_number)
-            debug_messages.append(f"Pushing time: {collision_time} > {FOUL_PUSHING_TIME} over the last {FOUL_PUSHING_PERIOD}")
-            debug_messages.append(f"Difference of distance: {d1-d2} > {FOUL_DISTANCE_THRESHOLD}")
+            debug_messages.append(f"Pushing time: {collision_time} > {blackboard.config.FOUL_PUSHING_TIME} over the last {blackboard.config.FOUL_PUSHING_PERIOD}")
+            debug_messages.append(f"Difference of distance: {d1-d2} > {blackboard.config.FOUL_DISTANCE_THRESHOLD}")
             info(debug_messages)
             forceful_contact_foul(team, number, opponent_team, opponent_number, d1, 'long_collision')
             return True
@@ -969,29 +931,29 @@ def check_team_forceful_contacts(team, number, opponent_team, opponent_number):
     v2 = p2['velocity']
     v1_squared = v1[0] * v1[0] + v1[1] * v1[1]
     v2_squared = v2[0] * v2[0] + v2[1] * v2[1]
-    if not v1_squared > FOUL_SPEED_THRESHOLD * FOUL_SPEED_THRESHOLD:
+    if not v1_squared > blackboard.config.FOUL_SPEED_THRESHOLD * blackboard.config.FOUL_SPEED_THRESHOLD:
         return False
     debug_messages.append(f"{p1_str:6s}: velocity: {readable_number_list(v1[:3])}, speed: {math.sqrt(v1_squared):.2f}")
     debug_messages.append(f"{p2_str:6s}: velocity: {readable_number_list(v2[:3])}, speed: {math.sqrt(v2_squared):.2f}")
-    if d1 < FOUL_VINCITY_DISTANCE:
-        debug_messages.append(f"{p1_str} is close to the ball ({d1:.2f} < {FOUL_VINCITY_DISTANCE})")
+    if d1 < blackboard.config.FOUL_VINCITY_DISTANCE:
+        debug_messages.append(f"{p1_str} is close to the ball ({d1:.2f} < {blackboard.config.FOUL_VINCITY_DISTANCE})")
         if moves_to_ball(p2, v2, v2_squared):
             if not moves_to_ball(p1, v1, v1_squared):
                 info(debug_messages)
                 forceful_contact_foul(team, number, opponent_team, opponent_number, d1,
                                       'opponent moving towards the ball, charge')
                 return True
-            if d1 - d2 > FOUL_DISTANCE_THRESHOLD:
+            if d1 - d2 > blackboard.config.FOUL_DISTANCE_THRESHOLD:
                 debug_messages.append(f"{p2_str} is significantly closer to the ball than {p1_str}: "
-                                      f"({d1-d2:.2f} < {FOUL_DISTANCE_THRESHOLD})")
+                                      f"({d1-d2:.2f} < {blackboard.config.FOUL_DISTANCE_THRESHOLD})")
                 info(debug_messages)
                 forceful_contact_foul(team, number, opponent_team, opponent_number, d1,
                                       'opponent moving towards the ball, charge from behind')
                 return True
-    elif math.sqrt(v1_squared) - math.sqrt(v2_squared) > FOUL_SPEED_THRESHOLD:
+    elif math.sqrt(v1_squared) - math.sqrt(v2_squared) > blackboard.config.FOUL_SPEED_THRESHOLD:
         info(debug_messages)
         forceful_contact_foul(team, number, opponent_team, opponent_number, d1, 'violent collision: '
-                              f'{math.sqrt(v1_squared)} - {math.sqrt(v2_squared)} > {FOUL_SPEED_THRESHOLD}')
+                              f'{math.sqrt(v1_squared)} - {math.sqrt(v2_squared)} > {blackboard.config.FOUL_SPEED_THRESHOLD}')
         return True
     return False
 
@@ -1050,7 +1012,7 @@ def check_team_ball_handling(team):
                 game.throw_in = False
                 if was_throw_in and not game.throw_in_ball_was_lifted:
                     sentence = 'throw-in with the hand or arm while the ball was not lifted by at least ' + \
-                               f'{BALL_LIFT_THRESHOLD * 100} cm'
+                               f'{blackboard.config.BALL_LIFT_THRESHOLD * 100} cm'
                     send_penalty(player, 'BALL_MANIPULATION', sentence, f'{color.capitalize()} player {number} {sentence}.')
                     continue
         goalkeeper = goalkeeper_inside_own_goal_area(team, number)
@@ -1064,14 +1026,14 @@ def check_team_ball_handling(team):
             continue
         ball_on_the_ground = game.ball_position[2] <= game.field.turf_depth + game.ball_radius
         if game.throw_in:
-            if duration >= BALL_HANDLING_TIMEOUT:  # a player can handle the ball for 10 seconds for throw-in, no more
+            if duration >= blackboard.config.BALL_HANDLING_TIMEOUT:  # a player can handle the ball for 10 seconds for throw-in, no more
                 reset_ball_handling(player)
-                sentence = f'touched the ball with its hand or arm for more than {BALL_HANDLING_TIMEOUT} '
+                sentence = f'touched the ball with its hand or arm for more than {blackboard.config.BALL_HANDLING_TIMEOUT} '
                 + 'seconds during throw-in'
                 send_penalty(player, 'BALL_MANIPULATION', sentence, f'{color.capitalize()} player {number} {sentence}.')
                 continue
         # goalkeeper case
-        if duration >= BALL_HANDLING_TIMEOUT:
+        if duration >= blackboard.config.BALL_HANDLING_TIMEOUT:
             if (game.ball_previous_touch_team == game.ball_last_touch_team and
                time_count - player['ball_handling_start'] >= 1000):  # ball handled by goalkeeper for 1 second or more
                 reset_ball_handling(player)
@@ -1081,12 +1043,12 @@ def check_team_ball_handling(team):
                 return True  # a freekick will be awarded
             reset_ball_handling(player)
             info(f'{color.capitalize()} goalkeeper {number} handled the ball up for more than '
-                 f'{BALL_HANDLING_TIMEOUT} seconds.')
+                 f'{blackboard.config.BALL_HANDLING_TIMEOUT} seconds.')
             return True  # a freekick will be awarded
-        if ball_on_the_ground and duration >= GOALKEEPER_GROUND_BALL_HANDLING:
+        if ball_on_the_ground and duration >= blackboard.config.GOALKEEPER_GROUND_BALL_HANDLING:
             reset_ball_handling(player)
             info(f'{color.capitalize()} goalkeeper {number} handled the ball on the ground for more than '
-                 f'{GOALKEEPER_GROUND_BALL_HANDLING} seconds.')
+                 f'{blackboard.config.GOALKEEPER_GROUND_BALL_HANDLING} seconds.')
             return True  # a freekick will be awarded
     return False  # not free kick awarded
 
@@ -1106,7 +1068,7 @@ def check_team_fallen(team):
         player = team['players'][number]
         if already_penalized(player):
             continue
-        if 'fallen' in player and time_count - player['fallen'] > 1000 * FALLEN_TIMEOUT:
+        if 'fallen' in player and time_count - player['fallen'] > 1000 * blackboard.config.FALLEN_TIMEOUT:
             del player['fallen']
             if game.penalty_shootout and is_penalty_kicker(team, number):
                 info("Kicker {color.capitalize()} {number} has fallen down and not recovered -> end of trial")
@@ -1136,7 +1098,7 @@ def check_team_inactive_goalkeeper(team):
         if not all([e[1]["own_goal_area"] for e in player['history']]):
             return
         ball_distances = [e[1]["ball_distance"] for e in player['history']]
-        if max(ball_distances) > INACTIVE_GOALKEEPER_DIST:
+        if max(ball_distances) > blackboard.config.INACTIVE_GOALKEEPER_DIST:
             return
         # In order to measure progress toward the ball, we just look if one of distance measured is significantly lower
         # than what happened previously. active_dist keeps track of the threshold below which we consider the player as
@@ -1145,10 +1107,10 @@ def check_team_inactive_goalkeeper(team):
         for d in ball_distances:
             if d < active_dist:
                 return
-            new_active_dist = d - INACTIVE_GOALKEEPER_PROGRESS
+            new_active_dist = d - blackboard.config.INACTIVE_GOALKEEPER_PROGRESS
             if new_active_dist > active_dist:
                 active_dist = new_active_dist
-        info(f'Goalkeeper did not move toward the ball over the last {INACTIVE_GOALKEEPER_TIMEOUT} seconds')
+        info(f'Goalkeeper did not move toward the ball over the last {blackboard.config.INACTIVE_GOALKEEPER_TIMEOUT} seconds')
         send_penalty(player, 'INCAPABLE', 'Inactive goalkeeper')
 
 
@@ -1188,7 +1150,7 @@ def check_penalty_kick_positions():
                     send_penalty(player, 'INCAPABLE', "Field player of the attacking team in front of penalty mark")
                 elif is_goalkeeper(team, number):
                     on_goal_line_or_behind = (player['on_outer_line'] or player['outside_field']) and \
-                        abs(player['position'][1]) <= GOAL_WIDTH
+                        abs(player['position'][1]) <= blackboard.config.GOAL_WIDTH
                     if not on_goal_line_or_behind:
                         send_penalty(player, 'INCAPABLE', "Defending goalkeeper between goal line and penalty mark")
                 else:
@@ -1274,14 +1236,14 @@ def check_team_outside_turf(team):
             continue
         if player['left_turf_time'] is None:
             continue
-        if time_count - player['left_turf_time'] < OUTSIDE_TURF_TIMEOUT * 1000:
+        if time_count - player['left_turf_time'] < blackboard.config.OUTSIDE_TURF_TIMEOUT * 1000:
             continue
         if game.penalty_shootout and is_penalty_kicker(team, number):
             info(f'Kicker {color.capitalize()} {number} left the field -> end of trial')
             next_penalty_shootout()
         else:
-            send_penalty(player, 'INCAPABLE', f'left the field for more than {OUTSIDE_TURF_TIMEOUT} seconds',
-                         f'{color.capitalize()} player {number} left the field for more than {OUTSIDE_TURF_TIMEOUT} seconds.')
+            send_penalty(player, 'INCAPABLE', f'left the field for more than {blackboard.config.OUTSIDE_TURF_TIMEOUT} seconds',
+                         f'{color.capitalize()} player {number} left the field for more than {blackboard.config.OUTSIDE_TURF_TIMEOUT} seconds.')
 
 
 def check_outside_turf():
@@ -1389,7 +1351,7 @@ def game_interruption_touched(team, number):
     if opponent:
         game.in_play = None
         game.ball_set_kick = True
-        game.interruption_countdown = SIMULATED_TIME_INTERRUPTION_PHASE_0
+        game.interruption_countdown = blackboard.config.SIMULATED_TIME_INTERRUPTION_PHASE_0
         info(f"Ball touched by opponent, retaking {GAME_INTERRUPTIONS[game.interruption]}")
         info(f"Reset interruption_countdown to {game.interruption_countdown}")
         game_controller_send(f'{game.interruption}:{game.interruption_team}:RETAKE')
@@ -1453,11 +1415,11 @@ def send_team_penalties(team):
             reason = player['penalty_reason']
             del player['penalty']
             del player['penalty_reason']
-            player['penalty_immunity'] = time_count + FOUL_PENALTY_IMMUNITY * 1000
+            player['penalty_immunity'] = time_count + blackboard.config.FOUL_PENALTY_IMMUNITY * 1000
             team_id = game.red.id if color == 'red' else game.blue.id
             game_controller_send(f'PENALTY:{team_id}:{number}:{penalty}')
             place_player_at_penalty(player, team, number)
-            player['penalized'] = REMOVAL_PENALTY_TIMEOUT
+            player['penalized'] = blackboard.config.REMOVAL_PENALTY_TIMEOUT
             # Once removed from the field, the robot will be in the air, therefore its status will not be updated.
             # Thus, we need to make sure it will not be considered in the air while falling
             player['outside_field'] = True
@@ -1535,7 +1497,7 @@ def reset_player(color, number, pose, custom_t=None, custom_r=None):
          f'translation ({t[0]} {t[1]} {t[2]}), rotation ({r[0]} {r[1]} {r[2]} {r[3]}).')
     info(f'Disabling actuators of {color} player {number}.')
     robot.getField('customData').setSFString('penalized')
-    player['enable_actuators_at'] = time_count + int(DISABLE_ACTUATORS_MIN_DURATION * 1000)
+    player['enable_actuators_at'] = time_count + int(blackboard.config.DISABLE_ACTUATORS_MIN_DURATION * 1000)
 
 
 def reset_teams(pose):
@@ -1699,14 +1661,14 @@ def check_penalty_goal_line():
             player['invalidGoalkeeperStart'] = None
             continue
         on_goal_line_or_behind = (player['on_outer_line'] or player['outside_field']) and \
-            abs(player['position'][1]) <= GOAL_WIDTH
+            abs(player['position'][1]) <= blackboard.config.GOAL_WIDTH
         if on_goal_line_or_behind and player['inside_own_side']:
             player['invalidGoalkeeperStart'] = None
         else:
             if player['invalidGoalkeeperStart'] is None:
                 player['invalidGoalkeeperStart'] = time_count
-            elif time_count - player['invalidGoalkeeperStart'] > INVALID_GOALKEEPER_TIMEOUT * 1000:
-                info(f'Goalkeeper of team {defending_team["color"]} is not on goal line since {INVALID_GOALKEEPER_TIMEOUT} sec')
+            elif time_count - player['invalidGoalkeeperStart'] > blackboard.config.INVALID_GOALKEEPER_TIMEOUT * 1000:
+                info(f'Goalkeeper of team {defending_team["color"]} is not on goal line since {blackboard.config.INVALID_GOALKEEPER_TIMEOUT} sec')
                 send_penalty(player, 'INCAPABLE', "Not on goal line during penalty")
 
 
@@ -1817,7 +1779,7 @@ def kickoff():
 
 
 def dropped_ball():
-    info(f'The ball didn\'t move for the past {DROPPED_BALL_TIMEOUT} seconds.')
+    info(f'The ball didn\'t move for the past {blackboard.config.DROPPED_BALL_TIMEOUT} seconds.')
     game.ball_last_move = time_count
     game_controller_send('DROPPEDBALL')
     game.phase = 'DROPPEDBALL'
@@ -1876,15 +1838,15 @@ def get_alternative_ball_locations(original_pos):
     locations = []
     if game.interruption == "DIRECT_FREEKICK" or game.interruption == "INDIRECT_FREEKICK":
         # TODO If indirect free kick in opponent penalty area on line parallel to goal line, move it along this line
-        for dist_mult in range(1, GAME_INTERRUPTION_PLACEMENT_NB_STEPS+1):
+        for dist_mult in range(1, blackboard.config.GAME_INTERRUPTION_PLACEMENT_NB_STEPS+1):
             locations.append(original_pos + offset_x * dist_mult)
             locations.append(original_pos + offset_y * dist_mult)
             locations.append(original_pos - offset_y * dist_mult)
             locations.append(original_pos - offset_x * dist_mult)
     elif game.interruption == "THROWIN":
-        for dist_mult in range(1, GAME_INTERRUPTION_PLACEMENT_NB_STEPS+1):
+        for dist_mult in range(1, blackboard.config.GAME_INTERRUPTION_PLACEMENT_NB_STEPS+1):
             locations.append(original_pos + offset_x * dist_mult)
-        for dist_mult in range(1, GAME_INTERRUPTION_PLACEMENT_NB_STEPS+1):
+        for dist_mult in range(1, blackboard.config.GAME_INTERRUPTION_PLACEMENT_NB_STEPS+1):
             locations.append(original_pos - offset_x * dist_mult)
     return locations
 
@@ -1916,7 +1878,7 @@ def move_robots_away(target_location):
                     player_2_ball = [1, 0, 0]
                     dist = 1
                 offset = player_2_ball / dist * game.field.place_ball_safety_dist
-                for dist_mult in range(1, GAME_INTERRUPTION_PLACEMENT_NB_STEPS+1):
+                for dist_mult in range(1, blackboard.config.GAME_INTERRUPTION_PLACEMENT_NB_STEPS+1):
                     allowed = True
                     pos = target_location + offset * dist_mult
                     for o in obstacles:
@@ -2097,10 +2059,6 @@ except KeyError:
     error('JAVA_HOME environment variable not set, unable to launch GameController.')
     clean_exit()
 
-sim_time = SimTime()
-game = Game()
-blackboard = Blackboard(supervisor, game, sim_time)
-
 toss_a_coin_if_needed('side_left')
 toss_a_coin_if_needed('kickoff')
 
@@ -2117,11 +2075,11 @@ spawn_team(blue_team, game.side_left == game.red.id, children)
 display = Display(blackboard, FONT_SIZE, FONT)
 display.setup_display()
 
-SIMULATED_TIME_INTERRUPTION_PHASE_0 = int(SIMULATED_TIME_INTERRUPTION_PHASE_0 * 1000 / time_step)
-SIMULATED_TIME_BEFORE_PLAY_STATE = int(SIMULATED_TIME_BEFORE_PLAY_STATE * 1000 / time_step)
-SIMULATED_TIME_SET_PENALTY_SHOOTOUT = int(SIMULATED_TIME_SET_PENALTY_SHOOTOUT * 1000 / time_step)
-players_ball_holding_time_window_size = int(1000 * PLAYERS_BALL_HOLDING_TIMEOUT / time_step)
-goalkeeper_ball_holding_time_window_size = int(1000 * GOALKEEPER_BALL_HOLDING_TIMEOUT / time_step)
+SIMULATED_TIME_INTERRUPTION_PHASE_0 = int(blackboard.config.SIMULATED_TIME_INTERRUPTION_PHASE_0 * 1000 / time_step)
+SIMULATED_TIME_BEFORE_PLAY_STATE = int(blackboard.config.SIMULATED_TIME_BEFORE_PLAY_STATE * 1000 / time_step)
+SIMULATED_TIME_SET_PENALTY_SHOOTOUT = int(blackboard.config.SIMULATED_TIME_SET_PENALTY_SHOOTOUT * 1000 / time_step)
+players_ball_holding_time_window_size = int(1000 * blackboard.config.PLAYERS_BALL_HOLDING_TIMEOUT / time_step)
+goalkeeper_ball_holding_time_window_size = int(1000 * blackboard.config.GOALKEEPER_BALL_HOLDING_TIMEOUT / time_step)
 red_team['players_holding_time_window'] = np.zeros(players_ball_holding_time_window_size, dtype=bool)
 red_team['goalkeeper_holding_time_window'] = np.zeros(goalkeeper_ball_holding_time_window_size, dtype=bool)
 blue_team['players_holding_time_window'] = np.zeros(players_ball_holding_time_window_size, dtype=bool)
@@ -2166,7 +2124,7 @@ game.wait_for_state = 'INITIAL'
 game.wait_for_sec_state = None
 game.wait_for_sec_phase = None
 game.forceful_contact_matrix = ForcefulContactMatrix(len(red_team['players']), len(blue_team['players']),
-                                                     FOUL_PUSHING_PERIOD, FOUL_PUSHING_TIME, time_step)
+                                                     blackboard.config.FOUL_PUSHING_PERIOD, blackboard.config.FOUL_PUSHING_TIME, time_step)
 
 previous_seconds_remaining = 0
 
@@ -2282,12 +2240,12 @@ try:
                     opponent_team = red_team if game.ball_must_kick_team == 'blue' else blue_team
                     check_team_away_from_ball(opponent_team, game.field.opponent_distance_to_ball)
                 # If ball is not in play after a kick_off, check for circle entrance for the defending team
-                if game.phase == 'KICKOFF' and game.kickoff != DROPPED_BALL_TEAM_ID:
+                if game.phase == 'KICKOFF' and game.kickoff != blackboard.config.DROPPED_BALL_TEAM_ID:
                     defending_team = red_team if game.kickoff == game.blue.id else blue_team
                     check_circle_entrance(defending_team)
                 if game.ball_first_touch_time != 0:
                     d = distance2(game.ball_kick_translation, game.ball_position)
-                    if d > BALL_IN_PLAY_MOVE:
+                    if d > blackboard.config.BALL_IN_PLAY_MOVE:
                         info(f'{game.ball_kick_translation} {game.ball_position}')
                         info(f'Ball in play, can be touched by any player (moved by {d * 100:.2f} cm).')
                         game.in_play = time_count
@@ -2295,7 +2253,7 @@ try:
                         team = red_team if game.ball_must_kick_team == 'blue' else blue_team
                         check_ball_must_kick(team)
             else:
-                if time_count - game.ball_last_move > DROPPED_BALL_TIMEOUT * 1000:
+                if time_count - game.ball_last_move > blackboard.config.DROPPED_BALL_TIMEOUT * 1000:
                     dropped_ball()
                 if game.ball_left_circle is None and game.phase == 'KICKOFF':
                     if distance2(game.ball_kick_translation, game.ball_position) > game.field.circle_radius + game.ball_radius:
@@ -2325,7 +2283,7 @@ try:
                 # It is unclear that using getVelocity is the good approach, because even when the ball is clearly not moving
                 # anymore, it still provides values above 1e-3.
                 ball_vel = game.ball.getVelocity()[:3]
-                if ball_in_goal_area and np.linalg.norm(ball_vel) < STATIC_SPEED_EPS:
+                if ball_in_goal_area and np.linalg.norm(ball_vel) < blackboard.config.STATIC_SPEED_EPS:
                     info(f"Ball stopped in goal area at {game.ball_position}")
                     next_penalty_shootout()
                 if game.penalty_shootout_count < 10:  # detect entrance of kicker in the goal area
@@ -2521,13 +2479,13 @@ try:
                         info('Beginning of penalty shout-out.')
                         game_controller_send('STATE:PENALTY-SHOOTOUT')
                         game.penalty_shootout = True
-                        info(f'Going to SET in {HALF_TIME_BREAK_REAL_TIME_DURATION} seconds (real-time)')
-                        game.set_real_time = time.time() + HALF_TIME_BREAK_REAL_TIME_DURATION
+                        info(f'Going to SET in {blackboard.config.HALF_TIME_BREAK_REAL_TIME_DURATION} seconds (real-time)')
+                        game.set_real_time = time.time() + blackboard.config.HALF_TIME_BREAK_REAL_TIME_DURATION
                     elif game.overtime:
                         info('Beginning of the knockout first half.')
                         game_controller_send('STATE:OVERTIME-FIRST-HALF')
-                        info(f'Going to READY in {HALF_TIME_BREAK_REAL_TIME_DURATION} seconds (real-time)')
-                        game.ready_real_time = time.time() + HALF_TIME_BREAK_REAL_TIME_DURATION
+                        info(f'Going to READY in {blackboard.config.HALF_TIME_BREAK_REAL_TIME_DURATION} seconds (real-time)')
+                        game.ready_real_time = time.time() + blackboard.config.HALF_TIME_BREAK_REAL_TIME_DURATION
             else:
                 game.over = True
                 break
@@ -2555,8 +2513,8 @@ try:
                     game_type = 'overtime '
                 info(f'Beginning of {game_type}second half.')
                 kickoff()
-                info(f'Going to READY in {HALF_TIME_BREAK_REAL_TIME_DURATION} seconds (real-time)')
-                game.ready_real_time = time.time() + HALF_TIME_BREAK_REAL_TIME_DURATION
+                info(f'Going to READY in {blackboard.config.HALF_TIME_BREAK_REAL_TIME_DURATION} seconds (real-time)')
+                game.ready_real_time = time.time() + blackboard.config.HALF_TIME_BREAK_REAL_TIME_DURATION
 
         if game.interruption_countdown > 0:
             game.interruption_countdown -= 1
