@@ -239,7 +239,7 @@ class Referee:
             if not data:
                 error('No UDP data received')
                 return
-        previous_seconds_remaining = game.state.seconds_remaining if game.state else 0
+        self.previous_seconds_remaining = game.state.seconds_remaining if game.state else 0
         previous_secondary_seconds_remaining = game.state.secondary_seconds_remaining if game.state else 0
         previous_state = game.state.game_state if game.state else None
         previous_sec_state = game.state.secondary_state if game.state else None
@@ -282,7 +282,7 @@ class Referee:
                 info('Ball in play, can be touched by any player (10 seconds elapsed after kickoff).')
                 game.in_play = time_count
                 game.ball_last_move = time_count
-        if previous_seconds_remaining != game.state.seconds_remaining:
+        if self.previous_seconds_remaining != game.state.seconds_remaining:
             allow_in_play = game.wait_for_sec_state is None and game.wait_for_sec_phase is None
             if allow_in_play and game.state.secondary_state == "STATE_NORMAL" and game.interruption_seconds is not None:
                 if game.interruption_seconds - game.state.seconds_remaining > IN_PLAY_TIMEOUT:
@@ -1992,7 +1992,7 @@ class Referee:
 
         self.reset_ball_touched()
 
-        previous_seconds_remaining = 0
+        self.previous_seconds_remaining = 0
 
         try:
             if game.controller_process:
@@ -2166,9 +2166,9 @@ class Referee:
                                 c = game.penalty_shootout_count - 10
                                 if game.penalty_shootout_time_to_reach_goal_area[c] is None:
                                     game.penalty_shootout_time_to_reach_goal_area[c] = 60 - game.state.seconds_remaining
-                    if previous_seconds_remaining != game.state.seconds_remaining:
+                    if self.previous_seconds_remaining != game.state.seconds_remaining:
                         self.update_state_display()
-                        previous_seconds_remaining = game.state.seconds_remaining
+                        self.previous_seconds_remaining = game.state.seconds_remaining
                         # TODO find out why GC can send negative 'seconds_remaining' when secondary state is penaltykick
                         if game.state.game_state != "STATE_FINISHED" and game.state.seconds_remaining <= 0 and \
                                 not game.state.secondary_state == "PENALTYKICK":
