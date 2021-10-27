@@ -1990,43 +1990,7 @@ class Referee:
 
         self.list_solids()  # prepare lists of solids to monitor in each robot to compute the convex hulls
 
-        game.penalty_shootout_count = 0
-        game.penalty_shootout_goal = False
-        game.penalty_shootout_time_to_score = [None, None, None, None, None, None, None, None, None, None]
-        game.penalty_shootout_time_to_reach_goal_area = [None, None, None, None, None, None, None, None, None, None]
-        game.penalty_shootout_time_to_touch_ball = [None, None, None, None, None, None, None, None, None, None]
-        game.ball = self.supervisor.getFromDef('BALL')
-        game.ball_radius = 0.07 if field_size == 'kid' else 0.1125
-        game.ball_kick_translation = [0, 0, game.ball_radius + game.field.turf_depth]  # initial position of ball before kick
-        game.ball_translation = self.supervisor.getFromDef('BALL').getField('translation')
-        game.ball_exit_translation = None
         self.reset_ball_touched()
-        game.ball_last_touch_time = 0
-        game.ball_first_touch_time = 0
-        game.ball_last_touch_time_for_display = 0
-        game.ball_position = [0, 0, 0]
-        game.ball_last_move = 0
-        game.real_time_multiplier = 1000 / (game.minimum_real_time_factor * time_step) if game.minimum_real_time_factor > 0 else 10
-        game.interruption = None
-        game.interruption_countdown = 0
-        game.interruption_step = None
-        game.interruption_step_time = 0
-        game.interruption_team = None
-        game.interruption_seconds = None
-        game.dropped_ball = False
-        game.overtime = False
-        game.finished_overtime = False
-        game.ready_countdown = 0  # simulated time countdown before ready state (used in kick-off after goal and dropped ball)
-        game.play_countdown = 0
-        game.in_play = None
-        game.throw_in = False  # True while throwing in to allow ball handling
-        game.throw_in_ball_was_lifted = False  # True if the throwing-in player lifted the ball
-        game.over = False
-        game.wait_for_state = 'INITIAL'
-        game.wait_for_sec_state = None
-        game.wait_for_sec_phase = None
-        game.forceful_contact_matrix = ForcefulContactMatrix(len(red_team['players']), len(blue_team['players']),
-                                                             self.config.FOUL_PUSHING_PERIOD, self.config.FOUL_PUSHING_TIME, time_step)
 
         previous_seconds_remaining = 0
 
