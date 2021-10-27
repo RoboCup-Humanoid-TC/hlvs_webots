@@ -54,12 +54,26 @@ global supervisor, game, red_team, blue_team, time_count, time_step, game_contro
 
 class Referee:
     def __init__(self):
+        # start the webots supervisor
+        self.supervisor = Supervisor()
+        self.time_step = int(supervisor.getBasicTimeStep())
         self.sim_time = SimTime()
-        self.game = Game()
         with open('referee_config.yaml') as f:
             config = yaml.load(f)
         self.config = SimpleNamespace(**config)
         self.config.GOAL_HALF_WIDTH = self.config.GOAL_WIDTH / 2
+
+        # determine configuration file name
+        game_config_file = os.environ['WEBOTS_ROBOCUP_GAME'] if 'WEBOTS_ROBOCUP_GAME' in os.environ \
+            else os.path.join(os.getcwd(), 'game.json')
+        if not os.path.isfile(game_config_file):
+            error(f'Cannot read {game_config_file} game config file.')
+            self.clean_exit()
+        # read configuration files
+        with open(game_config_file) as json_file:
+            self.game = json.loads(json_file.read(), object_hook=lambda d: Game(**d))
+        self.red_team = self.read_team(game.red.config)
+        self.blue_team = self.read_team(game.blue.config)
         self.blackboard = Blackboard(supervisor, self.game, self.sim_time, self.config)
         self.others = []
         self.game_controller_send_id = 0
@@ -1859,23 +1873,6 @@ class Referee:
         return team
 
     def setup(self):
-        # start the webots supervisor
-        supervisor = Supervisor()
-        time_step = int(supervisor.getBasicTimeStep())
-        time_count = 0
-
-        # determine configuration file name
-        game_config_file = os.environ['WEBOTS_ROBOCUP_GAME'] if 'WEBOTS_ROBOCUP_GAME' in os.environ \
-            else os.path.join(os.getcwd(), 'game.json')
-        if not os.path.isfile(game_config_file):
-            error(f'Cannot read {game_config_file} game config file.')
-            self.clean_exit()
-
-        # read configuration files
-        with open(game_config_file) as json_file:
-            game = json.loads(json_file.read(), object_hook=lambda d: SimpleNamespace(**d))
-        red_team = self.read_team(game.red.config)
-        blue_team = self.read_team(game.blue.config)
         # if the game.json file is malformed with ids defined as string instead of int, we need to convert them to int:
         if not isinstance(game.red.id, int):
             game.red.id = int(game.red.id)
