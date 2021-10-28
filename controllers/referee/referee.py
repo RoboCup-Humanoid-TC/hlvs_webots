@@ -156,10 +156,10 @@ class Referee:
         now = time.time()
         if self.status_update_last_real_time is None or self.status_update_last_sim_time is None:
             self.status_update_last_real_time = now
-            self.status_update_last_sim_time = time_count
+            self.status_update_last_sim_time = self.sim_time.get_sec()
         elif now - self.status_update_last_real_time > self.config.STATUS_PRINT_PERIOD:
             elapsed_real = now - self.status_update_last_real_time
-            elapsed_simulation = (time_count - self.game.last_time_count) / 1000
+            elapsed_simulation = self.sim_time.get_sec() - self.status_update_last_sim_time
             speed_factor = elapsed_simulation / elapsed_real
             messages = [f"Avg speed factor: {speed_factor:.3f} (over last {elapsed_real:.2f} seconds)"]
             if self.game.state is None:
@@ -173,7 +173,7 @@ class Referee:
             messages = [f"STATUS: {m}" for m in messages]
             info(messages)
             self.status_update_last_real_time = now
-            self.status_update_last_sim_time = time_count
+            self.status_update_last_sim_time = self.sim_time.get_sec()
 
     def toss_a_coin_if_needed(self, attribute):  # attribute should be either "side_left" or "kickoff"
         # If game.json contains such an attribute, use it to determine field side and kick-off
