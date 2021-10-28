@@ -10,11 +10,11 @@ class Game(SimpleNamespace):
         self.penalty_shootout_time_to_score = [None, None, None, None, None, None, None, None, None, None]
         self.penalty_shootout_time_to_reach_goal_area = [None, None, None, None, None, None, None, None, None, None]
         self.penalty_shootout_time_to_touch_ball = [None, None, None, None, None, None, None, None, None, None]
-        self.ball = supervisor.getFromDef('BALL')
+        self.ball = self.blackboard.supervisor.getFromDef('BALL')
         self.ball_radius = 0.07 if field_size == 'kid' else 0.1125
         self.ball_kick_translation = [0, 0,
                                       self.ball_radius + self.field.turf_depth]  # initial position of ball before kick
-        self.ball_translation = supervisor.getFromDef('BALL').getField('translation')
+        self.ball_translation = self.blackboard.supervisor.getFromDef('BALL').getField('translation')
         self.ball_exit_translation = None
         self.ball_last_touch_time = 0
         self.ball_first_touch_time = 0
@@ -22,7 +22,7 @@ class Game(SimpleNamespace):
         self.ball_position = [0, 0, 0]
         self.ball_last_move = 0
         self.real_time_multiplier = 1000 / (
-                    self.minimum_real_time_factor * time_step) if self.minimum_real_time_factor > 0 else 10
+                    self.minimum_real_time_factor * int(self.supervisor.getBasicTimeStep())) if self.minimum_real_time_factor > 0 else 10
         self.interruption = None
         self.interruption_countdown = 0
         self.interruption_step = None
@@ -42,4 +42,4 @@ class Game(SimpleNamespace):
         self.wait_for_sec_state = None
         self.wait_for_sec_phase = None
         self.forceful_contact_matrix = ForcefulContactMatrix(len(red_team['players']), len(blue_team['players']),
-                                                             FOUL_PUSHING_PERIOD, FOUL_PUSHING_TIME, time_step)
+                                                             FOUL_PUSHING_PERIOD, FOUL_PUSHING_TIME, int(self.supervisor.getBasicTimeStep()))
