@@ -50,7 +50,7 @@ GAME_INTERRUPTIONS = {
     'THROWIN': 'throw in'
 }
 
-global red_team, blue_team, time_count, time_step
+global red_team, blue_team
 
 
 class Referee:
@@ -63,9 +63,9 @@ class Referee:
             config = yaml.load(f)
         self.config = SimpleNamespace(**config)
         self.config.GOAL_HALF_WIDTH = self.config.GOAL_WIDTH / 2
-        self.config.SIMULATED_TIME_INTERRUPTION_PHASE_0 = int(self.config.SIMULATED_TIME_INTERRUPTION_PHASE_0 * 1000 / time_step)
-        self.config.SIMULATED_TIME_BEFORE_PLAY_STATE = int(self.config.SIMULATED_TIME_BEFORE_PLAY_STATE * 1000 / time_step)
-        self.config.SIMULATED_TIME_SET_PENALTY_SHOOTOUT = int(self.config.SIMULATED_TIME_SET_PENALTY_SHOOTOUT * 1000 / time_step)
+        self.config.SIMULATED_TIME_INTERRUPTION_PHASE_0 = int(self.config.SIMULATED_TIME_INTERRUPTION_PHASE_0 * 1000 / self.time_step)
+        self.config.SIMULATED_TIME_BEFORE_PLAY_STATE = int(self.config.SIMULATED_TIME_BEFORE_PLAY_STATE * 1000 / self.time_step)
+        self.config.SIMULATED_TIME_SET_PENALTY_SHOOTOUT = int(self.config.SIMULATED_TIME_SET_PENALTY_SHOOTOUT * 1000 / self.time_step)
 
         # determine configuration file name
         self.game_config_file = os.environ['WEBOTS_ROBOCUP_GAME'] if 'WEBOTS_ROBOCUP_GAME' in os.environ \
@@ -125,15 +125,15 @@ class Referee:
             if hasattr(self.game, 'press_a_key_to_terminate') and self.game.press_a_key_to_terminate:
                 print('Press a key to terminate')
                 keyboard = self.supervisor.getKeyboard()
-                keyboard.enable(time_step)
-                while self.supervisor.step(time_step) != -1:
+                keyboard.enable(self.time_step)
+                while self.supervisor.step(self.time_step) != -1:
                     if keyboard.getKey() != -1:
                         break
             else:
-                waiting_steps = self.config.END_OF_GAME_TIMEOUT * 1000 / time_step
+                waiting_steps = self.config.END_OF_GAME_TIMEOUT * 1000 / self.time_step
                 info(f"Waiting {waiting_steps} simulation steps before exiting")
                 while waiting_steps > 0:
-                    self.supervisor.step(time_step)
+                    self.supervisor.step(self.time_step)
                     waiting_steps -= 1
                 info("Finished waiting")
         if hasattr(self.game, 'record_simulation'):
@@ -144,12 +144,12 @@ class Referee:
                 info("Starting encoding")
                 self.supervisor.movieStopRecording()
                 while not self.supervisor.movieIsReady():
-                    self.supervisor.step(time_step)
+                    self.supervisor.step(self.time_step)
                 info("Encoding finished")
         info("Exiting webots properly")
 
         # Note: If self.supervisor.step is not called before the 'simulationQuit', information is not shown
-        self.supervisor.step(time_step)
+        self.supervisor.step(self.time_step)
         self.supervisor.simulationQuit(0)
 
     def print_status(self):
@@ -292,16 +292,16 @@ class Referee:
                 self.game.state.secondary_seconds_remaining == 0 and previous_secondary_seconds_remaining > 0:
             if self.game.in_play is None and self.game.phase == 'KICKOFF':
                 info('Ball in play, can be touched by any player (10 seconds elapsed after kickoff).')
-                self.game.in_play = time_count
-                self.game.ball_last_move = time_count
+                self.game.in_play = self.sim_time.get_ms()
+                self.game.ball_last_move = self.sim_time.get_ms()
         if self.previous_seconds_remaining != self.game.state.seconds_remaining:
             allow_in_play = self.game.wait_for_sec_state is None and self.game.wait_for_sec_phase is None
             if allow_in_play and self.game.state.secondary_state == "STATE_NORMAL" and self.game.interruption_seconds is not None:
                 if self.game.interruption_seconds - self.game.state.seconds_remaining > IN_PLAY_TIMEOUT:
                     if self.game.in_play is None:
                         info('Ball in play, can be touched by any player (10 seconds elapsed).')
-                        self.game.in_play = time_count
-                        self.game.ball_last_move = time_count
+                        self.game.in_play = self.sim_time.get_ms()
+                        self.game.ball_last_move = self.sim_time.get_ms()
                         self.game.interruption = None
                         self.game.interruption_step = None
                         self.game.interruption_step_time = 0
@@ -319,16 +319,16 @@ class Referee:
         if secondary_state[0:6] == 'STATE_' and secondary_state[6:] in GAME_INTERRUPTIONS:
             kick = secondary_state[6:]
             step = secondary_state_info[1]
-            delay = (time_count - self.game.interruption_step_time) / 1000
+            delay = (self.sim_time.get_ms() - self.game.interruption_step_time) / 1000
             if step == 0 and self.game.interruption_step != step:
                 self.game.interruption_step = step
-                self.game.interruption_step_time = time_count
+                self.game.interruption_step_time = self.sim_time.get_ms()
                 info(f'Awarding a {GAME_INTERRUPTIONS[kick]}.')
             elif (step == 1 and self.game.interruption_step != step and self.game.state.secondary_seconds_remaining <= 0 and
                   delay >= self.config.SIMULATED_TIME_INTERRUPTION_PHASE_1):
                 self.game.interruption_step = step
                 self.game_controller_send(f'{kick}:{secondary_state_info[0]}:PREPARE')
-                game.interruption_step_time = time_count
+                game.interruption_step_time = self.sim_time.get_ms()
                 info(f'Prepare for {GAME_INTERRUPTIONS[kick]}.')
             elif step == 2 and game.interruption_step != step and game.state.secondary_seconds_remaining <= 0:
                 game.interruption_step = step
@@ -430,7 +430,7 @@ class Referee:
                     info(f'Waiting for GameController to answer to {message.strip()}.')
                     time.sleep(0.2)
                     self.game_controller_send_id += 1
-                    clock_message = f'{self.game_controller_send_id}:CLOCK:{time_count}\n'
+                    clock_message = f'{self.game_controller_send_id}:CLOCK:{self.sim_time.get_ms()}\n'
                     self.game.controller.sendall(clock_message.encode('ascii'))
                     self.game_controller_send_unanswered[self.game_controller_send_id] = clock_message.strip()
         # We are waiting for a specific update from the GC before testing anything else
@@ -554,30 +554,30 @@ class Referee:
                 hull_vertices = np.take(points, hull.vertices, 0)
                 hold_ball = polygon_circle_collision(hull_vertices, self.game.ball_position, self.game.ball_radius * self.config.BALL_HOLDING_RATIO)
         players_holding_time_window = team['players_holding_time_window']
-        index = int(time_count / time_step) % len(players_holding_time_window)
+        index = int(self.sim_time.get_ms() / self.time_step) % len(players_holding_time_window)
         players_holding_time_window[index] = hold_ball
 
         goalkeeper_holding_time_window = team['goalkeeper_holding_time_window']
-        index = int(time_count / time_step) % len(goalkeeper_holding_time_window)
+        index = int(self.sim_time.get_ms() / self.time_step) % len(goalkeeper_holding_time_window)
         goalkeeper_holding_time_window[index] = goalkeeper_hold_ball
 
         color = team['color']
         if 'hold_ball' in team:
             if not hold_ball:
-                delay = int((time_count - team['hold_ball']) / 100) / 10
+                delay = int((self.sim_time.get_ms() - team['hold_ball']) / 100) / 10
                 info(f'{color.capitalize()} team released the ball after {delay} seconds.')
                 del team['hold_ball']
         elif hold_ball:
-            team['hold_ball'] = time_count
+            team['hold_ball'] = self.sim_time.get_ms()
             info(f'{color.capitalize()} team ({numbers}) is holding the ball.')
 
         if 'goalkeeper_hold_ball' in team:
             if not goalkeeper_hold_ball:
-                delay = int((time_count - team['goalkeeper_hold_ball']) / 100) / 10
+                delay = int((self.sim_time.get_ms() - team['goalkeeper_hold_ball']) / 100) / 10
                 info(f'{color.capitalize()} goalkeeper released the ball after {delay} seconds.')
                 del team['goalkeeper_hold_ball']
         elif goalkeeper_hold_ball:
-            team['goalkeeper_hold_ball'] = time_count
+            team['goalkeeper_hold_ball'] = self.sim_time.get_ms()
             info(f'{color.capitalize()} goalkeeper is holding the ball.')
 
     def update_ball_holding(self):
@@ -599,9 +599,9 @@ class Referee:
             player['outside_goal_area'] = True
             player['outside_penalty_area'] = True
             player['left_turf_time'] = None
-            # Stores tuples of with (time_count[int], dic) at a 1Hz frequency
+            # Stores tuples of with (self.sim_time.get_ms()[int], dic) at a 1Hz frequency
             player['history'] = []
-            window_size = int(1000 / time_step)  # one second window size
+            window_size = int(1000 / self.time_step)  # one second window size
             player['velocity_buffer'] = [[0] * 6] * window_size
             player['ball_handling_start'] = None
             player['ball_handling_last'] = None
@@ -616,7 +616,7 @@ class Referee:
                 continue
             l1 = len(player['velocity_buffer'])     # number of iterations
             l2 = len(player['velocity_buffer'][0])  # should be 6 (velocity vector size)
-            player['velocity_buffer'][int(time_count / time_step) % l1] = robot.getVelocity()
+            player['velocity_buffer'][int(self.sim_time.get_ms() / self.time_step) % l1] = robot.getVelocity()
             sum = [0] * l2
             for v in player['velocity_buffer']:
                 for i in range(l2):
@@ -658,9 +658,9 @@ class Referee:
                 if point[2] > self.game.field.turf_depth:  # not a contact with the ground
                     if not early_game_interruption and point in self.game.ball.contact_points:  # ball contact
                         if member in ['arm', 'hand']:
-                            player['ball_handling_last'] = time_count
+                            player['ball_handling_last'] = self.sim_time.get_ms()
                             if player['ball_handling_start'] is None:
-                                player['ball_handling_start'] = time_count
+                                player['ball_handling_start'] = self.sim_time.get_ms()
                                 info(f'Ball touched the {member} of {color} player {number}.')
                             if (self.game.throw_in and
                                     self.game.ball_position[2] > self.game.field.turf_depth + self.game.ball_radius + self.config.BALL_LIFT_THRESHOLD):
@@ -668,20 +668,20 @@ class Referee:
                         else:  # the ball was touched by another part of the robot
                             self.game.throw_in = False  # if the ball was hit by any player, we consider the throw-in (if any) complete
                         if self.game.ball_first_touch_time == 0:
-                            self.game.ball_first_touch_time = time_count
-                        self.game.ball_last_touch_time = time_count
+                            self.game.ball_first_touch_time = self.sim_time.get_ms()
+                        self.game.ball_last_touch_time = self.sim_time.get_ms()
                         if self.game.penalty_shootout_count >= 10:  # extended penalty shootout
                             self.game.penalty_shootout_time_to_touch_ball[self.game.penalty_shootout_count - 10] = \
                                 60 - self.game.state.seconds_remaining
                         if self.game.ball_last_touch_team != color or self.game.ball_last_touch_player_number != int(number):
                             self.set_ball_touched(color, int(number))
-                            self.game.ball_last_touch_time_for_display = time_count
+                            self.game.ball_last_touch_time_for_display = self.sim_time.get_ms()
                             action = 'kicked' if self.game.kicking_player_number is None else 'touched'
                             info(f'Ball {action} by {color} player {number}.')
                             if self.game.kicking_player_number is None:
                                 self.game.kicking_player_number = int(number)
-                        elif time_count - self.game.ball_last_touch_time_for_display >= 1000:  # dont produce too many touched messages
-                            self.game.ball_last_touch_time_for_display = time_count
+                        elif self.sim_time.get_ms() - self.game.ball_last_touch_time_for_display >= 1000:  # dont produce too many touched messages
+                            self.game.ball_last_touch_time_for_display = self.sim_time.get_ms()
                             info(f'Ball touched again by {color} player {number}.')
                         step = self.game.state.secondary_state_info[1]
                         if step != 0 and self.game.state.secondary_state[6:] in GAME_INTERRUPTIONS:
@@ -719,16 +719,16 @@ class Referee:
                 if 'fallen' in player:  # was already down
                     continue
                 info(f'{color.capitalize()} player {number} has fallen down.')
-                player['fallen'] = time_count
+                player['fallen'] = self.sim_time.get_ms()
             if not player['on_outer_line']:
                 player['on_outer_line'] = not (player['inside_field'] or player['outside_field'])
             if not fallen and 'fallen' in player:  # the robot has recovered
-                delay = (int((time_count - player['fallen']) / 100)) / 10
+                delay = (int((self.sim_time.get_ms() - player['fallen']) / 100)) / 10
                 info(f'{color.capitalize()} player {number} just recovered after {delay} seconds.')
                 del player['fallen']
             if outside_turf:
                 if player['left_turf_time'] is None:
-                    player['left_turf_time'] = time_count
+                    player['left_turf_time'] = self.sim_time.get_ms()
             else:
                 player['left_turf_time'] = None
 
@@ -771,14 +771,14 @@ class Referee:
                         red_number = opponent_number
                         blue_number = number
                     fcm = self.game.forceful_contact_matrix
-                    if (not fcm.contact(red_number, blue_number, time_count - time_step) and
-                            not fcm.contact(red_number, blue_number, time_count)):
-                        info(f'{time_count}: contact between {team["color"]} player {number} and '
+                    if (not fcm.contact(red_number, blue_number, self.sim_time.get_ms() - self.time_step) and
+                            not fcm.contact(red_number, blue_number, self.sim_time.get_ms())):
+                        info(f'{self.sim_time.get_ms()}: contact between {team["color"]} player {number} and '
                              f'{opponent_team["color"]} player {opponent_number}.')
-                    fcm.set_contact(red_number, blue_number, time_count)
+                    fcm.set_contact(red_number, blue_number, self.sim_time.get_ms())
 
     def update_robot_contacts(self):
-        self.game.forceful_contact_matrix.clear(time_count)
+        self.game.forceful_contact_matrix.clear(self.sim_time.get_ms())
         self.update_team_robot_contacts(red_team)
         self.update_team_robot_contacts(blue_team)
 
@@ -788,13 +788,13 @@ class Referee:
                 player = team['players'][number]
                 # Remove old ball_distances
                 if len(player['history']) > 0 \
-                        and (time_count - player['history'][0][0]) > self.config.INACTIVE_GOALKEEPER_TIMEOUT * 1000:
+                        and (self.sim_time.get_ms() - player['history'][0][0]) > self.config.INACTIVE_GOALKEEPER_TIMEOUT * 1000:
                     player['history'].pop(0)
                 # If enough time has elapsed, add an entry
-                if len(player['history']) == 0 or (time_count - player['history'][-1][0]) > self.config.BALL_DIST_PERIOD * 1000:
+                if len(player['history']) == 0 or (self.sim_time.get_ms() - player['history'][-1][0]) > self.config.BALL_DIST_PERIOD * 1000:
                     ball_dist = distance2(player['position'], self.game.ball_position)
                     own_goal_area = player['inside_own_side'] and not player['outside_goal_area']
-                    entry = (time_count, {"ball_distance": ball_dist, "own_goal_area": own_goal_area})
+                    entry = (self.sim_time.get_ms(), {"ball_distance": ball_dist, "own_goal_area": own_goal_area})
                     player['history'].append(entry)
 
     def update_team_penalized(self, team):
@@ -823,7 +823,7 @@ class Referee:
                     del player['stabilize']
                 player['outside_field'] = True
             elif 'enable_actuators_at' in player:
-                timing_ok = time_count >= player['enable_actuators_at']
+                timing_ok = self.sim_time.get_ms() >= player['enable_actuators_at']
                 penalty_ok = 'penalized' not in player or p.penalty == 0
                 if timing_ok and penalty_ok:
                     customData = player['robot'].getField('customData')
@@ -858,7 +858,7 @@ class Referee:
              f'{opponent_team["color"]} player {opponent_number} ({message}) {area}.')
         self.game.forceful_contact_matrix.clear_all()
         opponent = opponent_team['players'][opponent_number]
-        immunity_timeout = time_count + self.config.FOUL_PENALTY_IMMUNITY * 1000
+        immunity_timeout = self.sim_time.get_ms() + self.config.FOUL_PENALTY_IMMUNITY * 1000
         opponent['penalty_immunity'] = immunity_timeout
         player['penalty_immunity'] = immunity_timeout
         freekick_team_id = self.game.blue.id if team['color'] == "red" else self.game.red.id
@@ -897,7 +897,7 @@ class Referee:
     def check_team_forceful_contacts(self, team, number, opponent_team, opponent_number):
         p1 = team['players'][number]
         if 'penalty_immunity' in p1:
-            if p1['penalty_immunity'] < time_count:
+            if p1['penalty_immunity'] < self.sim_time.get_ms():
                 del p1['penalty_immunity']
             else:
                 return
@@ -962,7 +962,7 @@ class Referee:
         fcm = self.game.forceful_contact_matrix
         for red_number in red_team['players']:
             for blue_number in blue_team['players']:
-                if not fcm.contact(red_number, blue_number, time_count):
+                if not fcm.contact(red_number, blue_number, self.sim_time.get_ms()):
                     continue  # no contact
                 if self.check_team_forceful_contacts(red_team, red_number, blue_team, blue_number):
                     continue
@@ -1000,7 +1000,7 @@ class Referee:
                 continue
             duration = (player['ball_handling_last'] - player['ball_handling_start']) / 1000
             color = team['color']
-            if time_count - player['ball_handling_last'] >= 1000:  # ball was released one second ago or more
+            if self.sim_time.get_ms() - player['ball_handling_last'] >= 1000:  # ball was released one second ago or more
                 self.reset_ball_handling(player)
                 if self.game.throw_in:
                     was_throw_in = self.game.throw_in
@@ -1030,7 +1030,7 @@ class Referee:
             # goalkeeper case
             if duration >= self.config.BALL_HANDLING_TIMEOUT:
                 if (self.game.ball_previous_touch_team == self.game.ball_last_touch_team and
-                        time_count - player['ball_handling_start'] >= 1000):  # ball handled by goalkeeper for 1 second or more
+                        self.sim_time.get_ms() - player['ball_handling_start'] >= 1000):  # ball handled by goalkeeper for 1 second or more
                     self.reset_ball_handling(player)
                     sentence = 'handled the ball after it received it from teammate' \
                         if self.game.ball_last_touch_player_number == int(number) else 'released the ball and retook it'
@@ -1061,7 +1061,7 @@ class Referee:
             player = team['players'][number]
             if self.already_penalized(player):
                 continue
-            if 'fallen' in player and time_count - player['fallen'] > 1000 * self.config.FALLEN_TIMEOUT:
+            if 'fallen' in player and self.sim_time.get_ms() - player['fallen'] > 1000 * self.config.FALLEN_TIMEOUT:
                 del player['fallen']
                 if self.game.penalty_shootout and self.is_penalty_kicker(team, number):
                     info("Kicker {color.capitalize()} {number} has fallen down and not recovered -> end of trial")
@@ -1217,7 +1217,7 @@ class Referee:
                 continue
             if player['left_turf_time'] is None:
                 continue
-            if time_count - player['left_turf_time'] < self.config.OUTSIDE_TURF_TIMEOUT * 1000:
+            if self.sim_time.get_ms() - player['left_turf_time'] < self.config.OUTSIDE_TURF_TIMEOUT * 1000:
                 continue
             if self.game.penalty_shootout and self.is_penalty_kicker(team, number):
                 info(f'Kicker {color.capitalize()} {number} left the field -> end of trial')
@@ -1327,7 +1327,7 @@ class Referee:
             info(f"Reset interruption_countdown to {self.game.interruption_countdown}")
             self.game_controller_send(f'{self.game.interruption}:{self.game.interruption_team}:RETAKE')
         else:
-            self.game.in_play = time_count
+            self.game.in_play = self.sim_time.get_ms()
             info(f"Ball touched before execute, aborting {GAME_INTERRUPTIONS[self.game.interruption]}")
             self.game_controller_send(f'{self.game.interruption}:{self.game.interruption_team}:ABORT')
         self.game_controller_send(f'CARD:{team_id}:{number}:WARN')
@@ -1383,7 +1383,7 @@ class Referee:
                 reason = player['penalty_reason']
                 del player['penalty']
                 del player['penalty_reason']
-                player['penalty_immunity'] = time_count + self.config.FOUL_PENALTY_IMMUNITY * 1000
+                player['penalty_immunity'] = self.sim_time.get_ms() + self.config.FOUL_PENALTY_IMMUNITY * 1000
                 team_id = self.game.red.id if color == 'red' else self.game.blue.id
                 self.game_controller_send(f'PENALTY:{team_id}:{number}:{penalty}')
                 self.place_player_at_penalty(player, team, number)
@@ -1458,7 +1458,7 @@ class Referee:
              f'translation ({t[0]} {t[1]} {t[2]}), rotation ({r[0]} {r[1]} {r[2]} {r[3]}).')
         info(f'Disabling actuators of {color} player {number}.')
         robot.getField('customData').setSFString('penalized')
-        player['enable_actuators_at'] = time_count + int(self.config.DISABLE_ACTUATORS_MIN_DURATION * 1000)
+        player['enable_actuators_at'] = self.sim_time.get_ms() + int(self.config.DISABLE_ACTUATORS_MIN_DURATION * 1000)
 
     def reset_teams(self, pose):
         for number in red_team['players']:
@@ -1615,8 +1615,8 @@ class Referee:
                 player['invalidGoalkeeperStart'] = None
             else:
                 if player['invalidGoalkeeperStart'] is None:
-                    player['invalidGoalkeeperStart'] = time_count
-                elif time_count - player['invalidGoalkeeperStart'] > self.config.INVALID_GOALKEEPER_TIMEOUT * 1000:
+                    player['invalidGoalkeeperStart'] = self.sim_time.get_ms()
+                elif self.sim_time.get_ms() - player['invalidGoalkeeperStart'] > self.config.INVALID_GOALKEEPER_TIMEOUT * 1000:
                     info(f'Goalkeeper of team {defending_team["color"]} is not on goal line since {self.config.INVALID_GOALKEEPER_TIMEOUT} sec')
                     self.send_penalty(player, 'INCAPABLE', "Not on goal line during penalty")
 
@@ -1722,7 +1722,7 @@ class Referee:
 
     def dropped_ball(self):
         info(f'The ball didn\'t move for the past {self.config.DROPPED_BALL_TIMEOUT} seconds.')
-        self.game.ball_last_move = time_count
+        self.game.ball_last_move = self.sim_time.get_ms()
         self.game_controller_send('DROPPEDBALL')
         self.game.phase = 'DROPPEDBALL'
         self.game.ball_kick_translation[0] = 0
@@ -1985,8 +1985,8 @@ class Referee:
         self.spawn_team(red_team, self.game.side_left == self.game.blue.id, children)
         self.spawn_team(blue_team, self.game.side_left == self.game.red.id, children)
 
-        players_ball_holding_time_window_size = int(1000 * self.config.PLAYERS_BALL_HOLDING_TIMEOUT / time_step)
-        goalkeeper_ball_holding_time_window_size = int(1000 * self.config.GOALKEEPER_BALL_HOLDING_TIMEOUT / time_step)
+        players_ball_holding_time_window_size = int(1000 * self.config.PLAYERS_BALL_HOLDING_TIMEOUT / self.time_step)
+        goalkeeper_ball_holding_time_window_size = int(1000 * self.config.GOALKEEPER_BALL_HOLDING_TIMEOUT / self.time_step)
         red_team['players_holding_time_window'] = np.zeros(players_ball_holding_time_window_size, dtype=bool)
         red_team['goalkeeper_holding_time_window'] = np.zeros(goalkeeper_ball_holding_time_window_size, dtype=bool)
         blue_team['players_holding_time_window'] = np.zeros(players_ball_holding_time_window_size, dtype=bool)
@@ -2081,22 +2081,22 @@ class Referee:
     def main_loop(self):
         try:
             previous_real_time = time.time()
-            while self.supervisor.step(time_step) != -1 and not self.game.over:
+            while self.supervisor.step(self.time_step) != -1 and not self.game.over:
                 if hasattr(self.game, 'max_duration') and (time.time() - log.real_time) > self.game.max_duration:
                     info(f'Interrupting game automatically after {self.game.max_duration} seconds')
                     break
                 self.print_status()
-                self.game_controller_send(f'CLOCK:{time_count}')
+                self.game_controller_send(f'CLOCK:{self.sim_time.get_ms()}')
                 self.game_controller_receive()
                 if self.game.state is None:
-                    time_count += time_step
+                    self.sim_time.progress_ms(self.time_step)
                     continue
                 self.stabilize_robots()
                 send_play_state_after_penalties = False
                 previous_position = copy.deepcopy(self.game.ball_position)
                 self.game.ball_position = self.game.ball_translation.getSFVec3f()
                 if self.game.ball_position != previous_position:
-                    self.game.ball_last_move = time_count
+                    self.game.ball_last_move = self.sim_time.get_ms()
                 self.update_contacts()  # check for collisions with the ground and ball
                 if not self.game.penalty_shootout:
                     self.update_ball_holding()  # check for ball holding for field players and goalkeeper
@@ -2119,16 +2119,16 @@ class Referee:
                             if d > self.config.BALL_IN_PLAY_MOVE:
                                 info(f'{self.game.ball_kick_translation} {self.game.ball_position}')
                                 info(f'Ball in play, can be touched by any player (moved by {d * 100:.2f} cm).')
-                                self.game.in_play = time_count
+                                self.game.in_play = self.sim_time.get_ms()
                             elif not self.is_game_interruption():  # The game interruption case is handled in update_team_contacts
                                 team = red_team if self.game.ball_must_kick_team == 'blue' else blue_team
                                 self.check_ball_must_kick(team)
                     else:
-                        if time_count - self.game.ball_last_move > self.config.DROPPED_BALL_TIMEOUT * 1000:
+                        if self.sim_time.get_ms() - self.game.ball_last_move > self.config.DROPPED_BALL_TIMEOUT * 1000:
                             self.dropped_ball()
                         if self.game.ball_left_circle is None and self.game.phase == 'KICKOFF':
                             if distance2(self.game.ball_kick_translation, self.game.ball_position) > self.game.field.circle_radius + self.game.ball_radius:
-                                self.game.ball_left_circle = time_count
+                                self.game.ball_left_circle = self.sim_time.get_ms()
                                 info('The ball has left the center circle after kick-off.')
 
                         ball_touched_by_opponent = self.game.ball_last_touch_team and (self.game.ball_last_touch_team != self.game.ball_must_kick_team)
@@ -2413,12 +2413,12 @@ class Referee:
                         self.game_controller_send('STATE:PLAY')
                         send_play_state_after_penalties = False
 
-                time_count += time_step
+                self.sim_time.progress_ms(self.time_step)
 
                 if self.game.minimum_real_time_factor != 0:
                     # slow down the simulation to guarantee a miminum amount of real time between each step
                     t = time.time()
-                    delta_time = previous_real_time - t + self.game.minimum_real_time_factor * time_step / 1000
+                    delta_time = previous_real_time - t + self.game.minimum_real_time_factor * self.time_step / 1000
                     if delta_time > 0:
                         time.sleep(delta_time)
                     previous_real_time = time.time()
