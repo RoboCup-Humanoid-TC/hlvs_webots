@@ -152,7 +152,7 @@ class Referee:
         self.supervisor.step(time_step)
         self.supervisor.simulationQuit(0)
 
-    def perform_status_update(self):
+    def print_status(self):
         now = time.time()
         if self.status_update_last_real_time is None or self.status_update_last_sim_time is None:
             self.status_update_last_real_time = now
@@ -2085,7 +2085,7 @@ class Referee:
                 if hasattr(self.game, 'max_duration') and (time.time() - log.real_time) > self.game.max_duration:
                     info(f'Interrupting game automatically after {self.game.max_duration} seconds')
                     break
-                self.perform_status_update()
+                self.print_status()
                 self.game_controller_send(f'CLOCK:{time_count}')
                 self.game_controller_receive()
                 if self.game.state is None:
