@@ -92,6 +92,10 @@ class Referee:
         self.game_controller_udp_filter = os.environ['GAME_CONTROLLER_UDP_FILTER'] if 'GAME_CONTROLLER_UDP_FILTER' in os.environ else None
 
         self.setup()
+
+        self.last_real_time = None
+        self.last_time_count = None
+
         self.main_loop()
 
     def announce_final_score(self):
@@ -150,11 +154,11 @@ class Referee:
 
     def perform_status_update(self):
         now = time.time()
-        if not hasattr(self.game, "last_real_time"):
-            self.game.last_real_time = now
-            self.game.last_time_count = time_count
-        elif now - self.game.last_real_time > self.config.STATUS_PRINT_PERIOD:
-            elapsed_real = now - self.game.last_real_time
+        if self.last_real_time is None or self.last_time_count is None:
+            self.last_real_time = now
+            self.last_time_count = time_count
+        elif now - self.last_real_time > self.config.STATUS_PRINT_PERIOD:
+            elapsed_real = now - self.last_real_time
             elapsed_simulation = (time_count - self.game.last_time_count) / 1000
             speed_factor = elapsed_simulation / elapsed_real
             messages = [f"Avg speed factor: {speed_factor:.3f} (over last {elapsed_real:.2f} seconds)"]
@@ -168,8 +172,8 @@ class Referee:
                 messages.append(f"{self.get_penalty_shootout_msg()}")
             messages = [f"STATUS: {m}" for m in messages]
             info(messages)
-            self.game.last_real_time = now
-            self.game.last_time_count = time_count
+            self.last_real_time = now
+            self.last_time_count = time_count
 
     def toss_a_coin_if_needed(self, attribute):  # attribute should be either "side_left" or "kickoff"
         # If game.json contains such an attribute, use it to determine field side and kick-off
