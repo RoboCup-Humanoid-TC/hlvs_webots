@@ -19,6 +19,7 @@ import os
 import random
 import socket
 import subprocess
+import sys
 import time
 import traceback
 import yaml
@@ -172,6 +173,7 @@ class Referee:
         # Note: If self.supervisor.step is not called before the 'simulationQuit', information is not shown
         self.supervisor.step(self.time_step)
         self.supervisor.simulationQuit(0)
+        sys.exit()
 
     def print_status(self):
         now = time.time()
