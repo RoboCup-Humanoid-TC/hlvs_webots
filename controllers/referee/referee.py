@@ -108,7 +108,7 @@ class Referee:
         self.others = []
         self.game_controller_send_id = 0
         self.game_controller_send_unanswered = {}
-        self.game_controller_send_sent_once = None
+        self.game_controller_last_sent_message = None
         self.game_controller_udp_filter = os.environ['GAME_CONTROLLER_UDP_FILTER'] if 'GAME_CONTROLLER_UDP_FILTER' in os.environ else None
 
         self.setup()
@@ -374,9 +374,9 @@ class Referee:
     def game_controller_send(self, message):
         if message[:6] == 'STATE:' or message[:6] == 'SCORE:' or message == 'DROPPEDBALL':
             # we don't want to send twice the same STATE or SCORE message
-            if self.game_controller_send.sent_once == message:
+            if self.game_controller_last_sent_message == message:
                 return False
-            self.game_controller_send.sent_once = message
+            self.game_controller_last_sent_message = message
             if message[6:] in ['READY', 'SET']:
                 self.game.wait_for_state = message[6:]
             elif message[6:] == 'PLAY':
