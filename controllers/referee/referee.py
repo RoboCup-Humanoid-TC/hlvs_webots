@@ -105,7 +105,6 @@ class Referee:
                                                              self.config.FOUL_PUSHING_PERIOD,
                                                              self.config.FOUL_PUSHING_TIME, self.time_step)
         self.display = Display(self.blackboard)
-        self.display.setup_display()
         self.others = []
         self.game_controller_send_id = 0
         self.game_controller_send_unanswered = {}
@@ -113,6 +112,7 @@ class Referee:
         self.game_controller_udp_filter = os.environ['GAME_CONTROLLER_UDP_FILTER'] if 'GAME_CONTROLLER_UDP_FILTER' in os.environ else None
 
         self.setup()
+        self.display.setup_display()
         self.ball = self.blackboard.supervisor.getFromDef('BALL')
         self.game.ball_translation = self.blackboard.supervisor.getFromDef('BALL').getField('translation')
 
