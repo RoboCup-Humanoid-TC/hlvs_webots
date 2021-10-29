@@ -351,26 +351,26 @@ class Referee:
                   delay >= self.config.SIMULATED_TIME_INTERRUPTION_PHASE_1):
                 self.game.interruption_step = step
                 self.game_controller_send(f'{kick}:{secondary_state_info[0]}:PREPARE')
-                game.interruption_step_time = self.sim_time.get_ms()
+                self.game.interruption_step_time = self.sim_time.get_ms()
                 self.logger.info(f'Prepare for {GAME_INTERRUPTIONS[kick]}.')
-            elif step == 2 and game.interruption_step != step and game.state.secondary_seconds_remaining <= 0:
-                game.interruption_step = step
-                opponent_team = self.blue_team if secondary_state_info[0] == game.red.id else self.red_team
-                check_team_away_from_ball(opponent_team, game.field.opponent_distance_to_ball)
+            elif step == 2 and self.game.interruption_step != step and self.game.state.secondary_seconds_remaining <= 0:
+                self.game.interruption_step = step
+                opponent_team = self.blue_team if secondary_state_info[0] == self.game.red.id else self.red_team
+                self.check_team_away_from_ball(opponent_team, self.game.field.opponent_distance_to_ball)
                 if kick == "PENALTYKICK":
-                    check_penalty_kick_positions()
-                game_controller_send(f'{kick}:{secondary_state_info[0]}:EXECUTE')
+                    self.check_penalty_kick_positions()
+                self.game_controller_send(f'{kick}:{secondary_state_info[0]}:EXECUTE')
                 self.logger.info(f'Execute {GAME_INTERRUPTIONS[kick]}.')
-                game.interruption_seconds = game.state.seconds_remaining
-                if game.interruption_seconds == 0:
-                    game.interruption_seconds = None
+                self.game.interruption_seconds = self.game.state.seconds_remaining
+                if self.game.interruption_seconds == 0:
+                    self.game.interruption_seconds = None
         elif secondary_state not in ['STATE_NORMAL', 'STATE_OVERTIME', 'STATE_PENALTYSHOOT']:
-            print(f'GameController {game.state.game_state}:{secondary_state}: {secondary_state_info}')
+            print(f'GameController {self.game.state.game_state}:{secondary_state}: {secondary_state_info}')
         self.update_penalized()
-        if previous_state != game.state.game_state or \
+        if previous_state != self.game.state.game_state or \
                 previous_sec_state != new_sec_state or previous_sec_phase != new_sec_phase or \
-                previous_secondary_seconds_remaining != game.state.secondary_seconds_remaining or \
-                game.state.seconds_remaining <= 0:
+                previous_secondary_seconds_remaining != self.game.state.secondary_seconds_remaining or \
+                self.game.state.seconds_remaining <= 0:
             self.display.update_state_display()
 
     def game_controller_send(self, message):
