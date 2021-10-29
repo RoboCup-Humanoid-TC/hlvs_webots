@@ -61,7 +61,7 @@ class Referee:
         self.time_step = int(self.supervisor.getBasicTimeStep())
         self.sim_time = SimTime()
         with open('referee_config.yaml') as f:
-            config = yaml.load(f)
+            config = yaml.safe_load(f)
         self.config = SimpleNamespace(**config)
         self.config.GOAL_HALF_WIDTH = self.config.GOAL_WIDTH / 2
         self.config.SIMULATED_TIME_INTERRUPTION_PHASE_0 = int(self.config.SIMULATED_TIME_INTERRUPTION_PHASE_0 * 1000 / self.time_step)
