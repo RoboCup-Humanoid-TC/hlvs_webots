@@ -2552,3 +2552,7 @@ class Referee:
             self.clean_exit()
 
         self.clean_exit()
+
+
+if __name__ == '__main__':
+    Referee()
