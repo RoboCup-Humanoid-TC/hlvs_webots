@@ -1911,30 +1911,21 @@ class Referee:
         return team
 
     def setup(self):
-        # if the game.json file is malformed with ids defined as string instead of int, we need to convert them to int:
-        if not isinstance(self.game.red.id, int):
-            self.game.red.id = int(self.game.red.id)
-        if not isinstance(self.game.blue.id, int):
-            self.game.blue.id = int(self.game.blue.id)
-
-        # finalize the game object
-        if not hasattr(self.game, 'minimum_real_time_factor'):
-            self.game.minimum_real_time_factor = 3  # we garantee that each time step lasts at least 3x simulated time
-        if self.game.minimum_real_time_factor == 0:  # speed up non-real time tests
+        # speed up non-real time tests
+        if self.game.minimum_real_time_factor == 0:
             self.config.REAL_TIME_BEFORE_FIRST_READY_STATE = 5
             self.config.HALF_TIME_BREAK_REAL_TIME_DURATION = 2
-        if not hasattr(self.game, 'press_a_key_to_terminate'):
-            self.game.press_a_key_to_terminate = False
+
+        # check game type
         if self.game.type not in ['NORMAL', 'KNOCKOUT', 'PENALTY']:
             self.logger.error(f'Unsupported game type: {self.game.type}.')
             self.clean_exit()
-        self.game.penalty_shootout = self.game.type == 'PENALTY'
-        self.logger.info(f'Minimum real time factor is set to {self.game.minimum_real_time_factor}.')
+
         if self.game.minimum_real_time_factor == 0:
             self.logger.info('Simulation will run as fast as possible, real time waiting times will be minimal.')
         else:
-            self.logger.info(f'Simulation will guarantee a maximum {1 / self.game.minimum_real_time_factor:.2f}x speed for each time step.')
-
+            self.logger.info(
+                f'Simulation will guarantee a maximum {1 / self.game.minimum_real_time_factor:.2f}x speed for each time step.')
 
         # check team name length (should be at most 12 characters long, trim them if too long)
         if len(self.red_team['name']) > 12:

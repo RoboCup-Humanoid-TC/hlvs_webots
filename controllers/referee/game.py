@@ -7,6 +7,20 @@ class Game(SimpleNamespace):
         super().__init__(**kwargs)
         self.red = SimpleNamespace(**self.red)
         self.blue = SimpleNamespace(**self.blue)
+
+        # if the game.json file is malformed with ids defined as string instead of int, we need to convert them to int:
+        if not isinstance(self.red.id, int):
+            self.red.id = int(self.red.id)
+        if not isinstance(self.blue.id, int):
+            self.blue.id = int(self.blue.id)
+
+        # set defaults for unset values
+        if not hasattr(self, 'minimum_real_time_factor'):
+            self.minimum_real_time_factor = 3  # we guarantee that each time step lasts at least 3x simulated time
+        if not hasattr(self, 'press_a_key_to_terminate'):
+            self.press_a_key_to_terminate = False
+
+        self.penalty_shootout = self.type == 'PENALTY'
         self.penalty_shootout_count = 0
         self.penalty_shootout_goal = False
         self.penalty_shootout_time_to_score = [None, None, None, None, None, None, None, None, None, None]
@@ -22,7 +36,7 @@ class Game(SimpleNamespace):
         self.ball_position = [0, 0, 0]
         self.ball_last_move = 0
         self.real_time_multiplier = 1000 / (
-                    self.minimum_real_time_factor * int(self.supervisor.getBasicTimeStep())) if self.minimum_real_time_factor > 0 else 10
+                    self.minimum_real_time_factor * int(self.blackboard.supervisor.getBasicTimeStep())) if self.minimum_real_time_factor > 0 else 10
         self.interruption = None
         self.interruption_countdown = 0
         self.interruption_step = None
