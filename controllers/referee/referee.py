@@ -320,7 +320,7 @@ class Referee:
         if self.previous_seconds_remaining != self.game.state.seconds_remaining:
             allow_in_play = self.game.wait_for_sec_state is None and self.game.wait_for_sec_phase is None
             if allow_in_play and self.game.state.secondary_state == "STATE_NORMAL" and self.game.interruption_seconds is not None:
-                if self.game.interruption_seconds - self.game.state.seconds_remaining > IN_PLAY_TIMEOUT:
+                if self.game.interruption_seconds - self.game.state.seconds_remaining > self.config.IN_PLAY_TIMEOUT:
                     if self.game.in_play is None:
                         self.logger.info('Ball in play, can be touched by any player (10 seconds elapsed).')
                         self.game.in_play = self.sim_time.get_ms()
