@@ -330,12 +330,12 @@ class Referee:
                         self.game.interruption_step_time = 0
                         self.game.interruption_team = None
                         self.game.interruption_seconds = None
-            update_time_display()
+            self.display.update_time_display()
         red = 0 if self.game.state.teams[0].team_color == 'RED' else 1
         blue = 1 if red == 0 else 0
         if previous_red_score != self.game.state.teams[red].score or \
                 previous_blue_score != self.game.state.teams[blue].score:
-            update_score_display()
+            self.display.update_score_display()
         # print(self.game.state.game_state)
         secondary_state = self.game.state.secondary_state
         secondary_state_info = self.game.state.secondary_state_info
@@ -371,7 +371,7 @@ class Referee:
                 previous_sec_state != new_sec_state or previous_sec_phase != new_sec_phase or \
                 previous_secondary_seconds_remaining != game.state.secondary_seconds_remaining or \
                 game.state.seconds_remaining <= 0:
-            update_state_display()
+            self.display.update_state_display()
 
     def game_controller_send(self, message):
         if message[:6] == 'STATE:' or message[:6] == 'SCORE:' or message == 'DROPPEDBALL':
