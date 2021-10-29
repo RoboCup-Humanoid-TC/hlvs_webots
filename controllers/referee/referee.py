@@ -82,18 +82,24 @@ class Referee:
         with open(self.game_config_file) as json_file:
             game_data = json.loads(json_file.read())
         game_data['blackboard'] = self.blackboard
+        field_size = game_data['class'].lower()
+        game_data['field_size'] = field_size
+        self.field = Field(field_size)
+        self.blackboard.field = self.field
 
         self.game = Game(**game_data)
         self.blackboard.game = self.game
 
-        self.game.field = Field(self.game.field_size)
 
-        self.red_team = self.read_team(self.game.red.config)
-        self.blue_team = self.read_team(self.game.blue.config)
+        self.red_team = self.read_team(self.game.red['config'])
+        self.blue_team = self.read_team(self.game.blue['config'])
         self.red_team['color'] = 'red'
         self.blue_team['color'] = 'blue'
         self.init_team(self.red_team)
         self.init_team(self.blue_team)
+
+        self.blackboard.red_team = self.red_team
+        self.blackboard.blue_team = self.blue_team
 
         self.forceful_contact_matrix = ForcefulContactMatrix(len(self.red_team['players']),
                                                              len(self.blue_team['players']),
@@ -108,6 +114,8 @@ class Referee:
         self.game_controller_udp_filter = os.environ['GAME_CONTROLLER_UDP_FILTER'] if 'GAME_CONTROLLER_UDP_FILTER' in os.environ else None
 
         self.setup()
+        self.ball = self.blackboard.supervisor.getFromDef('BALL')
+        self.game.ball_translation = self.blackboard.supervisor.getFromDef('BALL').getField('translation')
 
         self.status_update_last_real_time = None
         self.status_update_last_sim_time = None
@@ -672,7 +680,7 @@ class Referee:
                     if name in player['tagged_solids']:
                         member = player['tagged_solids'][name]
                 if point[2] > self.game.field.turf_depth:  # not a contact with the ground
-                    if not early_game_interruption and point in self.game.ball.contact_points:  # ball contact
+                    if not early_game_interruption and point in self.ball.contact_points:  # ball contact
                         if member in ['arm', 'hand']:
                             player['ball_handling_last'] = self.sim_time.get_ms()
                             if player['ball_handling_start'] is None:
@@ -749,12 +757,12 @@ class Referee:
                 player['left_turf_time'] = None
 
     def update_ball_contacts(self):
-        self.game.ball.contact_points = []
-        for i in range(self.game.ball.getNumberOfContactPoints()):
-            point = self.game.ball.getContactPoint(i)
+        self.ball.contact_points = []
+        for i in range(self.ball.getNumberOfContactPoints()):
+            point = self.ball.getContactPoint(i)
             if point[2] <= self.game.field.turf_depth:  # contact with the ground
                 continue
-            self.game.ball.contact_points.append(point)
+            self.ball.contact_points.append(point)
             break
 
     def update_contacts(self):
@@ -899,8 +907,8 @@ class Referee:
     def moves_to_ball(self, player, velocity, velocity_squared):
         if velocity_squared < self.config.FOUL_SPEED_THRESHOLD * self.config.FOUL_SPEED_THRESHOLD:
             return True
-        rx = self.game.ball_position[0] - player['position'][0]
-        ry = self.game.ball_position[1] - player['position'][1]
+        rx = self.ball_position[0] - player['position'][0]
+        ry = self.ball_position[1] - player['position'][1]
         vx = velocity[0]
         vy = velocity[1]
         angle = math.acos((rx * vx + ry * vy) / (math.sqrt(rx * rx + ry * ry) * math.sqrt(vx * vx + vy * vy)))
@@ -1554,7 +1562,7 @@ class Referee:
             else:
                 self.reset_player(defending_color, number, 'halfTimeStartingPose')
         x = -self.game.field.penalty_mark_x if (self.game.side_left == self.game.kickoff) ^ default else self.game.field.penalty_mark_x
-        self.game.ball.resetPhysics()
+        self.ball.resetPhysics()
         self.reset_ball_touched()
         self.game.in_play = None
         self.game.can_score = True
@@ -1714,7 +1722,7 @@ class Referee:
     def move_ball_away(self):
         """Places ball far away from field for phases where the referee is supposed to hold it in it's hand"""
         target_location = [100, 100, self.game.ball_radius + 0.05]
-        self.game.ball.resetPhysics()
+        self.ball.resetPhysics()
         self.game.ball_translation.setSFVec3f(target_location)
         self.logger.info("Moved ball out of the field temporarily")
 
@@ -1873,7 +1881,7 @@ class Referee:
                     self.move_robots_away(target_location)
                 step += 1
         target_location[2] = self.game.ball_radius
-        self.game.ball.resetPhysics()
+        self.ball.resetPhysics()
         self.game.ball_translation.setSFVec3f(target_location)
         self.game.ball_set_kick = False
         self.reset_ball_touched()
@@ -2163,7 +2171,7 @@ class Referee:
                         ball_in_goal_area = self.game.field.circle_fully_inside_goal_area(self.game.ball_position, self.game.ball_radius)
                         # It is unclear that using getVelocity is the good approach, because even when the ball is clearly not moving
                         # anymore, it still provides values above 1e-3.
-                        ball_vel = self.game.ball.getVelocity()[:3]
+                        ball_vel = self.ball.getVelocity()[:3]
                         if ball_in_goal_area and np.linalg.norm(ball_vel) < self.config.STATIC_SPEED_EPS:
                             self.logger.info(f"Ball stopped in goal area at {self.game.ball_position}")
                             self.next_penalty_shootout()

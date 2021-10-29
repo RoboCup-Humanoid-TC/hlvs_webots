@@ -128,8 +128,8 @@ class Display:
         self.blackboard.supervisor.setLabel(2, ' ' * 7 + '█' * 14, 0, 0, self.font_size, left_color, 0.2, self.font)
         self.blackboard.supervisor.setLabel(3, ' ' * 26 + '█' * 14, 0, 0, self.font_size, right_color, 0.2, self.font)
         # white background and names
-        left_team = red_team if self.blackboard.game.side_left == self.blackboard.game.red.id else blue_team
-        right_team = red_team if self.blackboard.game.side_left == self.blackboard.game.blue.id else blue_team
+        left_team = self.blackboard.red_team if self.blackboard.game.side_left == self.blackboard.game.red.id else self.blackboard.blue_team
+        right_team = self.blackboard.red_team if self.blackboard.game.side_left == self.blackboard.game.blue.id else self.blackboard.blue_team
         team_names = 7 * '█' + (13 - len(left_team['name'])) * ' ' + left_team['name'] + \
                      ' █████ ' + right_team['name'] + ' ' * (13 - len(right_team['name'])) + '█' * 22
         self.blackboard.supervisor.setLabel(4, team_names, 0, 0, self.font_size, self.blackboard.config.WHITE_COLOR, 0.2, self.font)

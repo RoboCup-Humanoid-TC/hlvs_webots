@@ -1,21 +1,18 @@
-from forceful_contact_matrix import ForcefulContactMatrix
+
 from types import SimpleNamespace
 
 
 class Game(SimpleNamespace):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.field_size = getattr(self, 'class').lower()
         self.penalty_shootout_count = 0
         self.penalty_shootout_goal = False
         self.penalty_shootout_time_to_score = [None, None, None, None, None, None, None, None, None, None]
         self.penalty_shootout_time_to_reach_goal_area = [None, None, None, None, None, None, None, None, None, None]
         self.penalty_shootout_time_to_touch_ball = [None, None, None, None, None, None, None, None, None, None]
-        self.ball = self.blackboard.supervisor.getFromDef('BALL')
-        self.ball_radius = 0.07 if field_size == 'kid' else 0.1125
+        self.ball_radius = 0.07 if self.field_size == 'kid' else 0.1125
         self.ball_kick_translation = [0, 0,
-                                      self.ball_radius + self.field.turf_depth]  # initial position of ball before kick
-        self.ball_translation = self.blackboard.supervisor.getFromDef('BALL').getField('translation')
+                                      self.ball_radius + self.blackboard.field.turf_depth]  # initial position of ball before kick
         self.ball_exit_translation = None
         self.ball_last_touch_time = 0
         self.ball_first_touch_time = 0
