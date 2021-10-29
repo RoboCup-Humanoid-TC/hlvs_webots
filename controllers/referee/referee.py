@@ -366,7 +366,7 @@ class Referee:
                     game.interruption_seconds = None
         elif secondary_state not in ['STATE_NORMAL', 'STATE_OVERTIME', 'STATE_PENALTYSHOOT']:
             print(f'GameController {game.state.game_state}:{secondary_state}: {secondary_state_info}')
-        update_penalized()
+        self.update_penalized()
         if previous_state != game.state.game_state or \
                 previous_sec_state != new_sec_state or previous_sec_phase != new_sec_phase or \
                 previous_secondary_seconds_remaining != game.state.secondary_seconds_remaining or \
