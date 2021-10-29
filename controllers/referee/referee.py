@@ -113,8 +113,6 @@ class Referee:
 
         self.setup()
         self.display.setup_display()
-        self.ball = self.blackboard.supervisor.getFromDef('BALL')
-        self.game.ball_translation = self.blackboard.supervisor.getFromDef('BALL').getField('translation')
 
         self.status_update_last_real_time = None
         self.status_update_last_sim_time = None
@@ -1997,6 +1995,8 @@ class Referee:
         ball_size = 1 if self.game.field_size == 'kid' else 5
         # the ball is initially very far away from the field
         children.importMFNodeFromString(-1, f'DEF BALL RobocupSoccerBall {{ translation 100 100 0.5 size {ball_size} }}')
+        self.ball = self.blackboard.supervisor.getFromDef('BALL')
+        self.game.ball_translation = self.blackboard.supervisor.getFromDef('BALL').getField('translation')
 
         self.game.state = None
         self.spawn_team(self.red_team, self.game.side_left == self.game.blue.id, children)
