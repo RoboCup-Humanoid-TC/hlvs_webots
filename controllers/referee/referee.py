@@ -90,9 +90,8 @@ class Referee:
         self.game = Game(**game_data)
         self.blackboard.game = self.game
 
-
-        self.red_team = self.read_team(self.game.red['config'])
-        self.blue_team = self.read_team(self.game.blue['config'])
+        self.red_team = self.read_team(self.game.red.config)
+        self.blue_team = self.read_team(self.game.blue.config)
         self.red_team['color'] = 'red'
         self.blue_team['color'] = 'blue'
         self.init_team(self.red_team)
