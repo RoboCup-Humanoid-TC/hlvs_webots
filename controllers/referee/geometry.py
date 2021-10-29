@@ -1,4 +1,7 @@
-import math, transforms3d
+import math
+import numpy as np
+import transforms3d
+
 
 def distance2(v1, v2):
     return math.sqrt((v1[0] - v2[0]) ** 2 + (v1[1] - v2[1]) ** 2)
