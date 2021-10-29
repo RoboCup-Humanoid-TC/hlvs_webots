@@ -354,7 +354,7 @@ class Referee:
             elif step == 2 and self.game.interruption_step != step and self.game.state.secondary_seconds_remaining <= 0:
                 self.game.interruption_step = step
                 opponent_team = self.blue_team if secondary_state_info[0] == self.game.red.id else self.red_team
-                self.check_team_away_from_ball(opponent_team, self.game.field.opponent_distance_to_ball)
+                self.check_team_away_from_ball(opponent_team, self.field.opponent_distance_to_ball)
                 if kick == "PENALTYKICK":
                     self.check_penalty_kick_positions()
                 self.game_controller_send(f'{kick}:{secondary_state_info[0]}:EXECUTE')
@@ -513,7 +513,7 @@ class Referee:
         appearance = f'Appearance {{ material {material} }}'
         point = 'point ['
         for vertex in vertices:
-            point += ' ' + str(vertex[0]) + ' ' + str(vertex[1]) + f' {self.game.field.turf_depth + 0.001},'  # 1 mm above turf
+            point += ' ' + str(vertex[0]) + ' ' + str(vertex[1]) + f' {self.field.turf_depth + 0.001},'  # 1 mm above turf
         point = point[:-1]
         point += ' ]'
         coord = f'Coordinate {{ {point} }}'
@@ -533,7 +533,7 @@ class Referee:
         for number in team['players']:
             player = team['players'][number]
             d = distance2(player['position'], self.game.ball_position)
-            if d <= self.game.field.ball_vincity:
+            if d <= self.field.ball_vincity:
                 if self.is_goalkeeper(team, number):
                     goalkeeper_number = number
                 players_close_to_the_ball.append(player)
@@ -676,7 +676,7 @@ class Referee:
                     name = name_field.getSFString()
                     if name in player['tagged_solids']:
                         member = player['tagged_solids'][name]
-                if point[2] > self.game.field.turf_depth:  # not a contact with the ground
+                if point[2] > self.field.turf_depth:  # not a contact with the ground
                     if not early_game_interruption and point in self.ball.contact_points:  # ball contact
                         if member in ['arm', 'hand']:
                             player['ball_handling_last'] = self.sim_time.get_ms()
@@ -684,7 +684,7 @@ class Referee:
                                 player['ball_handling_start'] = self.sim_time.get_ms()
                                 self.logger.info(f'Ball touched the {member} of {color} player {number}.')
                             if (self.game.throw_in and
-                                    self.game.ball_position[2] > self.game.field.turf_depth + self.game.ball_radius + self.config.BALL_LIFT_THRESHOLD):
+                                    self.game.ball_position[2] > self.field.turf_depth + self.game.ball_radius + self.config.BALL_LIFT_THRESHOLD):
                                 self.game.throw_in_ball_was_lifted = True
                         else:  # the ball was touched by another part of the robot
                             self.game.throw_in = False  # if the ball was hit by any player, we consider the throw-in (if any) complete
@@ -711,27 +711,27 @@ class Referee:
                     # the robot touched something else than the ball or the ground
                     player['contact_points'].append(point)  # this list will be checked later for robot-robot collisions
                     continue
-                if distance2(point, [0, 0]) < self.game.field.circle_radius:
+                if distance2(point, [0, 0]) < self.field.circle_radius:
                     player['outside_circle'] = False
-                if self.game.field.point_inside(point, include_turf=True):
+                if self.field.point_inside(point, include_turf=True):
                     outside_turf = False
-                if self.game.field.point_inside(point):
+                if self.field.point_inside(point):
                     player['outside_field'] = False
-                    if abs(point[0]) > self.game.field.size_x - self.game.field.penalty_area_length and \
-                            abs(point[1]) < self.game.field.penalty_area_width / 2:
+                    if abs(point[0]) > self.field.size_x - self.field.penalty_area_length and \
+                            abs(point[1]) < self.field.penalty_area_width / 2:
                         player['outside_penalty_area'] = False
-                        if abs(point[0]) > self.game.field.size_x - self.game.field.goal_area_length and \
-                                abs(point[1]) < self.game.field.goal_area_width / 2:
+                        if abs(point[0]) > self.field.size_x - self.field.goal_area_length and \
+                                abs(point[1]) < self.field.goal_area_width / 2:
                             player['outside_goal_area'] = False
-                    if not self.game.field.point_inside(point, include_turf=False, include_border_line=False):
+                    if not self.field.point_inside(point, include_turf=False, include_border_line=False):
                         player['on_outer_line'] = True
                 else:
                     player['inside_field'] = False
                 if self.game.side_left == (self.game.red.id if color == 'red' else self.game.blue.id):
-                    if point[0] > -self.game.field.line_half_width:
+                    if point[0] > -self.field.line_half_width:
                         player['inside_own_side'] = False
                 else:
-                    if point[0] < self.game.field.line_half_width:
+                    if point[0] < self.field.line_half_width:
                         player['inside_own_side'] = False
                 # check if the robot has fallen
                 if member == 'foot':
@@ -757,7 +757,7 @@ class Referee:
         self.ball.contact_points = []
         for i in range(self.ball.getNumberOfContactPoints()):
             point = self.ball.getContactPoint(i)
-            if point[2] <= self.game.field.turf_depth:  # contact with the ground
+            if point[2] <= self.field.turf_depth:  # contact with the ground
                 continue
             self.ball.contact_points.append(point)
             break
@@ -1040,7 +1040,7 @@ class Referee:
                 else:
                     self.send_penalty(player, 'BALL_MANIPULATION', sentence, f'{color.capitalize()} player {number} {sentence}.')
                 continue
-            ball_on_the_ground = self.game.ball_position[2] <= self.game.field.turf_depth + self.game.ball_radius
+            ball_on_the_ground = self.game.ball_position[2] <= self.field.turf_depth + self.game.ball_radius
             if self.game.throw_in:
                 if duration >= self.config.BALL_HANDLING_TIMEOUT:  # a player can handle the ball for 10 seconds for throw-in, no more
                     self.reset_ball_handling(player)
@@ -1150,8 +1150,8 @@ class Referee:
                 if self.already_penalized(player):
                     continue
                 player_x = player['position'][0]
-                ahead_of_ball = self.game.ball_position[0] * player_x > 0 and abs(player_x) > self.game.field.penalty_mark_x
-                near_ball = distance2(self.game.ball_position, player['position']) < self.game.field.opponent_distance_to_ball
+                ahead_of_ball = self.game.ball_position[0] * player_x > 0 and abs(player_x) > self.field.penalty_mark_x
+                near_ball = distance2(self.game.ball_position, player['position']) < self.field.opponent_distance_to_ball
                 if ahead_of_ball:
                     if not defending_team:
                         # In rules version from June 21st 2021, there are no constraint on the position of the striker.
@@ -1355,20 +1355,20 @@ class Referee:
 
     def get_first_available_spot(self, team_color, number, reentry_pos):
         """Return the first available spot to enter on one side of the field given the reentry_pos"""
-        if not self.is_other_robot_near(team_color, number, reentry_pos, self.game.field.robot_radius):
+        if not self.is_other_robot_near(team_color, number, reentry_pos, self.field.robot_radius):
             return reentry_pos
         preferred_dir = 1 if reentry_pos[1] > self.game.ball_position[1] else -1
-        max_iterations = math.ceil(reentry_pos[1] / self.game.field.penalty_offset)
-        basic_offset = np.array([self.game.field.penalty_offset, 0, 0])
+        max_iterations = math.ceil(reentry_pos[1] / self.field.penalty_offset)
+        basic_offset = np.array([self.field.penalty_offset, 0, 0])
         initial_pos = np.array(reentry_pos)
         for i in range(1, max_iterations):
             for direction in [preferred_dir, -preferred_dir]:
                 current_pos = initial_pos + direction * i * basic_offset
                 opposite_sides = current_pos[0] * initial_pos[0] < 0  # current_pos should be on the other side
-                out_of_field = abs(current_pos[0]) > self.game.field.size_x
+                out_of_field = abs(current_pos[0]) > self.field.size_x
                 if opposite_sides or out_of_field:
                     continue
-                if not self.is_other_robot_near(team_color, number, current_pos, self.game.field.robot_radius):
+                if not self.is_other_robot_near(team_color, number, current_pos, self.field.robot_radius):
                     return current_pos.tolist()
         return None
 
@@ -1376,7 +1376,7 @@ class Referee:
         color = team['color']
         t = copy.deepcopy(player['reentryStartingPose']['translation'])
         r = copy.deepcopy(player['reentryStartingPose']['rotation'])
-        t[0] = self.game.field.penalty_mark_x if t[0] > 0 else -self.game.field.penalty_mark_x
+        t[0] = self.field.penalty_mark_x if t[0] > 0 else -self.field.penalty_mark_x
         if (self.game.ball_position[1] > 0 and t[1] > 0) or (self.game.ball_position[1] < 0 and t[1] < 0):
             t[1] = -t[1]
             r = rotate_along_z(r)
@@ -1558,7 +1558,7 @@ class Referee:
                 defending_team['players'][number]['invalidGoalkeeperStart'] = None
             else:
                 self.reset_player(defending_color, number, 'halfTimeStartingPose')
-        x = -self.game.field.penalty_mark_x if (self.game.side_left == self.game.kickoff) ^ default else self.game.field.penalty_mark_x
+        x = -self.field.penalty_mark_x if (self.game.side_left == self.game.kickoff) ^ default else self.field.penalty_mark_x
         self.ball.resetPhysics()
         self.reset_ball_touched()
         self.game.in_play = None
@@ -1646,12 +1646,12 @@ class Referee:
             self.game.ball_kick_translation[:2] = location[:2]
         if interruption_type == 'FREEKICK':
             own_side = (self.game.side_left == team) ^ (self.game.ball_position[0] < 0)
-            inside_penalty_area = self.game.field.circle_fully_inside_penalty_area(self.game.ball_position, self.game.ball_radius)
+            inside_penalty_area = self.field.circle_fully_inside_penalty_area(self.game.ball_position, self.game.ball_radius)
             if inside_penalty_area and own_side:
                 if is_goalkeeper_ball_manipulation:
                     # move the ball on the penalty line parallel to the goal line
-                    dx = self.game.field.size_x - self.game.field.penalty_area_length
-                    dy = self.game.field.penalty_area_width / 2
+                    dx = self.field.size_x - self.field.penalty_area_length
+                    dy = self.field.penalty_area_width / 2
                     moved = False
                     if abs(location[0]) > dx:
                         self.game.ball_kick_translation[0] = dx * (-1 if location[0] < 0 else 1)
@@ -1664,7 +1664,7 @@ class Referee:
                     interruption_type = 'INDIRECT_FREEKICK'
                 else:
                     interruption_type = 'PENALTYKICK'
-                    self.game.ball_kick_translation = [self.game.field.penalty_mark_x, 0, 0.08]
+                    self.game.ball_kick_translation = [self.field.penalty_mark_x, 0, 0.08]
                     if location[0] < 0:
                         self.game.ball_kick_translation[0] *= -1
             else:
@@ -1693,7 +1693,7 @@ class Referee:
         # set the ball on the touch line for throw in
         sign = -1 if left_side else 1
         self.game.ball_kick_translation[0] = self.game.ball_exit_translation[0]
-        self.game.ball_kick_translation[1] = sign * (self.game.field.size_y - self.game.field.line_half_width)
+        self.game.ball_kick_translation[1] = sign * (self.field.size_y - self.field.line_half_width)
         self.game.can_score = False  # disallow direct goal
         self.game.throw_in = True
         self.game.throw_in_ball_was_lifted = False
@@ -1702,17 +1702,17 @@ class Referee:
     def corner_kick(self, left_side):
         # set the ball in the right corner for corner kick
         sign = -1 if left_side else 1
-        self.game.ball_kick_translation[0] = sign * (self.game.field.size_x - self.game.field.line_half_width)
-        self.game.ball_kick_translation[1] = self.game.field.size_y - self.game.field.line_half_width if self.game.ball_exit_translation[1] > 0 \
-            else -self.game.field.size_y + self.game.field.line_half_width
+        self.game.ball_kick_translation[0] = sign * (self.field.size_x - self.field.line_half_width)
+        self.game.ball_kick_translation[1] = self.field.size_y - self.field.line_half_width if self.game.ball_exit_translation[1] > 0 \
+            else -self.field.size_y + self.field.line_half_width
         self.game.can_score = True
         self.interruption('CORNERKICK')
 
     def goal_kick(self):
         # set the ball at intersection between the centerline and touchline
         self.game.ball_kick_translation[0] = 0
-        self.game.ball_kick_translation[1] = self.game.field.size_y - self.game.field.line_half_width if self.game.ball_exit_translation[1] > 0 \
-            else -self.game.field.size_y + self.game.field.line_half_width
+        self.game.ball_kick_translation[1] = self.field.size_y - self.field.line_half_width if self.game.ball_exit_translation[1] > 0 \
+            else -self.field.size_y + self.field.line_half_width
         self.game.can_score = True
         self.interruption('GOALKICK')
 
@@ -1791,8 +1791,8 @@ class Referee:
     def get_alternative_ball_locations(self, original_pos):
         prefered_x_dir = 1 if (self.game.interruption_team == self.game.red.id) ^ (self.game.side_left == self.game.blue.id) else -1
         prefered_y_dir = -1 if original_pos[1] > 0 else 1
-        offset_x = prefered_x_dir * self.game.field.place_ball_safety_dist * np.array([1, 0, 0])
-        offset_y = prefered_y_dir * self.game.field.place_ball_safety_dist * np.array([0, 1, 0])
+        offset_x = prefered_x_dir * self.field.place_ball_safety_dist * np.array([1, 0, 0])
+        offset_y = prefered_y_dir * self.field.place_ball_safety_dist * np.array([0, 1, 0])
         locations = []
         if self.game.interruption == "DIRECT_FREEKICK" or self.game.interruption == "INDIRECT_FREEKICK":
             # TODO If indirect free kick in opponent penalty area on line parallel to goal line, move it along this line
@@ -1826,19 +1826,19 @@ class Referee:
                 if player['robot'] is None:
                     continue
                 initial_pos = np.array(player['position'])
-                if distance2(initial_pos, target_location) < self.game.field.place_ball_safety_dist:
+                if distance2(initial_pos, target_location) < self.field.place_ball_safety_dist:
                     obstacles = self.get_obstacles_positions(team, number)
                     player_2_ball = initial_pos - np.array(target_location)
                     dist = np.linalg.norm(player_2_ball[:2])
                     if dist < 0.001:
                         player_2_ball = [1, 0, 0]
                         dist = 1
-                    offset = player_2_ball / dist * self.game.field.place_ball_safety_dist
+                    offset = player_2_ball / dist * self.field.place_ball_safety_dist
                     for dist_mult in range(1, self.config.GAME_INTERRUPTION_PLACEMENT_NB_STEPS+1):
                         allowed = True
                         pos = target_location + offset * dist_mult
                         for o in obstacles:
-                            if distance2(o, pos) < self.game.field.place_ball_safety_dist:
+                            if distance2(o, pos) < self.field.place_ball_safety_dist:
                                 allowed = False
                                 break
                         if allowed:
@@ -1854,22 +1854,22 @@ class Referee:
 
     def game_interruption_place_ball(self, target_location, enforce_distance=True):
         if enforce_distance:
-            target_location[2] = 0  # Set position along z-axis to 0 for all 'self.game.field.point_inside' checks
+            target_location[2] = 0  # Set position along z-axis to 0 for all 'self.field.point_inside' checks
             step = 1
             self.logger.info(f"GI placing ball to {target_location}")
-            while step <= 4 and self.is_robot_near(target_location, self.game.field.place_ball_safety_dist):
+            while step <= 4 and self.is_robot_near(target_location, self.field.place_ball_safety_dist):
                 if step == 1:
                     self.logger.info('Reset of penalized robots')
-                    self.reset_pos_penalized_robots_near(target_location, self.game.field.place_ball_safety_dist)
+                    self.reset_pos_penalized_robots_near(target_location, self.field.place_ball_safety_dist)
                 elif step == 2:
                     self.logger.info('Penalizing fallen robots')
-                    self.penalize_fallen_robots_near(target_location, self.game.field.place_ball_safety_dist)
+                    self.penalize_fallen_robots_near(target_location, self.field.place_ball_safety_dist)
                 elif step == 3:
                     self.logger.info('Finding alternative locations')
                     for loc in self.get_alternative_ball_locations(target_location):
                         self.logger.info(f"Testing alternative location: {loc}")
                         # TODO: ?should it only allow point outside penalty area?
-                        if self.game.field.point_inside(loc) and not self.is_robot_near(loc, self.game.field.place_ball_safety_dist):
+                        if self.field.point_inside(loc) and not self.is_robot_near(loc, self.field.place_ball_safety_dist):
                             self.logger.info(f"Set alternative location to: {loc}")
                             target_location = loc.tolist()
                             break
@@ -2126,7 +2126,7 @@ class Referee:
                         # During period after the end of a game interruption, check distance of opponents
                         if self.game.phase in GAME_INTERRUPTIONS and self.game.state.secondary_state[6:] == "NORMAL":
                             opponent_team = self.red_team if self.game.ball_must_kick_team == 'blue' else self.blue_team
-                            self.check_team_away_from_ball(opponent_team, self.game.field.opponent_distance_to_ball)
+                            self.check_team_away_from_ball(opponent_team, self.field.opponent_distance_to_ball)
                         # If ball is not in play after a kick_off, check for circle entrance for the defending team
                         if self.game.phase == 'KICKOFF' and self.game.kickoff != self.config.DROPPED_BALL_TEAM_ID:
                             defending_team = self.red_team if self.game.kickoff == self.game.blue.id else self.blue_team
@@ -2144,7 +2144,7 @@ class Referee:
                         if self.sim_time.get_ms() - self.game.ball_last_move > self.config.DROPPED_BALL_TIMEOUT * 1000:
                             self.dropped_ball()
                         if self.game.ball_left_circle is None and self.game.phase == 'KICKOFF':
-                            if distance2(self.game.ball_kick_translation, self.game.ball_position) > self.game.field.circle_radius + self.game.ball_radius:
+                            if distance2(self.game.ball_kick_translation, self.game.ball_position) > self.field.circle_radius + self.game.ball_radius:
                                 self.game.ball_left_circle = self.sim_time.get_ms()
                                 self.logger.info('The ball has left the center circle after kick-off.')
 
@@ -2167,7 +2167,7 @@ class Referee:
 
                     if self.game.penalty_shootout:
                         self.check_penalty_goal_line()
-                        ball_in_goal_area = self.game.field.circle_fully_inside_goal_area(self.game.ball_position, self.game.ball_radius)
+                        ball_in_goal_area = self.field.circle_fully_inside_goal_area(self.game.ball_position, self.game.ball_radius)
                         # It is unclear that using getVelocity is the good approach, because even when the ball is clearly not moving
                         # anymore, it still provides values above 1e-3.
                         ball_vel = self.ball.getVelocity()[:3]
@@ -2222,32 +2222,32 @@ class Referee:
                                 self.clean_exit()
                     if (self.game.interruption_countdown == 0 and self.game.ready_countdown == 0 and
                             self.game.ready_real_time is None and not self.game.throw_in and
-                            (self.game.ball_position[1] - self.game.ball_radius >= self.game.field.size_y or
-                             self.game.ball_position[1] + self.game.ball_radius <= -self.game.field.size_y or
-                             self.game.ball_position[0] - self.game.ball_radius >= self.game.field.size_x or
-                             self.game.ball_position[0] + self.game.ball_radius <= -self.game.field.size_x)):
+                            (self.game.ball_position[1] - self.game.ball_radius >= self.field.size_y or
+                             self.game.ball_position[1] + self.game.ball_radius <= -self.field.size_y or
+                             self.game.ball_position[0] - self.game.ball_radius >= self.field.size_x or
+                             self.game.ball_position[0] + self.game.ball_radius <= -self.field.size_x)):
                         self.logger.info(f'Ball left the field at ({self.game.ball_position[0]} {self.game.ball_position[1]} {self.game.ball_position[2]}) after '
                              f'being touched by {self.game.ball_last_touch_team} player {self.game.ball_last_touch_player_number}.')
                         self.game.ball_exit_translation = self.game.ball_position
                         scoring_team = None
                         right_way = None
-                        if self.game.ball_exit_translation[1] - self.game.ball_radius > self.game.field.size_y:
+                        if self.game.ball_exit_translation[1] - self.game.ball_radius > self.field.size_y:
                             if self.game.penalty_shootout:
                                 self.next_penalty_shootout()
                             else:
-                                self.game.ball_exit_translation[1] = self.game.field.size_y - self.game.field.line_half_width
+                                self.game.ball_exit_translation[1] = self.field.size_y - self.field.line_half_width
                                 self.throw_in(left_side=False)
-                        elif self.game.ball_exit_translation[1] + self.game.ball_radius < -self.game.field.size_y:
+                        elif self.game.ball_exit_translation[1] + self.game.ball_radius < -self.field.size_y:
                             if self.game.penalty_shootout:
                                 self.next_penalty_shootout()
                             else:
                                 self.throw_in(left_side=True)
-                        if self.game.ball_exit_translation[0] - self.game.ball_radius > self.game.field.size_x:
+                        if self.game.ball_exit_translation[0] - self.game.ball_radius > self.field.size_x:
                             right_way = self.game.ball_last_touch_team == 'red' and self.game.side_left == self.game.red.id or \
                                         self.game.ball_last_touch_team == 'blue' and self.game.side_left == self.game.blue.id
                             if self.game.ball_exit_translation[1] < self.config.GOAL_HALF_WIDTH and \
                                     self.game.ball_exit_translation[1] > -self.config.GOAL_HALF_WIDTH and \
-                                    self.game.ball_exit_translation[2] < self.game.field.goal_height:
+                                    self.game.ball_exit_translation[2] < self.field.goal_height:
                                 scoring_team = self.game.side_left  # goal
                             elif self.game.penalty_shootout:
                                 self.next_penalty_shootout()
@@ -2256,12 +2256,12 @@ class Referee:
                                     self.goal_kick()
                                 else:
                                     self.corner_kick(left_side=False)
-                        elif self.game.ball_exit_translation[0] + self.game.ball_radius < -self.game.field.size_x:
+                        elif self.game.ball_exit_translation[0] + self.game.ball_radius < -self.field.size_x:
                             right_way = self.game.ball_last_touch_team == 'red' and self.game.side_left == self.game.blue.id or \
                                         self.game.ball_last_touch_team == 'blue' and self.game.side_left == self.game.red.id
                             if self.game.ball_exit_translation[1] < self.config.GOAL_HALF_WIDTH and \
                                     self.game.ball_exit_translation[1] > -self.config.GOAL_HALF_WIDTH and \
-                                    self.game.ball_exit_translation[2] < self.game.field.goal_height:
+                                    self.game.ball_exit_translation[2] < self.field.goal_height:
                                 # goal
                                 scoring_team = self.game.red.id if self.game.blue.id == self.game.side_left else self.game.blue.id
                             elif self.game.penalty_shootout:
