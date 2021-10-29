@@ -25,7 +25,7 @@ FOUL_PUSHING_PERIOD: 2                   # 2 seconds
 FOUL_VINCITY_DISTANCE: 2                 # 2 meters
 FOUL_DISTANCE_THRESHOLD: 0.1             # 0.1 meter
 FOUL_SPEED_THRESHOLD: 0.2                # 0.2 m/s
-FOUL_DIRECTION_THRESHOLD: math.pi / 6    # 30 degrees
+FOUL_DIRECTION_THRESHOLD: 0.523599       # 30 degrees
 FOUL_BALL_DISTANCE: 1                    # if the ball is more than 1 m away from an offense, a removal penalty is applied
 FOUL_PENALTY_IMMUNITY: 2                 # after a foul, a player is immune to penalty for a period of 2 seconds
 GOAL_WIDTH: 2.6                          # width of the goal
@@ -36,7 +36,7 @@ BLACK_COLOR: 0x000000                    # black color used for the display
 STATIC_SPEED_EPS: 1e-2                   # The speed below which an object is considered as static [m/s]
 DROPPED_BALL_TEAM_ID: 128                # The team id used for dropped ball
 BALL_DIST_PERIOD: 1                      # seconds. The period at which distance to the ball is checked
-BALL_HOLDING_RATIO: 1.0/3                # The ratio of the radius used to compute minimal distance to the convex hull
+BALL_HOLDING_RATIO: 0.333333             # The ratio of the radius used to compute minimal distance to the convex hull
 GAME_INTERRUPTION_PLACEMENT_NB_STEPS: 5  # The maximal number of steps allowed when moving ball or player away
 STATUS_PRINT_PERIOD: 20                  # Real time between two status updates in seconds
 DISABLE_ACTUATORS_MIN_DURATION: 1.0      # The minimal simulated time [s] until enabling actuators again after a reset
