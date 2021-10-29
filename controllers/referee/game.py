@@ -42,4 +42,6 @@ class Game(SimpleNamespace):
         self.wait_for_sec_state = None
         self.wait_for_sec_phase = None
         self.forceful_contact_matrix = ForcefulContactMatrix(len(red_team['players']), len(blue_team['players']),
-                                                             FOUL_PUSHING_PERIOD, FOUL_PUSHING_TIME, int(self.supervisor.getBasicTimeStep()))
+                                                             self.blackboard.config.FOUL_PUSHING_PERIOD,
+                                                             self.blackboard.config.FOUL_PUSHING_TIME,
+                                                             int(self.supervisor.getBasicTimeStep()))
