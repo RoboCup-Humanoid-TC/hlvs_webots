@@ -5,6 +5,7 @@ from types import SimpleNamespace
 class Game(SimpleNamespace):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.field_size = getattr(self, 'class').lower()
         self.penalty_shootout_count = 0
         self.penalty_shootout_goal = False
         self.penalty_shootout_time_to_score = [None, None, None, None, None, None, None, None, None, None]

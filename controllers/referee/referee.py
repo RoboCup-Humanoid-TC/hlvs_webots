@@ -82,10 +82,18 @@ class Referee:
         with open(self.game_config_file) as json_file:
             game_data = json.loads(json_file.read())
         game_data['blackboard'] = self.blackboard
+
         self.game = Game(**game_data)
         self.blackboard.game = self.game
+
+        self.game.field = Field(self.game.field_size)
+
         self.red_team = self.read_team(self.game.red.config)
         self.blue_team = self.read_team(self.game.blue.config)
+        self.red_team['color'] = 'red'
+        self.blue_team['color'] = 'blue'
+        self.init_team(self.red_team)
+        self.init_team(self.blue_team)
 
         self.forceful_contact_matrix = ForcefulContactMatrix(len(self.red_team['players']),
                                                              len(self.blue_team['players']),
@@ -1919,13 +1927,7 @@ class Referee:
             self.logger.info('Simulation will run as fast as possible, real time waiting times will be minimal.')
         else:
             self.logger.info(f'Simulation will guarantee a maximum {1 / self.game.minimum_real_time_factor:.2f}x speed for each time step.')
-        field_size = getattr(self.game, 'class').lower()
-        self.game.field = Field(field_size)
 
-        self.red_team['color'] = 'red'
-        self.blue_team['color'] = 'blue'
-        self.init_team(self.red_team)
-        self.init_team(self.blue_team)
 
         # check team name length (should be at most 12 characters long, trim them if too long)
         if len(self.red_team['name']) > 12:
@@ -1947,7 +1949,7 @@ class Referee:
                     self.game.controller_process = None
                     self.clean_exit()
                 else:
-                    path = os.path.join(GAME_CONTROLLER_HOME, 'build', 'jar', 'config', f'hl_sim_{field_size}', 'teams.cfg')
+                    path = os.path.join(GAME_CONTROLLER_HOME, 'build', 'jar', 'config', f'hl_sim_{self.game.field_size}', 'teams.cfg')
                     red_line = f'{self.game.red.id}={self.red_team["name"]}\n'
                     blue_line = f'{self.game.blue.id}={self.blue_team["name"]}\n'
                     with open(path, 'w') as file:
@@ -1984,8 +1986,8 @@ class Referee:
         self.toss_a_coin_if_needed('kickoff')
 
         children = self.supervisor.getRoot().getField('children')
-        children.importMFNodeFromString(-1, f'RobocupSoccerField {{ size "{field_size}" }}')
-        ball_size = 1 if field_size == 'kid' else 5
+        children.importMFNodeFromString(-1, f'RobocupSoccerField {{ size "{self.game.field_size}" }}')
+        ball_size = 1 if self.game.field_size == 'kid' else 5
         # the ball is initially very far away from the field
         children.importMFNodeFromString(-1, f'DEF BALL RobocupSoccerBall {{ translation 100 100 0.5 size {ball_size} }}')
 
