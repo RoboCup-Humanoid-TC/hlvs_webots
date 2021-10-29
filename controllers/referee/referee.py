@@ -32,7 +32,7 @@ from controller import Supervisor, Node
 from gamestate import GameState
 from field import Field
 from forceful_contact_matrix import ForcefulContactMatrix
-from logging import Logger
+from logger import Logger
 from geometry import distance2, rotate_along_z, aabb_circle_collision, polygon_circle_collision, update_aabb
 from display import Display
 from game import Game
