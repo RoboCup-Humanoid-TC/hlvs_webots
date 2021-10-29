@@ -87,6 +87,10 @@ class Referee:
         self.red_team = self.read_team(self.game.red.config)
         self.blue_team = self.read_team(self.game.blue.config)
 
+        self.forceful_contact_matrix = ForcefulContactMatrix(len(self.red_team['players']),
+                                                             len(self.blue_team['players']),
+                                                             self.config.FOUL_PUSHING_PERIOD,
+                                                             self.config.FOUL_PUSHING_TIME, self.time_step)
         self.display = Display(self.blackboard)
         self.display.setup_display()
         self.others = []
@@ -774,7 +778,7 @@ class Referee:
                     else:
                         red_number = opponent_number
                         blue_number = number
-                    fcm = self.game.forceful_contact_matrix
+                    fcm = self.forceful_contact_matrix
                     if (not fcm.contact(red_number, blue_number, self.sim_time.get_ms() - self.time_step) and
                             not fcm.contact(red_number, blue_number, self.sim_time.get_ms())):
                         self.logger.info(f'{self.sim_time.get_ms()}: contact between {team["color"]} player {number} and '
@@ -782,7 +786,7 @@ class Referee:
                     fcm.set_contact(red_number, blue_number, self.sim_time.get_ms())
 
     def update_robot_contacts(self):
-        self.game.forceful_contact_matrix.clear(self.sim_time.get_ms())
+        self.forceful_contact_matrix.clear(self.sim_time.get_ms())
         self.update_team_robot_contacts(self.red_team)
         self.update_team_robot_contacts(self.blue_team)
 
@@ -860,7 +864,7 @@ class Referee:
             area = 'inside penalty area'
         self.logger.info(f'{team["color"].capitalize()} player {number} committed a forceful contact foul on '
              f'{opponent_team["color"]} player {opponent_number} ({message}) {area}.')
-        self.game.forceful_contact_matrix.clear_all()
+        self.forceful_contact_matrix.clear_all()
         opponent = opponent_team['players'][opponent_number]
         immunity_timeout = self.sim_time.get_ms() + self.config.FOUL_PENALTY_IMMUNITY * 1000
         opponent['penalty_immunity'] = immunity_timeout
@@ -923,9 +927,9 @@ class Referee:
         else:
             red_number = opponent_number
             blue_number = number
-        if self.game.forceful_contact_matrix.long_collision(red_number, blue_number):
+        if self.forceful_contact_matrix.long_collision(red_number, blue_number):
             if d1 < self.config.FOUL_VINCITY_DISTANCE and d1 - d2 > self.config.FOUL_DISTANCE_THRESHOLD:
-                collision_time = self.game.forceful_contact_matrix.get_collision_time(red_number, blue_number)
+                collision_time = self.forceful_contact_matrix.get_collision_time(red_number, blue_number)
                 debug_messages.append(f"Pushing time: {collision_time} > {self.config.FOUL_PUSHING_TIME} over the last {self.config.FOUL_PUSHING_PERIOD}")
                 debug_messages.append(f"Difference of distance: {d1-d2} > {self.config.FOUL_DISTANCE_THRESHOLD}")
                 self.logger.info(debug_messages)
@@ -963,7 +967,7 @@ class Referee:
 
     def check_forceful_contacts(self):
         self.update_robot_contacts()
-        fcm = self.game.forceful_contact_matrix
+        fcm = self.forceful_contact_matrix
         for red_number in self.red_team['players']:
             for blue_number in self.blue_team['players']:
                 if not fcm.contact(red_number, blue_number, self.sim_time.get_ms()):
