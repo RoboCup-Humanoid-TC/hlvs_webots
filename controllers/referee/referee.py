@@ -906,8 +906,8 @@ class Referee:
     def moves_to_ball(self, player, velocity, velocity_squared):
         if velocity_squared < self.config.FOUL_SPEED_THRESHOLD * self.config.FOUL_SPEED_THRESHOLD:
             return True
-        rx = self.ball_position[0] - player['position'][0]
-        ry = self.ball_position[1] - player['position'][1]
+        rx = self.game.ball_position[0] - player['position'][0]
+        ry = self.game.ball_position[1] - player['position'][1]
         vx = velocity[0]
         vy = velocity[1]
         angle = math.acos((rx * vx + ry * vy) / (math.sqrt(rx * rx + ry * ry) * math.sqrt(vx * vx + vy * vy)))
