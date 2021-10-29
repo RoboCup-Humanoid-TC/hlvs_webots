@@ -50,7 +50,7 @@ GAME_INTERRUPTIONS = {
     'THROWIN': 'throw in'
 }
 
-global red_team, blue_team
+
 
 
 class Referee:
@@ -336,7 +336,7 @@ class Referee:
                 self.logger.info(f'Prepare for {GAME_INTERRUPTIONS[kick]}.')
             elif step == 2 and game.interruption_step != step and game.state.secondary_seconds_remaining <= 0:
                 game.interruption_step = step
-                opponent_team = blue_team if secondary_state_info[0] == game.red.id else red_team
+                opponent_team = self.blue_team if secondary_state_info[0] == game.red.id else self.red_team
                 check_team_away_from_ball(opponent_team, game.field.opponent_distance_to_ball)
                 if kick == "PENALTYKICK":
                     check_penalty_kick_positions()
@@ -485,8 +485,8 @@ class Referee:
             self.list_player_solids(team['players'][number], team['color'], number)
 
     def list_solids(self):
-        self.list_team_solids(red_team)
-        self.list_team_solids(blue_team)
+        self.list_team_solids(self.red_team)
+        self.list_team_solids(self.blue_team)
 
     def show_polygon(self, vertices):
         polygon = self.supervisor.getFromDef('POLYGON')
@@ -585,8 +585,8 @@ class Referee:
             self.logger.info(f'{color.capitalize()} goalkeeper is holding the ball.')
 
     def update_ball_holding(self):
-        self.update_team_ball_holding(red_team)
-        self.update_team_ball_holding(blue_team)
+        self.update_team_ball_holding(self.red_team)
+        self.update_team_ball_holding(self.blue_team)
 
     def init_team(self, team):
         # check validity of team files
@@ -748,8 +748,8 @@ class Referee:
     def update_contacts(self):
         """Only updates the contact of objects which are not asleep"""
         self.update_ball_contacts()
-        self.update_team_contacts(red_team)
-        self.update_team_contacts(blue_team)
+        self.update_team_contacts(self.red_team)
+        self.update_team_contacts(self.blue_team)
 
     def find_robot_contact(self, team, point):
         for number in team['players']:
@@ -763,12 +763,12 @@ class Referee:
             contact_points = player['contact_points']
             if len(contact_points) == 0:
                 continue
-            opponent_team = red_team if team == blue_team else blue_team
+            opponent_team = self.red_team if team == self.blue_team else self.blue_team
             opponent_number = None
             for point in contact_points:
                 opponent_number = self.find_robot_contact(opponent_team, point)
                 if opponent_number is not None:
-                    if team == red_team:
+                    if team == self.red_team:
                         red_number = number
                         blue_number = opponent_number
                     else:
@@ -783,11 +783,11 @@ class Referee:
 
     def update_robot_contacts(self):
         self.game.forceful_contact_matrix.clear(self.sim_time.get_ms())
-        self.update_team_robot_contacts(red_team)
-        self.update_team_robot_contacts(blue_team)
+        self.update_team_robot_contacts(self.red_team)
+        self.update_team_robot_contacts(self.blue_team)
 
     def update_histories(self):
-        for team in [red_team, blue_team]:
+        for team in [self.red_team, self.blue_team]:
             for number in team['players']:
                 player = team['players'][number]
                 # Remove old ball_distances
@@ -838,8 +838,8 @@ class Referee:
                         del player['penalized']
 
     def update_penalized(self):
-        self.update_team_penalized(red_team)
-        self.update_team_penalized(blue_team)
+        self.update_team_penalized(self.red_team)
+        self.update_team_penalized(self.blue_team)
 
     def already_penalized(self, player):
         return 'penalized' in player
@@ -917,7 +917,7 @@ class Referee:
             self.logger.info(debug_messages)
             self.forceful_contact_foul(team, number, opponent_team, opponent_number, d1, 'goalkeeper')
             return True
-        if team == red_team:
+        if team == self.red_team:
             red_number = number
             blue_number = opponent_number
         else:
@@ -964,13 +964,13 @@ class Referee:
     def check_forceful_contacts(self):
         self.update_robot_contacts()
         fcm = self.game.forceful_contact_matrix
-        for red_number in red_team['players']:
-            for blue_number in blue_team['players']:
+        for red_number in self.red_team['players']:
+            for blue_number in self.blue_team['players']:
                 if not fcm.contact(red_number, blue_number, self.sim_time.get_ms()):
                     continue  # no contact
-                if self.check_team_forceful_contacts(red_team, red_number, blue_team, blue_number):
+                if self.check_team_forceful_contacts(self.red_team, red_number, self.blue_team, blue_number):
                     continue
-                if self.check_team_forceful_contacts(blue_team, blue_number, red_team, red_number):
+                if self.check_team_forceful_contacts(self.blue_team, blue_number, self.red_team, red_number):
                     continue
 
     def check_team_ball_holding(self, team):
@@ -987,9 +987,9 @@ class Referee:
         return False
 
     def check_ball_holding(self):  # return the team id which gets a free kick in case of ball holding from the other team
-        if self.check_team_ball_holding(red_team):
+        if self.check_team_ball_holding(self.red_team):
             return self.game.blue.id
-        if self.check_team_ball_holding(blue_team):
+        if self.check_team_ball_holding(self.blue_team):
             return self.game.red.id
         return None
 
@@ -1052,9 +1052,9 @@ class Referee:
         return False  # not free kick awarded
 
     def check_ball_handling(self):  # return the team id which gets a free kick in case of wrong ball handling by a goalkeeper
-        if self.check_team_ball_handling(red_team):
+        if self.check_team_ball_handling(self.red_team):
             return self.game.blue.id
-        if self.check_team_ball_handling(blue_team):
+        if self.check_team_ball_handling(self.blue_team):
             return self.game.red.id
         return None
 
@@ -1077,8 +1077,8 @@ class Referee:
         return penalty
 
     def check_fallen(self):
-        red = self.check_team_fallen(red_team)
-        blue = self.check_team_fallen(blue_team)
+        red = self.check_team_fallen(self.red_team)
+        blue = self.check_team_fallen(self.blue_team)
         return red or blue
 
     def check_team_inactive_goalkeeper(self, team):
@@ -1109,8 +1109,8 @@ class Referee:
             self.send_penalty(player, 'INCAPABLE', 'Inactive goalkeeper')
 
     def check_inactive_goalkeepers(self):
-        self.check_team_inactive_goalkeeper(red_team)
-        self.check_team_inactive_goalkeeper(blue_team)
+        self.check_team_inactive_goalkeeper(self.red_team)
+        self.check_team_inactive_goalkeeper(self.blue_team)
 
     def check_team_away_from_ball(self, team, distance):
         for number in team['players']:
@@ -1125,7 +1125,7 @@ class Referee:
                                  f'({d:.2f} m., should be at least {distance:.2f} m.)')
 
     def check_penalty_kick_positions(self):
-        for team in [red_team, blue_team]:
+        for team in [self.red_team, self.blue_team]:
             defending_team = (team['color'] == 'red') ^ (self.game.state.secondary_state_info[0] == self.game.red.id)
             has_striker = False
             for number in team['players']:
@@ -1171,8 +1171,8 @@ class Referee:
         return penalty
 
     def check_start_position(self):
-        red = self.check_team_start_position(red_team)
-        blue = self.check_team_start_position(blue_team)
+        red = self.check_team_start_position(self.red_team)
+        blue = self.check_team_start_position(self.blue_team)
         return red or blue
 
     def check_team_kickoff_position(self, team):
@@ -1195,8 +1195,8 @@ class Referee:
         return penalty
 
     def check_kickoff_position(self):
-        red = self.check_team_kickoff_position(red_team)
-        blue = self.check_team_kickoff_position(blue_team)
+        red = self.check_team_kickoff_position(self.red_team)
+        blue = self.check_team_kickoff_position(self.blue_team)
         return red or blue
 
     def check_team_dropped_ball_position(self, team):
@@ -1210,8 +1210,8 @@ class Referee:
                 self.send_penalty(player, 'INCAPABLE', 'outside team side during dropped ball')
 
     def check_dropped_ball_position(self):
-        self.check_team_dropped_ball_position(red_team)
-        self.check_team_dropped_ball_position(blue_team)
+        self.check_team_dropped_ball_position(self.red_team)
+        self.check_team_dropped_ball_position(self.blue_team)
 
     def check_team_outside_turf(self, team):
         color = team['color']
@@ -1231,8 +1231,8 @@ class Referee:
                                  f'{color.capitalize()} player {number} left the field for more than {self.config.OUTSIDE_TURF_TIMEOUT} seconds.')
 
     def check_outside_turf(self):
-        self.check_team_outside_turf(red_team)
-        self.check_team_outside_turf(blue_team)
+        self.check_team_outside_turf(self.red_team)
+        self.check_team_outside_turf(self.blue_team)
 
     def check_team_penalized_in_field(self, team):
         color = team['color']
@@ -1253,8 +1253,8 @@ class Referee:
         return penalty
 
     def check_penalized_in_field(self):
-        red = self.check_team_penalized_in_field(red_team)
-        blue = self.check_team_penalized_in_field(blue_team)
+        red = self.check_team_penalized_in_field(self.red_team)
+        blue = self.check_team_penalized_in_field(self.blue_team)
         return red or blue
 
     def check_circle_entrance(self, team):
@@ -1398,8 +1398,8 @@ class Referee:
                 self.logger.info(f'{penalty} penalty for {color} player {number}: {reason}.')
 
     def send_penalties(self):
-        self.send_team_penalties(red_team)
-        self.send_team_penalties(blue_team)
+        self.send_team_penalties(self.red_team)
+        self.send_team_penalties(self.blue_team)
 
     def stabilize_team_robots(self, team):
         color = team['color']
@@ -1419,8 +1419,8 @@ class Referee:
                     player['stabilize'] -= 1
 
     def stabilize_robots(self):
-        self.stabilize_team_robots(red_team)
-        self.stabilize_team_robots(blue_team)
+        self.stabilize_team_robots(self.red_team)
+        self.stabilize_team_robots(self.blue_team)
 
     def flip_pose(self, pose):
         pose['translation'][0] = -pose['translation'][0]
@@ -1434,13 +1434,13 @@ class Referee:
 
     def flip_sides(self):  # flip sides (no need to notify GameController, it does it automatically)
         self.game.side_left = self.game.red.id if self.game.side_left == self.game.blue.id else self.game.blue.id
-        for team in [red_team, blue_team]:
+        for team in [self.red_team, self.blue_team]:
             for number in team['players']:
                 self.flip_poses(team['players'][number])
         self.display.update_team_display()
 
     def reset_player(self, color, number, pose, custom_t=None, custom_r=None):
-        team = red_team if color == 'red' else blue_team
+        team = self.red_team if color == 'red' else self.blue_team
         player = team['players'][number]
         robot = player['robot']
         if robot is None:
@@ -1465,27 +1465,27 @@ class Referee:
         player['enable_actuators_at'] = self.sim_time.get_ms() + int(self.config.DISABLE_ACTUATORS_MIN_DURATION * 1000)
 
     def reset_teams(self, pose):
-        for number in red_team['players']:
+        for number in self.red_team['players']:
             self.reset_player('red', str(number), pose)
-        for number in blue_team['players']:
+        for number in self.blue_team['players']:
             self.reset_player('blue', str(number), pose)
 
     def is_goalkeeper(self, team, id):
         n = self.game.state.teams[0].team_number
-        index = 0 if (n == self.game.red.id and team == red_team) or (n == self.game.blue.id and team == blue_team) else 1
+        index = 0 if (n == self.game.red.id and team == self.red_team) or (n == self.game.blue.id and team == self.blue_team) else 1
         return self.game.state.teams[index].players[int(id) - 1].goalkeeper
 
     def get_penalty_attacking_team(self):
         first_team = self.game.penalty_shootout_count % 2 == 0
         if first_team == (self.game.kickoff == self.game.red.id):
-            return red_team
-        return blue_team
+            return self.red_team
+        return self.blue_team
 
     def get_penalty_defending_team(self):
         first_team = self.game.penalty_shootout_count % 2 == 0
         if first_team == (self.game.kickoff != self.game.red.id):
-            return red_team
-        return blue_team
+            return self.red_team
+        return self.blue_team
 
     def player_has_red_card(self, player):
         return 'penalized' in player and player['penalized'] == 'red_card'
@@ -1498,7 +1498,7 @@ class Referee:
 
     def penalty_kicker_player(self):
         default = self.game.penalty_shootout_count % 2 == 0
-        attacking_team = red_team if (self.game.kickoff == self.game.blue.id) ^ default else blue_team
+        attacking_team = self.red_team if (self.game.kickoff == self.game.blue.id) ^ default else self.blue_team
         for number in attacking_team['players']:
             player = attacking_team['players'][number]
             if self.player_has_red_card(player):
@@ -1520,12 +1520,12 @@ class Referee:
         attacking_color = 'red' if (self.game.kickoff == self.game.blue.id) ^ default else 'blue'
         if attacking_color == 'red':
             defending_color = 'blue'
-            attacking_team = red_team
-            defending_team = blue_team
+            attacking_team = self.red_team
+            defending_team = self.blue_team
         else:
             defending_color = 'red'
-            attacking_team = blue_team
-            defending_team = red_team
+            attacking_team = self.blue_team
+            defending_team = self.red_team
         for number in attacking_team['players']:
             if self.player_has_red_card(attacking_team['players'][number]):
                 continue
@@ -1739,7 +1739,7 @@ class Referee:
         self.game.can_score_own = False
 
     def is_robot_near(self, position, min_dist):
-        for team in [red_team, blue_team]:
+        for team in [self.red_team, self.blue_team]:
             for number in team['players']:
                 if distance2(position, team['players'][number]['position']) < min_dist:
                     return True
@@ -1747,7 +1747,7 @@ class Referee:
 
     def is_other_robot_near(self, robot_color, robot_number, position, min_dist):
         """Test if another robot than the robot defined by team_color and number is closer than min_dist from position"""
-        for team in [red_team, blue_team]:
+        for team in [self.red_team, self.blue_team]:
             for number in team['players']:
                 if team['color'] == robot_color and number == robot_number:
                     continue
@@ -1756,14 +1756,14 @@ class Referee:
         return False
 
     def reset_pos_penalized_robots_near(self, position, min_dist):
-        for team in [red_team, blue_team]:
+        for team in [self.red_team, self.blue_team]:
             for number in team['players']:
                 player = team['players'][number]
                 if 'penalized' in player and distance2(position, player['position']) < min_dist:
                     self.place_player_at_penalty(player, team, number)
 
     def penalize_fallen_robots_near(self, position, min_dist):
-        for team in [red_team, blue_team]:
+        for team in [self.red_team, self.blue_team]:
             for number in team['players']:
                 player = team['players'][number]
                 if 'fallen' in player:
@@ -1795,7 +1795,7 @@ class Referee:
         """Returns the list of potential obstacles in case the indicated robot is moved"""
         # TODO: add goal posts for safety
         obstacles = []
-        for o_team in [blue_team, red_team]:
+        for o_team in [self.blue_team, self.red_team]:
             for o_number in o_team['players']:
                 if team['color'] == o_team['color'] and number == o_number:
                     continue
@@ -1803,7 +1803,7 @@ class Referee:
         return obstacles
 
     def move_robots_away(self, target_location):
-        for team in [blue_team, red_team]:
+        for team in [self.blue_team, self.red_team]:
             for number in team['players']:
                 player = team['players'][number]
                 if player['robot'] is None:
@@ -1918,16 +1918,16 @@ class Referee:
         field_size = getattr(self.game, 'class').lower()
         self.game.field = Field(field_size)
 
-        red_team['color'] = 'red'
-        blue_team['color'] = 'blue'
-        self.init_team(red_team)
-        self.init_team(blue_team)
+        self.red_team['color'] = 'red'
+        self.blue_team['color'] = 'blue'
+        self.init_team(self.red_team)
+        self.init_team(self.blue_team)
 
         # check team name length (should be at most 12 characters long, trim them if too long)
-        if len(red_team['name']) > 12:
-            red_team['name'] = red_team['name'][:12]
-        if len(blue_team['name']) > 12:
-            blue_team['name'] = blue_team['name'][:12]
+        if len(self.red_team['name']) > 12:
+            self.red_team['name'] = self.red_team['name'][:12]
+        if len(self.blue_team['name']) > 12:
+            self.blue_team['name'] = self.blue_team['name'][:12]
 
         # check if the host parameter of the game.json file correspond to the actual host
         host = socket.gethostbyname(socket.gethostname())
@@ -1944,8 +1944,8 @@ class Referee:
                     self.clean_exit()
                 else:
                     path = os.path.join(GAME_CONTROLLER_HOME, 'build', 'jar', 'config', f'hl_sim_{field_size}', 'teams.cfg')
-                    red_line = f'{self.game.red.id}={red_team["name"]}\n'
-                    blue_line = f'{self.game.blue.id}={blue_team["name"]}\n'
+                    red_line = f'{self.game.red.id}={self.red_team["name"]}\n'
+                    blue_line = f'{self.game.blue.id}={self.blue_team["name"]}\n'
                     with open(path, 'w') as file:
                         file.write((red_line + blue_line) if self.game.red.id < self.game.blue.id else (blue_line + red_line))
                     command_line = [os.path.join(JAVA_HOME, 'bin', 'java'), '-jar', 'GameControllerSimulator.jar']
@@ -1986,15 +1986,15 @@ class Referee:
         children.importMFNodeFromString(-1, f'DEF BALL RobocupSoccerBall {{ translation 100 100 0.5 size {ball_size} }}')
 
         self.game.state = None
-        self.spawn_team(red_team, self.game.side_left == self.game.blue.id, children)
-        self.spawn_team(blue_team, self.game.side_left == self.game.red.id, children)
+        self.spawn_team(self.red_team, self.game.side_left == self.game.blue.id, children)
+        self.spawn_team(self.blue_team, self.game.side_left == self.game.red.id, children)
 
         players_ball_holding_time_window_size = int(1000 * self.config.PLAYERS_BALL_HOLDING_TIMEOUT / self.time_step)
         goalkeeper_ball_holding_time_window_size = int(1000 * self.config.GOALKEEPER_BALL_HOLDING_TIMEOUT / self.time_step)
-        red_team['players_holding_time_window'] = np.zeros(players_ball_holding_time_window_size, dtype=bool)
-        red_team['goalkeeper_holding_time_window'] = np.zeros(goalkeeper_ball_holding_time_window_size, dtype=bool)
-        blue_team['players_holding_time_window'] = np.zeros(players_ball_holding_time_window_size, dtype=bool)
-        blue_team['goalkeeper_holding_time_window'] = np.zeros(goalkeeper_ball_holding_time_window_size, dtype=bool)
+        self.red_team['players_holding_time_window'] = np.zeros(players_ball_holding_time_window_size, dtype=bool)
+        self.red_team['goalkeeper_holding_time_window'] = np.zeros(goalkeeper_ball_holding_time_window_size, dtype=bool)
+        self.blue_team['players_holding_time_window'] = np.zeros(players_ball_holding_time_window_size, dtype=bool)
+        self.blue_team['goalkeeper_holding_time_window'] = np.zeros(goalkeeper_ball_holding_time_window_size, dtype=bool)
 
         self.list_solids()  # prepare lists of solids to monitor in each robot to compute the convex hulls
 
@@ -2044,8 +2044,8 @@ class Referee:
         try:
             self.display.update_state_display()
             self.logger.info(f'Game type is {self.game.type}.')
-            self.logger.info(f'Red team is "{red_team["name"]}", playing on {"left" if self.game.side_left == self.game.red.id else "right"} side.')
-            self.logger.info(f'Blue team is "{blue_team["name"]}", playing on {"left" if self.game.side_left == self.game.blue.id else "right"} side.')
+            self.logger.info(f'Red team is "{self.red_team["name"]}", playing on {"left" if self.game.side_left == self.game.red.id else "right"} side.')
+            self.logger.info(f'Blue team is "{self.blue_team["name"]}", playing on {"left" if self.game.side_left == self.game.blue.id else "right"} side.')
             self.game_controller_send(f'SIDE_LEFT:{self.game.side_left}')
 
             if hasattr(self.game, 'supervisor'):  # optional supervisor used for CI tests
@@ -2112,11 +2112,11 @@ class Referee:
                     if self.game.in_play is None:
                         # During period after the end of a game interruption, check distance of opponents
                         if self.game.phase in GAME_INTERRUPTIONS and self.game.state.secondary_state[6:] == "NORMAL":
-                            opponent_team = red_team if self.game.ball_must_kick_team == 'blue' else blue_team
+                            opponent_team = self.red_team if self.game.ball_must_kick_team == 'blue' else self.blue_team
                             self.check_team_away_from_ball(opponent_team, self.game.field.opponent_distance_to_ball)
                         # If ball is not in play after a kick_off, check for circle entrance for the defending team
                         if self.game.phase == 'KICKOFF' and self.game.kickoff != self.config.DROPPED_BALL_TEAM_ID:
-                            defending_team = red_team if self.game.kickoff == self.game.blue.id else blue_team
+                            defending_team = self.red_team if self.game.kickoff == self.game.blue.id else self.blue_team
                             self.check_circle_entrance(defending_team)
                         if self.game.ball_first_touch_time != 0:
                             d = distance2(self.game.ball_kick_translation, self.game.ball_position)
@@ -2125,7 +2125,7 @@ class Referee:
                                 self.logger.info(f'Ball in play, can be touched by any player (moved by {d * 100:.2f} cm).')
                                 self.game.in_play = self.sim_time.get_ms()
                             elif not self.is_game_interruption():  # The game interruption case is handled in update_team_contacts
-                                team = red_team if self.game.ball_must_kick_team == 'blue' else blue_team
+                                team = self.red_team if self.game.ball_must_kick_team == 'blue' else self.blue_team
                                 self.check_ball_must_kick(team)
                     else:
                         if self.sim_time.get_ms() - self.game.ball_last_move > self.config.DROPPED_BALL_TIMEOUT * 1000:
