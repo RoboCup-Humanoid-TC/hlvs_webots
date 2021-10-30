@@ -1600,7 +1600,7 @@ class Referee:
 
     def next_penalty_shootout(self):
         self.game.penalty_shootout_count += 1
-        if not self.game.penalty_shootout_goal and self.game.state.self.game_state[:8] != "FINISHED":
+        if not self.game.penalty_shootout_goal and self.game.state.game_state[:8] != "FINISHED":
             self.logger.info("Sending state finish to end current_penalty_shootout")
             self.game_controller_send('STATE:FINISH')
         self.game.penalty_shootout_goal = False
