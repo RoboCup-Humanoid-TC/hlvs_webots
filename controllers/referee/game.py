@@ -55,3 +55,53 @@ class Game(SimpleNamespace):
         self.wait_for_state = 'INITIAL'
         self.wait_for_sec_state = None
         self.wait_for_sec_phase = None
+
+    def reset_ball_touched(self):
+        self.ball_previous_touch_team = None
+        self.ball_previous_touch_player_number = None
+        self.ball_last_touch_team = None
+        self.ball_last_touch_player_number = None
+
+    def set_ball_touched(self, team_color, player_number):
+        self.ball_previous_touch_team = self.ball_last_touch_team
+        self.ball_previous_touch_player_number = self.ball_last_touch_player_number
+        self.ball_last_touch_team = team_color
+        self.ball_last_touch_player_number = player_number
+        self.dropped_ball = False
+
+    def set_penalty(self, team_color, ball_x):
+        self.in_play = None
+        self.can_score = True
+        self.can_score_own = False
+        self.ball_set_kick = True
+        self.ball_left_circle = True
+        self.ball_must_kick_team = team_color
+        self.kicking_player_number = None
+        self.ball_kick_translation[0] = ball_x
+        self.ball_kick_translation[1] = 0
+        self.ball_translation.setSFVec3f(self.game.ball_kick_translation)
+
+    def set_kickoff(self, team_color):
+        self.phase = 'KICKOFF'
+        self.ball_kick_translation[0] = 0
+        self.ball_kick_translation[1] = 0
+        self.ball_set_kick = True
+        self.ball_first_touch_time = 0
+        self.in_play = None
+        self.ball_must_kick_team = team_color
+        self.reset_ball_touched()
+        self.ball_left_circle = None  # one can score only after ball went out of the circle
+        self.can_score = False        # or was touched by another player
+        self.can_score_own = False
+        self.kicking_player_number = None
+
+    def set_dropped_ball(self):
+        self.phase = 'DROPPEDBALL'
+        self.ball_kick_translation[0] = 0
+        self.ball_kick_translation[1] = 0
+        self.ball_set_kick = True
+        self.ball_first_touch_time = 0
+        self.in_play = None
+        self.dropped_ball = True
+        self.can_score = True
+        self.can_score_own = False

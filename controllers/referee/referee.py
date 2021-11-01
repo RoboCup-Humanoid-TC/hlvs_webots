@@ -697,7 +697,7 @@ class Referee:
                             self.game.penalty_shootout_time_to_touch_ball[self.game.penalty_shootout_count - 10] = \
                                 60 - self.game.state.seconds_remaining
                         if self.game.ball_last_touch_team != color or self.game.ball_last_touch_player_number != int(number):
-                            self.set_ball_touched(color, int(number))
+                            self.game.set_ball_touched(color, int(number))
                             self.game.ball_last_touch_time_for_display = self.sim_time.get_ms()
                             action = 'kicked' if self.game.kicking_player_number is None else 'touched'
                             self.logger.info(f'Ball {action} by {color} player {number}.')
@@ -1306,19 +1306,6 @@ class Referee:
             break
         return True
 
-    def set_ball_touched(self, team_color, player_number):
-        self.game.ball_previous_touch_team = self.game.ball_last_touch_team
-        self.game.ball_previous_touch_player_number = self.game.ball_last_touch_player_number
-        self.game.ball_last_touch_team = team_color
-        self.game.ball_last_touch_player_number = player_number
-        self.game.dropped_ball = False
-
-    def reset_ball_touched(self):
-        self.game.ball_previous_touch_team = None
-        self.game.ball_previous_touch_player_number = None
-        self.game.ball_last_touch_team = None
-        self.game.ball_last_touch_player_number = None
-
     def is_game_interruption(self):
         if not hasattr(self.game, "state"):
             return False
@@ -1562,17 +1549,8 @@ class Referee:
                 self.reset_player(defending_color, number, 'halfTimeStartingPose')
         x = -self.field.penalty_mark_x if (self.game.side_left == self.game.kickoff) ^ default else self.field.penalty_mark_x
         self.ball.resetPhysics()
-        self.reset_ball_touched()
-        self.game.in_play = None
-        self.game.can_score = True
-        self.game.can_score_own = False
-        self.game.ball_set_kick = True
-        self.game.ball_left_circle = True
-        self.game.ball_must_kick_team = attacking_team['color']
-        self.game.kicking_player_number = None
-        self.game.ball_kick_translation[0] = x
-        self.game.ball_kick_translation[1] = 0
-        self.game.ball_translation.setSFVec3f(self.game.ball_kick_translation)
+        self.game.reset_ball_touched()
+        self.game.set_penalty(attacking_team['color'], x)
 
     def stop_penalty_shootout(self):
         self.logger.info(f"End of {self.get_penalty_shootout_msg()}")
@@ -1685,7 +1663,7 @@ class Referee:
         else:
             self.game.interruption_team = team
         self.game.ball_must_kick_team = 'red' if self.game.interruption_team == self.game.red.id else 'blue'
-        self.reset_ball_touched()
+        self.game.reset_ball_touched()
         self.logger.info(f'Ball not in play, will be kicked by a player from the {self.game.ball_must_kick_team} team.')
         color = 'red' if self.game.interruption_team == self.game.red.id else 'blue'
         self.logger.info(f'{GAME_INTERRUPTIONS[interruption_type].capitalize()} awarded to {color} team.')
@@ -1728,18 +1706,8 @@ class Referee:
     def kickoff(self):
         color = 'red' if self.game.kickoff == self.game.red.id else 'blue'
         self.logger.info(f'Kick-off is {color}.')
-        self.game.phase = 'KICKOFF'
-        self.game.ball_kick_translation[0] = 0
-        self.game.ball_kick_translation[1] = 0
-        self.game.ball_set_kick = True
-        self.game.ball_first_touch_time = 0
-        self.game.in_play = None
-        self.game.ball_must_kick_team = color
-        self.reset_ball_touched()
-        self.game.ball_left_circle = None  # one can score only after ball went out of the circle
-        self.game.can_score = False        # or was touched by another player
-        self.game.can_score_own = False
-        self.game.kicking_player_number = None
+        self.game.set_kickoff(color)
+        self.game.reset_ball_touched()
         self.move_ball_away()
         self.logger.info(f'Ball not in play, will be kicked by a player from the {self.game.ball_must_kick_team} team.')
 
@@ -1747,15 +1715,7 @@ class Referee:
         self.logger.info(f'The ball didn\'t move for the past {self.config.DROPPED_BALL_TIMEOUT} seconds.')
         self.game.ball_last_move = self.sim_time.get_ms()
         self.game_controller_send('DROPPEDBALL')
-        self.game.phase = 'DROPPEDBALL'
-        self.game.ball_kick_translation[0] = 0
-        self.game.ball_kick_translation[1] = 0
-        self.game.ball_set_kick = True
-        self.game.ball_first_touch_time = 0
-        self.game.in_play = None
-        self.game.dropped_ball = True
-        self.game.can_score = True
-        self.game.can_score_own = False
+        self.game.set_dropped_ball()
 
     def is_robot_near(self, position, min_dist):
         for team in [self.red_team, self.blue_team]:
@@ -1883,7 +1843,7 @@ class Referee:
         self.ball.resetPhysics()
         self.game.ball_translation.setSFVec3f(target_location)
         self.game.ball_set_kick = False
-        self.reset_ball_touched()
+        self.game.reset_ball_touched()
         self.logger.info(f'Ball respawned at {target_location[0]} {target_location[1]} {target_location[2]}.')
 
     def read_team(self, json_path):
@@ -2004,7 +1964,7 @@ class Referee:
 
         self.list_solids()  # prepare lists of solids to monitor in each robot to compute the convex hulls
 
-        self.reset_ball_touched()
+        self.game.reset_ball_touched()
 
         self.previous_seconds_remaining = 0
 
