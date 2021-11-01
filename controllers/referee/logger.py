@@ -2,9 +2,11 @@ import time
 from controller import AnsiCodes
 import sys
 
+from blackboard import blackboard
+
 
 class Logger:
-    def __init__(self, blackboard):
+    def __init__(self):
         self.blackboard = blackboard
         self.log_file = open('log.txt', 'w')
 
@@ -39,3 +41,5 @@ class Logger:
 
     def close(self):
         self.log_file.close()
+
+logger = Logger()

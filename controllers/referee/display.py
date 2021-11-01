@@ -1,7 +1,8 @@
 from types import SimpleNamespace
+from blackboard import blackboard
 
 class Display:
-    def __init__(self, blackboard):
+    def __init__(self):
         self.blackboard = blackboard
         self.font_size = blackboard.config.FONT_SIZE
         self.font = blackboard.config.FONT

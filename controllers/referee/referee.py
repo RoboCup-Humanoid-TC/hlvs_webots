@@ -33,12 +33,13 @@ from controller import Supervisor, Node
 from gamestate import GameState
 from field import Field
 from forceful_contact_matrix import ForcefulContactMatrix
-from logger import Logger
+from logger import logger
 from geometry import distance2, rotate_along_z, aabb_circle_collision, polygon_circle_collision, update_aabb
 from display import Display
 from game import Game
+from team import Team
 from sim_time import SimTime
-from blackboard import Blackboard
+from blackboard import blackboard
 
 
 # game interruptions requiring a free kick procedure
@@ -68,9 +69,12 @@ class Referee:
         self.config.SIMULATED_TIME_BEFORE_PLAY_STATE = int(self.config.SIMULATED_TIME_BEFORE_PLAY_STATE * 1000 / self.time_step)
         self.config.SIMULATED_TIME_SET_PENALTY_SHOOTOUT = int(self.config.SIMULATED_TIME_SET_PENALTY_SHOOTOUT * 1000 / self.time_step)
 
-        self.blackboard = Blackboard(supervisor=self.supervisor, sim_time=self.sim_time, config=self.config)
+        self.blackboard = blackboard
+        self.blackboard.supervisor = self.supervisor
+        self.blackboard.sim_time = self.sim_time
+        self.blackboard.config = self.config
         self.blackboard.start_real_time = time.time()
-        self.logger = Logger(self.blackboard)
+        self.logger = logger
 
         # determine configuration file name
         self.game_config_file = os.environ['WEBOTS_ROBOCUP_GAME'] if 'WEBOTS_ROBOCUP_GAME' in os.environ \
@@ -105,7 +109,7 @@ class Referee:
                                                              len(self.blue_team['players']),
                                                              self.config.FOUL_PUSHING_PERIOD,
                                                              self.config.FOUL_PUSHING_TIME, self.time_step)
-        self.display = Display(self.blackboard)
+        self.display = Display()
         self.others = []
         self.game_controller_send_id = 0
         self.game_controller_send_unanswered = {}
