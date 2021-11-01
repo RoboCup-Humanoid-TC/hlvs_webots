@@ -46,7 +46,7 @@ class Display:
         self.blackboard.supervisor.setLabel(5, score, 0, 0, self.font_size, self.blackboard.config.BLACK_COLOR, 0.2, self.font)
 
     def update_team_details_display(self, team, side, strings):
-        for n in range(len(team['players'])):
+        for n in range(len(team.players)):
             robot_info = self.blackboard.game.state.teams[side].players[n]
             strings.background += '█  '
             if robot_info.number_of_warnings > 0:  # a robot can have both a warning and a yellow card
@@ -90,7 +90,7 @@ class Display:
         self.update_team_details_display(left_team, left, strings)
         strings.left_background = strings.background
         strings.background = ' ' * 28
-        space = 21 - len(left_team['players']) * 3
+        space = 21 - len(left_team.players) * 3
         strings.white += '█' * space
         strings.warning += ' ' * space
         strings.yellow_card += ' ' * space
@@ -99,7 +99,7 @@ class Display:
         self.update_team_details_display(right_team, right, strings)
         strings.right_background = strings.background
         del strings.background
-        space = 12 - 3 * len(right_team['players'])
+        space = 12 - 3 * len(right_team.players)
         strings.white += '█' * (22 + space)
         strings.secondary_state = ' ' * 41 + self.blackboard.game.state.secondary_state[6:]
         sr = self.blackboard.config.IN_PLAY_TIMEOUT - self.blackboard.game.interruption_seconds + self.blackboard.game.state.seconds_remaining \
@@ -131,8 +131,8 @@ class Display:
         # white background and names
         left_team = self.blackboard.red_team if self.blackboard.game.side_left == self.blackboard.game.red.id else self.blackboard.blue_team
         right_team = self.blackboard.red_team if self.blackboard.game.side_left == self.blackboard.game.blue.id else self.blackboard.blue_team
-        team_names = 7 * '█' + (13 - len(left_team['name'])) * ' ' + left_team['name'] + \
-                     ' █████ ' + right_team['name'] + ' ' * (13 - len(right_team['name'])) + '█' * 22
+        team_names = 7 * '█' + (13 - len(left_team.name)) * ' ' + left_team.name + \
+                     ' █████ ' + right_team.name + ' ' * (13 - len(right_team.name)) + '█' * 22
         self.blackboard.supervisor.setLabel(4, team_names, 0, 0, self.font_size, self.blackboard.config.WHITE_COLOR, 0.2, self.font)
         self.update_score_display()
 
