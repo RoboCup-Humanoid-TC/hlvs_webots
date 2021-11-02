@@ -1737,7 +1737,7 @@ class Referee:
         # TODO: add goal posts for safety
         obstacles = []
         for o_team in [self.blue_team, self.red_team]:
-            for o_number, o_player in team.players.items():
+            for o_number, o_player in o_team.players.items():
                 if team.color == o_team.color and number == o_number:
                     continue
                 obstacles.append(o_player['position'])
