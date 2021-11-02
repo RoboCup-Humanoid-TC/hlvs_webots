@@ -79,7 +79,7 @@ class Game(SimpleNamespace):
         self.kicking_player_number = None
         self.ball_kick_translation[0] = ball_x
         self.ball_kick_translation[1] = 0
-        self.ball_translation.setSFVec3f(self.game.ball_kick_translation)
+        self.ball_translation.setSFVec3f(self.ball_kick_translation)
 
     def set_kickoff(self, team_color):
         self.phase = 'KICKOFF'
