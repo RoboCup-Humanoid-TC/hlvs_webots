@@ -130,6 +130,7 @@ class Referee:
         self.main_loop()
 
     def announce_final_score(self):
+        """ Prints score of the match to the console and saves it to the log. """
         if not hasattr(self.game, "state"):
             return
         red_team_idx = self.team_index('red')
@@ -185,6 +186,10 @@ class Referee:
         sys.exit()
 
     def print_status(self):
+        """
+        Print/Log status about current real time factor and state the game is in.
+        Period of printing is limited by the STATUS_PRINT_PERIOD in the config
+        """
         now = time.time()
         if self.status_update_last_real_time is None or self.status_update_last_sim_time is None:
             self.status_update_last_real_time = now
@@ -258,6 +263,11 @@ class Referee:
                  f'{halfTimeStartingRotation[3]}).')
 
     def team_index(self, color):
+        """
+        Returns index of the team in self.game.state.teams of the specified team.
+        :param color: team color 'red' or 'blue'
+        :return: index of the team in self.game.state.teams
+        """
         if color not in ['red', 'blue']:
             raise RuntimeError(f'Wrong color passed to team_index(): \'{color}\'.')
         id = self.game.red.id if color == 'red' else self.game.blue.id
@@ -267,6 +277,10 @@ class Referee:
         return index
 
     def game_controller_receive(self):
+        """
+        Receive new message from gamecontroller and update the game object (including game.state) accordingly
+        Also update display.
+        """
         data = None
         ip = None
         while True:
@@ -274,7 +288,7 @@ class Referee:
                 self.others.append(ip)
                 self.logger.warning(f'Ignoring UDP packets from {ip} not matching GAME_CONTROLLER_UDP_FILTER={self.game_controller_udp_filter}.')
             try:
-                data, peer = self.game.udp.recvfrom(GameState.sizeof())
+                data, peer = self.game.udp.recvfrom(GameState.sizeof()) #TODO move udp from game.py to referee.py
                 ip, port = peer
                 if self.game_controller_udp_filter is None or self.game_controller_udp_filter == ip:
                     break
@@ -1255,6 +1269,12 @@ class Referee:
         return red or blue
 
     def check_circle_entrance(self, team):
+        """
+        Checks if a player from the opposing team has entered the center circle.
+        If so, the player is sent to penalty.
+        :param team: opposing team
+        :return:
+        """
         penalty = False
         for number, player in team.players.items():
             if self.already_penalized(player):
