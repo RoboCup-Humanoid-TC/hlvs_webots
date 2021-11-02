@@ -69,6 +69,8 @@ class Referee:
         self.config.SIMULATED_TIME_BEFORE_PLAY_STATE = int(self.config.SIMULATED_TIME_BEFORE_PLAY_STATE * 1000 / self.time_step)
         self.config.SIMULATED_TIME_SET_PENALTY_SHOOTOUT = int(self.config.SIMULATED_TIME_SET_PENALTY_SHOOTOUT * 1000 / self.time_step)
 
+        self.game_controller_socket = None
+
         self.blackboard = blackboard
         self.blackboard.supervisor = self.supervisor
         self.blackboard.sim_time = self.sim_time
@@ -140,9 +142,9 @@ class Referee:
     def clean_exit(self):
         """Save logs and clean all subprocesses"""
         self.announce_final_score()
-        if hasattr(self.game, "controller") and self.game.controller:
+        if hasattr(self.game, "controller") and self.game_controller_socket:
             self.logger.info("Closing 'controller' socket")
-            self.game.controller.close()
+            self.game_controller_socket.close()
         if hasattr(self.game, "controller_process") and self.game.controller_process:
             self.logger.info("Terminating 'game_controller' process")
             self.game.controller_process.terminate()
@@ -413,14 +415,14 @@ class Referee:
         if message[:6] != 'CLOCK:':
             self.logger.info(f'Sending {self.game_controller_send_id}:{message} to GameController.')
         message = f'{self.game_controller_send_id}:{message}\n'
-        self.game.controller.sendall(message.encode('ascii'))
+        self.game_controller_socket.sendall(message.encode('ascii'))
         # self.logger.info(f'sending {message.strip()} to GameController')
         self.game_controller_send_unanswered[self.game_controller_send_id] = message.strip()
         answered = False
         sent_id = self.game_controller_send_id
         while True:
             try:
-                answers = self.game.controller.recv(1024).decode('ascii').split('\n')
+                answers = self.game_controller_socket.recv(1024).decode('ascii').split('\n')
                 for answer in answers:
                     if answer == '':
                         continue
@@ -460,7 +462,7 @@ class Referee:
                     time.sleep(0.2)
                     self.game_controller_send_id += 1
                     clock_message = f'{self.game_controller_send_id}:CLOCK:{self.sim_time.get_ms()}\n'
-                    self.game.controller.sendall(clock_message.encode('ascii'))
+                    self.game_controller_socket.sendall(clock_message.encode('ascii'))
                     self.game_controller_send_unanswered[self.game_controller_send_id] = clock_message.strip()
         # We are waiting for a specific update from the GC before testing anything else
         while self.game.wait_for_state is not None or self.game.wait_for_sec_state is not None or self.game.wait_for_sec_phase is not None:
@@ -1907,12 +1909,12 @@ class Referee:
 
         try:
             if self.game.controller_process:
-                self.game.controller = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self.game_controller_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 retry = 0
                 while True:
                     try:
-                        self.game.controller.connect(('localhost', 8750))
-                        self.game.controller.setblocking(False)
+                        self.game_controller_socket.connect(('localhost', 8750))
+                        self.game_controller_socket.setblocking(False)
                         break
                     except socket.error as msg:
                         retry += 1
@@ -1922,7 +1924,7 @@ class Referee:
                             self.supervisor.step(0)
                         else:
                             self.logger.error('Could not connect to GameController at localhost:8750.')
-                            self.game.controller = None
+                            self.game_controller_socket = None
                             self.clean_exit()
                             break
                 self.logger.info('Connected to GameControllerSimulator at localhost:8750.')
@@ -1939,7 +1941,7 @@ class Referee:
                 except Exception:
                     self.logger.error("Failed to set up UDP socket to listen to GC messages")
             else:
-                self.game.controller = None
+                self.game_controller_socket = None
         except Exception:
             self.logger.error(f"Failed connecting to GameController with the following exception {traceback.format_exc()}")
             self.clean_exit()
