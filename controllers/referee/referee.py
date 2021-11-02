@@ -223,7 +223,13 @@ class Referee:
         if getattr(self.game, attribute) == 'random':  # toss a coin to determine a random team
             setattr(self.game, attribute, self.game.red.id if bool(random.getrandbits(1)) else self.game.blue.id)
 
-    def spawn_team(self, team, red_on_right, children):
+    def spawn_team(self, team, red_on_right):
+        """
+        Spawn robots defined in the team.json file at their defined starting poses
+        :param team: Team object containing the team configuration
+        :param red_on_right: whether or not right is on the right, used for flipping the spawn poses
+        """
+        children = self.supervisor.getRoot().getField('children')
         color = team.color
         nb_players = len(team.players)
         for number, player in team.players.items():
@@ -1891,8 +1897,8 @@ class Referee:
         self.game.ball_translation = self.blackboard.supervisor.getFromDef('BALL').getField('translation')
 
         self.game.state = None
-        self.spawn_team(self.red_team, self.game.side_left == self.game.blue.id, children)
-        self.spawn_team(self.blue_team, self.game.side_left == self.game.red.id, children)
+        self.spawn_team(self.red_team, self.game.side_left == self.game.blue.id)
+        self.spawn_team(self.blue_team, self.game.side_left == self.game.red.id)
 
         players_ball_holding_time_window_size = int(1000 * self.config.PLAYERS_BALL_HOLDING_TIMEOUT / self.time_step)
         goalkeeper_ball_holding_time_window_size = int(1000 * self.config.GOALKEEPER_BALL_HOLDING_TIMEOUT / self.time_step)
