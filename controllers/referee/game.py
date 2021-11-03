@@ -107,8 +107,8 @@ class Game(SimpleNamespace):
         self.can_score_own = False
 
     def ball_in_play(self, ms):
-        self.in_play = self.sim_time.get_ms()
-        self.ball_last_move = self.sim_time.get_ms()
+        self.in_play = ms
+        self.ball_last_move = ms
         self.interruption = None
         self.interruption_step = None
         self.interruption_step_time = 0
