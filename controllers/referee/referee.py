@@ -53,8 +53,6 @@ GAME_INTERRUPTIONS = {
 }
 
 
-
-
 class Referee:
     def __init__(self):
         # start the webots supervisor
@@ -298,9 +296,6 @@ class Referee:
                 return
             except Exception as e:
                 self.logger.error(f'UDP input failure: {e}')
-                return
-            if not data:
-                self.logger.error('No UDP data received')
                 return
         self.previous_seconds_remaining = self.game.state.seconds_remaining if self.game.state else 0
         previous_secondary_seconds_remaining = self.game.state.secondary_seconds_remaining if self.game.state else 0
@@ -628,7 +623,6 @@ class Referee:
         self.update_team_ball_holding(self.red_team)
         self.update_team_ball_holding(self.blue_team)
 
-
     def update_team_contacts(self, team):
         early_game_interruption = self.is_early_game_interruption()
         color = team.color
@@ -781,7 +775,6 @@ class Referee:
             if len(contact_points) == 0:
                 continue
             opponent_team = self.red_team if team == self.blue_team else self.blue_team
-            opponent_number = None
             for point in contact_points:
                 opponent_number = self.find_robot_contact(opponent_team, point)
                 if opponent_number is not None:
@@ -1888,13 +1881,10 @@ class Referee:
                         self.udp_bouncer_process = None
                     self.game.controller_process = subprocess.Popen(command_line, cwd=os.path.join(GAME_CONTROLLER_HOME, 'build', 'jar'))
             except KeyError:
-                GAME_CONTROLLER_HOME = None
                 self.game.controller_process = None
                 self.logger.error('GAME_CONTROLLER_HOME environment variable not set, unable to launch GameController.')
                 self.clean_exit()
         except KeyError:
-            JAVA_HOME = None
-            GAME_CONTROLLER_HOME = None
             self.game.controller_process = None
             self.logger.error('JAVA_HOME environment variable not set, unable to launch GameController.')
             self.clean_exit()
@@ -2340,7 +2330,6 @@ class Referee:
                     self.send_penalties()
                     if send_play_state_after_penalties:
                         self.game_controller_send('STATE:PLAY')
-                        send_play_state_after_penalties = False
 
                 self.sim_time.progress_ms(self.time_step)
 
