@@ -479,7 +479,9 @@ class Referee:
 
         return True
 
-    def append_solid(self, solid, solids, tagged_solids, active_tag=None):  # we list only the hands and feet
+    def append_solid(self, solid, active_tag=None):  # we list only the hands and feet
+        solids = []
+        tagged_solids = dict()
         name_field = solid.getField('name')
         if name_field:
             name = name_field.getSFString()
@@ -496,24 +498,27 @@ class Referee:
             child = children.getMFNode(i)
             if child.getType() in [Node.ROBOT, Node.SOLID, Node.GROUP, Node.TRANSFORM, Node.ACCELEROMETER, Node.CAMERA, Node.GYRO,
                                    Node.TOUCH_SENSOR]:
-                self.append_solid(child, solids, tagged_solids, active_tag)
+                s, ts = self.append_solid(child, active_tag)
+                solids.extend(s)
+                tagged_solids.update(ts)
                 continue
             if child.getType() in [Node.HINGE_JOINT, Node.HINGE_2_JOINT, Node.SLIDER_JOINT, Node.BALL_JOINT]:
                 endPoint = child.getProtoField('endPoint') if child.isProto() else child.getField('endPoint')
                 solid = endPoint.getSFNode()
                 if solid.getType() == Node.NO_NODE or solid.getType() == Node.SOLID_REFERENCE:
                     continue
-                self.append_solid(solid, solids, tagged_solids, None)  # active tag is reset after a joint
+                s, ts = self.append_solid(solid, None)  # active tag is reset after a joint
+                solids.extend(s)
+                tagged_solids.update(ts)
+        return solids, tagged_solids
 
     def list_player_solids(self, player, color, number):
         robot = player['robot']
-        player['solids'] = []
-        player['tagged_solids'] = {}  # Keys: name of solid, Values: name of tag
-        solids = player['solids']
-        self.append_solid(robot, solids, player['tagged_solids'])
-        if len(solids) != 4:
+        # Tagged solids: Keys: name of solid, Values: name of tag
+        player['solids'], player['tagged_solids'] = self.append_solid(robot)
+        if len(player['solids']) != 4:
             self.logger.info(f"Tagged solids: {player['tagged_solids']}")
-            self.logger.error(f'{color} player {number}: invalid number of [hand]+[foot], received {len(solids)}, expected 4.')
+            self.logger.error(f'{color} player {number}: invalid number of [hand]+[foot], received {len(player["solids"])}, expected 4.')
             self.clean_exit()
 
     def list_team_solids(self, team):
