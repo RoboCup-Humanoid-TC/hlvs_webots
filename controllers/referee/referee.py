@@ -351,13 +351,7 @@ class Referee:
                 if self.game.interruption_seconds - self.game.state.seconds_remaining > self.config.IN_PLAY_TIMEOUT:
                     if self.game.in_play is None:
                         self.logger.info('Ball in play, can be touched by any player (10 seconds elapsed).')
-                        self.game.in_play = self.sim_time.get_ms()
-                        self.game.ball_last_move = self.sim_time.get_ms()
-                        self.game.interruption = None
-                        self.game.interruption_step = None
-                        self.game.interruption_step_time = 0
-                        self.game.interruption_team = None
-                        self.game.interruption_seconds = None
+                        self.game.ball_in_play(self.sim_time.get_ms())
             self.display.update_time_display()
         red = 0 if self.game.state.teams[0].team_color == 'RED' else 1
         blue = 1 if red == 0 else 0
