@@ -19,7 +19,10 @@ class Display:
         if self.blackboard.game.state:
             state = self.blackboard.game.state.game_state[6:]
             if state == 'READY' or state == 'SET':  # kickoff
-                color = self.blackboard.config.RED_COLOR if self.blackboard.game.kickoff == self.blackboard.game.red.id else self.blackboard.config.BLUE_COLOR
+                if self.blackboard.game.kickoff == self.blackboard.game.red.id:
+                    color = self.blackboard.config.RED_COLOR
+                else:
+                    color = self.blackboard.config.BLUE_COLOR
             else:
                 color = 0x000000
         else:
@@ -57,7 +60,8 @@ class Display:
                 strings.yellow_card += '■  ' if robot_info.number_of_yellow_cards > 0 else '   '
             strings.red_card += '■  ' if robot_info.number_of_red_cards > 0 else '   '
             strings.white += str(n + 1) + '██'
-            strings.foreground += f'{robot_info.secs_till_unpenalized:02d} ' if robot_info.secs_till_unpenalized != 0 else '   '
+            strings.foreground += f'{robot_info.secs_till_unpenalized:02d} ' \
+                    if robot_info.secs_till_unpenalized != 0 else '   '
 
     def update_details_display(self):
         if not self.blackboard.game.state:
@@ -102,38 +106,49 @@ class Display:
         space = 12 - 3 * len(right_team.players)
         strings.white += '█' * (22 + space)
         strings.secondary_state = ' ' * 41 + self.blackboard.game.state.secondary_state[6:]
-        sr = self.blackboard.config.IN_PLAY_TIMEOUT - self.blackboard.game.interruption_seconds + self.blackboard.game.state.seconds_remaining \
+        sr = self.blackboard.config.IN_PLAY_TIMEOUT - self.blackboard.game.interruption_seconds \
+                + self.blackboard.game.state.seconds_remaining \
             if self.blackboard.game.interruption_seconds is not None else 0
         if sr > 0:
             strings.secondary_state += ' ' + format_time(sr)
-        if self.blackboard.game.state.secondary_state[6:] != 'NORMAL' or self.blackboard.game.state.secondary_state_info[1] != 0:
+        if (self.blackboard.game.state.secondary_state[6:] != 'NORMAL' or
+                self.blackboard.game.state.secondary_state_info[1] != 0):
             strings.secondary_state += ' [' + str(self.blackboard.game.state.secondary_state_info[1]) + ']'
         if self.blackboard.game.interruption_team is not None:  # interruption
-            secondary_state_color = self.blackboard.config.RED_COLOR if self.blackboard.game.interruption_team == self.blackboard.game.red.id else self.blackboard.config.BLUE_COLOR
+            secondary_state_color = self.blackboard.config.RED_COLOR \
+                if self.blackboard.game.interruption_team == self.blackboard.game.red.id else self.blackboard.config.BLUE_COLOR
         else:
             secondary_state_color = self.blackboard.config.BLACK_COLOR
         y = 0.0465  # vertical position of the second line
         self.blackboard.supervisor.setLabel(10, strings.left_background, 0, y, self.font_size, left_color, 0.2, self.font)
         self.blackboard.supervisor.setLabel(11, strings.right_background, 0, y, self.font_size, right_color, 0.2, self.font)
-        self.blackboard.supervisor.setLabel(12, strings.white, 0, y, self.font_size, self.blackboard.config.WHITE_COLOR, 0.2, self.font)
+        self.blackboard.supervisor.setLabel(12, strings.white, 0, y, self.font_size,
+                self.blackboard.config.WHITE_COLOR, 0.2, self.font)
         self.blackboard.supervisor.setLabel(13, strings.warning, 0, 2 * y, self.font_size, 0x0000ff, 0.2, self.font)
         self.blackboard.supervisor.setLabel(14, strings.yellow_card, 0, 2 * y, self.font_size, 0xffff00, 0.2, self.font)
         self.blackboard.supervisor.setLabel(15, strings.red_card, 0, 2 * y, self.font_size, 0xff0000, 0.2, self.font)
-        self.blackboard.supervisor.setLabel(16, strings.foreground, 0, y, self.font_size, self.blackboard.config.BLACK_COLOR, 0.2, self.font)
-        self.blackboard.supervisor.setLabel(17, strings.secondary_state, 0, y, self.font_size, secondary_state_color, 0.2, self.font)
+        self.blackboard.supervisor.setLabel(16, strings.foreground, 0, y, self.font_size,
+                self.blackboard.config.BLACK_COLOR, 0.2, self.font)
+        self.blackboard.supervisor.setLabel(17, strings.secondary_state, 0, y, self.font_size,
+                secondary_state_color, 0.2, self.font)
 
     def update_team_display(self):
         # red and blue backgrounds
-        left_color = self.blackboard.config.RED_COLOR if self.blackboard.game.side_left == self.blackboard.game.red.id else self.blackboard.config.BLUE_COLOR
-        right_color = self.blackboard.config.BLUE_COLOR if self.blackboard.game.side_left == self.blackboard.game.red.id else self.blackboard.config.RED_COLOR
+        left_color = self.blackboard.config.RED_COLOR \
+                if self.blackboard.game.side_left == self.blackboard.game.red.id else self.blackboard.config.BLUE_COLOR
+        right_color = self.blackboard.config.BLUE_COLOR \
+                if self.blackboard.game.side_left == self.blackboard.game.red.id else self.blackboard.config.RED_COLOR
         self.blackboard.supervisor.setLabel(2, ' ' * 7 + '█' * 14, 0, 0, self.font_size, left_color, 0.2, self.font)
         self.blackboard.supervisor.setLabel(3, ' ' * 26 + '█' * 14, 0, 0, self.font_size, right_color, 0.2, self.font)
         # white background and names
-        left_team = self.blackboard.red_team if self.blackboard.game.side_left == self.blackboard.game.red.id else self.blackboard.blue_team
-        right_team = self.blackboard.red_team if self.blackboard.game.side_left == self.blackboard.game.blue.id else self.blackboard.blue_team
+        left_team = self.blackboard.red_team \
+                if self.blackboard.game.side_left == self.blackboard.game.red.id else self.blackboard.blue_team
+        right_team = self.blackboard.red_team \
+                if self.blackboard.game.side_left == self.blackboard.game.blue.id else self.blackboard.blue_team
         team_names = 7 * '█' + (13 - len(left_team.name)) * ' ' + left_team.name + \
                      ' █████ ' + right_team.name + ' ' * (13 - len(right_team.name)) + '█' * 22
-        self.blackboard.supervisor.setLabel(4, team_names, 0, 0, self.font_size, self.blackboard.config.WHITE_COLOR, 0.2, self.font)
+        self.blackboard.supervisor.setLabel(4, team_names, 0, 0, self.font_size,
+                self.blackboard.config.WHITE_COLOR, 0.2, self.font)
         self.update_score_display()
 
     def setup_display(self):

@@ -27,8 +27,9 @@ class Game(SimpleNamespace):
         self.penalty_shootout_time_to_reach_goal_area = [None, None, None, None, None, None, None, None, None, None]
         self.penalty_shootout_time_to_touch_ball = [None, None, None, None, None, None, None, None, None, None]
         self.ball_radius = 0.07 if self.field_size == 'kid' else 0.1125
+        # initial position of ball before kick
         self.ball_kick_translation = [0, 0,
-                                      self.ball_radius + self.blackboard.field.turf_depth]  # initial position of ball before kick
+                                      self.ball_radius + self.blackboard.field.turf_depth]
         self.ball_exit_translation = None
         self.ball_last_touch_time = 0
         self.ball_first_touch_time = 0
@@ -36,7 +37,8 @@ class Game(SimpleNamespace):
         self.ball_position = [0, 0, 0]
         self.ball_last_move = 0
         self.real_time_multiplier = 1000 / (
-                    self.minimum_real_time_factor * int(self.blackboard.supervisor.getBasicTimeStep())) if self.minimum_real_time_factor > 0 else 10
+                    self.minimum_real_time_factor * int(self.blackboard.supervisor.getBasicTimeStep())) \
+                            if self.minimum_real_time_factor > 0 else 10
         self.interruption = None
         self.interruption_countdown = 0
         self.interruption_step = None
