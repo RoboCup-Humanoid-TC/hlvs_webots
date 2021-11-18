@@ -1,4 +1,4 @@
- # Copyright 1996-2021 Cyberbotics Ltd.
+# Copyright 1996-2021 Cyberbotics Ltd.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 
 from types import SimpleNamespace
 from blackboard import blackboard
+
 
 class Display:
     def __init__(self):
@@ -75,7 +76,7 @@ class Display:
             strings.red_card += '■  ' if robot_info.number_of_red_cards > 0 else '   '
             strings.white += str(n + 1) + '██'
             strings.foreground += f'{robot_info.secs_till_unpenalized:02d} ' \
-                    if robot_info.secs_till_unpenalized != 0 else '   '
+                if robot_info.secs_till_unpenalized != 0 else '   '
 
     def update_details_display(self):
         if not self.blackboard.game.state:
@@ -121,7 +122,7 @@ class Display:
         strings.white += '█' * (22 + space)
         strings.secondary_state = ' ' * 41 + self.blackboard.game.state.secondary_state[6:]
         sr = self.blackboard.config.IN_PLAY_TIMEOUT - self.blackboard.game.interruption_seconds \
-                + self.blackboard.game.state.seconds_remaining \
+            + self.blackboard.game.state.seconds_remaining \
             if self.blackboard.game.interruption_seconds is not None else 0
         if sr > 0:
             strings.secondary_state += ' ' + format_time(sr)
@@ -137,32 +138,32 @@ class Display:
         self.blackboard.supervisor.setLabel(10, strings.left_background, 0, y, self.font_size, left_color, 0.2, self.font)
         self.blackboard.supervisor.setLabel(11, strings.right_background, 0, y, self.font_size, right_color, 0.2, self.font)
         self.blackboard.supervisor.setLabel(12, strings.white, 0, y, self.font_size,
-                self.blackboard.config.WHITE_COLOR, 0.2, self.font)
+                                            self.blackboard.config.WHITE_COLOR, 0.2, self.font)
         self.blackboard.supervisor.setLabel(13, strings.warning, 0, 2 * y, self.font_size, 0x0000ff, 0.2, self.font)
         self.blackboard.supervisor.setLabel(14, strings.yellow_card, 0, 2 * y, self.font_size, 0xffff00, 0.2, self.font)
         self.blackboard.supervisor.setLabel(15, strings.red_card, 0, 2 * y, self.font_size, 0xff0000, 0.2, self.font)
         self.blackboard.supervisor.setLabel(16, strings.foreground, 0, y, self.font_size,
-                self.blackboard.config.BLACK_COLOR, 0.2, self.font)
+                                            self.blackboard.config.BLACK_COLOR, 0.2, self.font)
         self.blackboard.supervisor.setLabel(17, strings.secondary_state, 0, y, self.font_size,
-                secondary_state_color, 0.2, self.font)
+                                            secondary_state_color, 0.2, self.font)
 
     def update_team_display(self):
         # red and blue backgrounds
         left_color = self.blackboard.config.RED_COLOR \
-                if self.blackboard.game.side_left == self.blackboard.game.red.id else self.blackboard.config.BLUE_COLOR
+            if self.blackboard.game.side_left == self.blackboard.game.red.id else self.blackboard.config.BLUE_COLOR
         right_color = self.blackboard.config.BLUE_COLOR \
-                if self.blackboard.game.side_left == self.blackboard.game.red.id else self.blackboard.config.RED_COLOR
+            if self.blackboard.game.side_left == self.blackboard.game.red.id else self.blackboard.config.RED_COLOR
         self.blackboard.supervisor.setLabel(2, ' ' * 7 + '█' * 14, 0, 0, self.font_size, left_color, 0.2, self.font)
         self.blackboard.supervisor.setLabel(3, ' ' * 26 + '█' * 14, 0, 0, self.font_size, right_color, 0.2, self.font)
         # white background and names
         left_team = self.blackboard.red_team \
-                if self.blackboard.game.side_left == self.blackboard.game.red.id else self.blackboard.blue_team
+            if self.blackboard.game.side_left == self.blackboard.game.red.id else self.blackboard.blue_team
         right_team = self.blackboard.red_team \
-                if self.blackboard.game.side_left == self.blackboard.game.blue.id else self.blackboard.blue_team
+            if self.blackboard.game.side_left == self.blackboard.game.blue.id else self.blackboard.blue_team
         team_names = 7 * '█' + (13 - len(left_team.name)) * ' ' + left_team.name + \
-                     ' █████ ' + right_team.name + ' ' * (13 - len(right_team.name)) + '█' * 22
+            ' █████ ' + right_team.name + ' ' * (13 - len(right_team.name)) + '█' * 22
         self.blackboard.supervisor.setLabel(4, team_names, 0, 0, self.font_size,
-                self.blackboard.config.WHITE_COLOR, 0.2, self.font)
+                                            self.blackboard.config.WHITE_COLOR, 0.2, self.font)
         self.update_score_display()
 
     def setup_display(self):
@@ -184,4 +185,3 @@ def format_time(s):
     if len(seconds) == 1:
         seconds = '0' + seconds
     return sign + minutes + ':' + seconds
-

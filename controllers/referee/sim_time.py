@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 class SimTime:
     def __init__(self):
         self.time = 0
@@ -23,4 +24,4 @@ class SimTime:
         return self.time
 
     def get_sec(self):
-        return self.time/1000.0
+        return self.time / 1000.0

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 import time
 from controller import AnsiCodes
 import sys
@@ -40,7 +41,8 @@ class Logger:
         print(console_message, file=sys.stderr if msg_type == 'Error' else sys.stdout)
         if self.log_file:
             real_time = int(1000 * (time.time() - self.blackboard.start_real_time)) / 1000
-            self.log_file.write(f'[{real_time:08.3f}|{self.blackboard.sim_time.get_ms() / 1000:08.3f}] {msg_type}: {message}\n')  # log real and virtual times
+            # log real and virtual times
+            self.log_file.write(f'[{real_time:08.3f}|{self.blackboard.sim_time.get_ms() / 1000:08.3f}] {msg_type}: {message}\n')
             if force_flush:
                 self.log_file.flush()
 

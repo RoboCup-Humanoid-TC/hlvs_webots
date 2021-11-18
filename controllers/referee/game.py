@@ -1,4 +1,4 @@
- # Copyright 1996-2021 Cyberbotics Ltd.
+# Copyright 1996-2021 Cyberbotics Ltd.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 
 from types import SimpleNamespace
 
@@ -50,8 +51,8 @@ class Game(SimpleNamespace):
         self.ball_position = [0, 0, 0]
         self.ball_last_move = 0
         self.real_time_multiplier = 1000 / (
-                    self.minimum_real_time_factor * int(self.blackboard.supervisor.getBasicTimeStep())) \
-                            if self.minimum_real_time_factor > 0 else 10
+                self.minimum_real_time_factor * int(self.blackboard.supervisor.getBasicTimeStep())) \
+            if self.minimum_real_time_factor > 0 else 10
         self.interruption = None
         self.interruption_countdown = 0
         self.interruption_step = None
@@ -106,7 +107,7 @@ class Game(SimpleNamespace):
         self.ball_must_kick_team = team_color
         self.reset_ball_touched()
         self.ball_left_circle = None  # one can score only after ball went out of the circle
-        self.can_score = False        # or was touched by another player
+        self.can_score = False  # or was touched by another player
         self.can_score_own = False
         self.kicking_player_number = None
 

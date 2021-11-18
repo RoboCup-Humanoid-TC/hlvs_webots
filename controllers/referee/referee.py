@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+
 import copy
 import json
 import math
@@ -64,11 +66,11 @@ class Referee:
         self.config = SimpleNamespace(**config)
         self.config.GOAL_HALF_WIDTH = self.config.GOAL_WIDTH / 2
         self.config.SIMULATED_TIME_INTERRUPTION_PHASE_0 = \
-                int(self.config.SIMULATED_TIME_INTERRUPTION_PHASE_0 * 1000 / self.time_step)
+            int(self.config.SIMULATED_TIME_INTERRUPTION_PHASE_0 * 1000 / self.time_step)
         self.config.SIMULATED_TIME_BEFORE_PLAY_STATE = \
-                int(self.config.SIMULATED_TIME_BEFORE_PLAY_STATE * 1000 / self.time_step)
+            int(self.config.SIMULATED_TIME_BEFORE_PLAY_STATE * 1000 / self.time_step)
         self.config.SIMULATED_TIME_SET_PENALTY_SHOOTOUT = \
-                int(self.config.SIMULATED_TIME_SET_PENALTY_SHOOTOUT * 1000 / self.time_step)
+            int(self.config.SIMULATED_TIME_SET_PENALTY_SHOOTOUT * 1000 / self.time_step)
 
         self.game_controller_socket = None
 
@@ -121,7 +123,7 @@ class Referee:
         self.game_controller_send_unanswered = {}
         self.game_controller_last_sent_message = None
         self.game_controller_udp_filter = os.environ['GAME_CONTROLLER_UDP_FILTER'] \
-                if 'GAME_CONTROLLER_UDP_FILTER' in os.environ else None
+            if 'GAME_CONTROLLER_UDP_FILTER' in os.environ else None
 
         self.setup()
         self.display.setup_display()
@@ -211,7 +213,7 @@ class Referee:
             else:
                 messages.append(f"state: {self.game.state.game_state}, remaining time: {self.game.state.seconds_remaining}")
                 if self.game.state.secondary_state in GAME_INTERRUPTIONS:
-                    messages.append(f"  sec_state: {self.game.state.secondary_state} phase: " + \
+                    messages.append(f"  sec_state: {self.game.state.secondary_state} phase: "
                                     f"{self.game.state.secondary_state_info[1]}")
             if self.game.penalty_shootout:
                 messages.append(f"{self.get_penalty_shootout_msg()}")
@@ -229,7 +231,7 @@ class Referee:
             elif getattr(self.game, attribute) == 'blue':
                 setattr(self.game, attribute, self.game.blue.id)
             elif getattr(self.game, attribute) != 'random':
-                self.logger.error(f'Unsupported value for "{attribute}" in game.json file: ' + \
+                self.logger.error(f'Unsupported value for "{attribute}" in game.json file: '
                                   f'{getattr(self.game, attribute)}, using "random".')
                 setattr(self.game, attribute, 'random')
         else:
@@ -269,9 +271,9 @@ class Referee:
             player['robot'] = self.supervisor.getFromDef(defname)
             player['position'] = player['robot'].getCenterOfMass()
             self.logger.info(f'Spawned {defname} {model} on port {port} at halfTimeStartingPose: translation (' +
-                 f'{halfTimeStartingTranslation[0]} {halfTimeStartingTranslation[1]} {halfTimeStartingTranslation[2]}), ' +
-                 f'rotation ({halfTimeStartingRotation[0]} {halfTimeStartingRotation[1]} {halfTimeStartingRotation[2]} ' +
-                 f'{halfTimeStartingRotation[3]}).')
+                             f'{halfTimeStartingTranslation[0]} {halfTimeStartingTranslation[1]} ' +
+                             f'{halfTimeStartingTranslation[2]}), rotation ({halfTimeStartingRotation[0]} ' +
+                             f'{halfTimeStartingRotation[1]} {halfTimeStartingRotation[2]} {halfTimeStartingRotation[3]}).')
 
     def team_index(self, color):
         """
@@ -297,10 +299,10 @@ class Referee:
         while True:
             if self.game_controller_udp_filter and ip and ip not in self.others:
                 self.others.append(ip)
-                self.logger.warning(f'Ignoring UDP packets from {ip} not matching ' + \
+                self.logger.warning(f'Ignoring UDP packets from {ip} not matching '
                                     f'GAME_CONTROLLER_UDP_FILTER={self.game_controller_udp_filter}.')
             try:
-                data, peer = self.game.udp.recvfrom(GameState.sizeof()) #TODO move udp from game.py to referee.py
+                data, peer = self.game.udp.recvfrom(GameState.sizeof())  # TODO move udp from game.py to referee.py
                 ip, port = peer
                 if self.game_controller_udp_filter is None or self.game_controller_udp_filter == ip:
                     break
@@ -332,7 +334,7 @@ class Referee:
             if self.game.wait_for_state is not None:
                 if 'STATE_' + self.game.wait_for_state != self.game.state.game_state:
                     self.logger.warning(f'Received unexpected state from GameController: {self.game.state.game_state} ' +
-                            f'while expecting {self.game.wait_for_state}')
+                                        f'while expecting {self.game.wait_for_state}')
                 else:
                     self.logger.info(f"State has succesfully changed to {self.game.wait_for_state}")
                     self.game.wait_for_state = None
@@ -342,9 +344,9 @@ class Referee:
             self.logger.info(f'New secondary state received from GameController: {new_sec_state}, phase {new_sec_phase}.')
             if self.game.wait_for_sec_state is not None or self.game.wait_for_sec_phase is not None:
                 if 'STATE_' + self.game.wait_for_sec_state != new_sec_state or new_sec_phase != self.game.wait_for_sec_phase:
-                    self.logger.warning(f'Received unexpected secondary state from GameController: ' + \
-                            f'{new_sec_state}:{new_sec_phase} ' +
-                            f'while expecting {self.game.wait_for_sec_state}:{self.game.wait_for_sec_phase}')
+                    self.logger.warning(f'Received unexpected secondary state from GameController: '
+                                        f'{new_sec_state}:{new_sec_phase} '
+                                        f'while expecting {self.game.wait_for_sec_state}:{self.game.wait_for_sec_phase}')
                 else:
                     self.logger.info(f"State has succesfully changed to {new_sec_state}:{new_sec_phase}")
                     self.game.wait_for_sec_state = None
@@ -448,6 +450,7 @@ class Referee:
         while True:
             try:
                 answers = self.game_controller_socket.recv(1024).decode('ascii').split('\n')
+                self.logger.info(answers)
                 for answer in answers:
                     if answer == '':
                         continue
@@ -535,7 +538,7 @@ class Referee:
         player['solids'], player['tagged_solids'] = self.append_solid(robot)
         if len(player['solids']) != 4:
             self.logger.info(f"Tagged solids: {player['tagged_solids']}")
-            self.logger.error(f'{color} player {number}: invalid number of [hand]+[foot], ' + \
+            self.logger.error(f'{color} player {number}: invalid number of [hand]+[foot], '
                               f'received {len(player["solids"])}, expected 4.')
             self.clean_exit()
 
@@ -593,7 +596,7 @@ class Referee:
                 i += 1
             # check for collision between AABB of goalkeeper and ball
             if aabb_circle_collision(aabb, self.game.ball_position[0], self.game.ball_position[1],
-                    self.game.ball_radius * self.config.BALL_HOLDING_RATIO):
+                                     self.game.ball_radius * self.config.BALL_HOLDING_RATIO):
                 hull = ConvexHull(points)
                 hull_vertices = np.take(points, hull.vertices, 0)
                 goalkeeper_hold_ball = polygon_circle_collision(hull_vertices, self.game.ball_position,
@@ -613,11 +616,11 @@ class Referee:
                     i += 1
             # check for collision between AABB of players and ball
             if aabb_circle_collision(aabb, self.game.ball_position[0], self.game.ball_position[1],
-                    self.game.ball_radius * self.config.BALL_HOLDING_RATIO):
+                                     self.game.ball_radius * self.config.BALL_HOLDING_RATIO):
                 hull = ConvexHull(points)
                 hull_vertices = np.take(points, hull.vertices, 0)
                 hold_ball = polygon_circle_collision(hull_vertices, self.game.ball_position,
-                        self.game.ball_radius * self.config.BALL_HOLDING_RATIO)
+                                                     self.game.ball_radius * self.config.BALL_HOLDING_RATIO)
         players_holding_time_window = team.players_holding_time_window
         index = int(self.sim_time.get_ms() / self.time_step) % len(players_holding_time_window)
         players_holding_time_window[index] = hold_ball
@@ -706,8 +709,8 @@ class Referee:
                                 player['ball_handling_start'] = self.sim_time.get_ms()
                                 self.logger.info(f'Ball touched the {member} of {color} player {number}.')
                             if (self.game.throw_in and
-                                    self.game.ball_position[2] > \
-                                            self.field.turf_depth + self.game.ball_radius + self.config.BALL_LIFT_THRESHOLD):
+                                    self.game.ball_position[2] >
+                                    self.field.turf_depth + self.game.ball_radius + self.config.BALL_LIFT_THRESHOLD):
                                 self.game.throw_in_ball_was_lifted = True
                         else:  # the ball was touched by another part of the robot
                             # if the ball was hit by any player, we consider the throw-in (if any) complete
@@ -819,7 +822,7 @@ class Referee:
                     if (not fcm.contact(red_number, blue_number, self.sim_time.get_ms() - self.time_step) and
                             not fcm.contact(red_number, blue_number, self.sim_time.get_ms())):
                         self.logger.info(f'{self.sim_time.get_ms()}: contact between {team.color} player {number} and '
-                             f'{opponent_team.color} player {opponent_number}.')
+                                         f'{opponent_team.color} player {opponent_number}.')
                     fcm.set_contact(red_number, blue_number, self.sim_time.get_ms())
 
     def update_robot_contacts(self):
@@ -900,7 +903,7 @@ class Referee:
         else:
             area = 'inside penalty area'
         self.logger.info(f'{team.color.capitalize()} player {number} committed a forceful contact foul on '
-             f'{opponent_team.color} player {opponent_number} ({message}) {area}.')
+                         f'{opponent_team.color} player {opponent_number} ({message}) {area}.')
         self.forceful_contact_matrix.clear_all()
         opponent = opponent_team.players[opponent_number]
         immunity_timeout = self.sim_time.get_ms() + self.config.FOUL_PENALTY_IMMUNITY * 1000
@@ -967,7 +970,7 @@ class Referee:
         if self.forceful_contact_matrix.long_collision(red_number, blue_number):
             if d1 < self.config.FOUL_VINCITY_DISTANCE and d1 - d2 > self.config.FOUL_DISTANCE_THRESHOLD:
                 collision_time = self.forceful_contact_matrix.get_collision_time(red_number, blue_number)
-                debug_messages.append(f"Pushing time: {collision_time} > {self.config.FOUL_PUSHING_TIME} " + \
+                debug_messages.append(f"Pushing time: {collision_time} > {self.config.FOUL_PUSHING_TIME} "
                                       f"over the last {self.config.FOUL_PUSHING_PERIOD}")
                 debug_messages.append(f"Difference of distance: {d1-d2} > {self.config.FOUL_DISTANCE_THRESHOLD}")
                 self.logger.info(debug_messages)
@@ -979,9 +982,9 @@ class Referee:
         v2_squared = v2[0] * v2[0] + v2[1] * v2[1]
         if not v1_squared > self.config.FOUL_SPEED_THRESHOLD * self.config.FOUL_SPEED_THRESHOLD:
             return False
-        debug_messages.append(f"{p1_str:6s}: velocity: {self.readable_number_list(v1[:3])}, " + \
+        debug_messages.append(f"{p1_str:6s}: velocity: {self.readable_number_list(v1[:3])}, "
                               f"speed: {math.sqrt(v1_squared):.2f}")
-        debug_messages.append(f"{p2_str:6s}: velocity: {self.readable_number_list(v2[:3])}, " + \
+        debug_messages.append(f"{p2_str:6s}: velocity: {self.readable_number_list(v2[:3])}, "
                               f"speed: {math.sqrt(v2_squared):.2f}")
         if d1 < self.config.FOUL_VINCITY_DISTANCE:
             debug_messages.append(f"{p1_str} is close to the ball ({d1:.2f} < {self.config.FOUL_VINCITY_DISTANCE})")
@@ -1000,8 +1003,9 @@ class Referee:
                     return True
         elif math.sqrt(v1_squared) - math.sqrt(v2_squared) > self.config.FOUL_SPEED_THRESHOLD:
             self.logger.info(debug_messages)
-            self.forceful_contact_foul(team, number, opponent_team, opponent_number, d1, f'violent collision: ' + \
-                    f'{math.sqrt(v1_squared)} - {math.sqrt(v2_squared)} > {self.config.FOUL_SPEED_THRESHOLD}')
+            self.forceful_contact_foul(team, number, opponent_team, opponent_number, d1,
+                                       f'violent collision: {math.sqrt(v1_squared)} - {math.sqrt(v2_squared)} '
+                                       f'> {self.config.FOUL_SPEED_THRESHOLD}')
             return True
         return False
 
@@ -1056,7 +1060,7 @@ class Referee:
                         sentence = 'throw-in with the hand or arm while the ball was not lifted by at least ' + \
                                    f'{self.config.BALL_LIFT_THRESHOLD * 100} cm'
                         self.send_penalty(player, 'BALL_MANIPULATION', sentence,
-                                f'{color.capitalize()} player {number} {sentence}.')
+                                          f'{color.capitalize()} player {number} {sentence}.')
                         continue
             goalkeeper = self.goalkeeper_inside_own_goal_area(team, number)
             if not goalkeeper and not self.game.throw_in:
@@ -1066,7 +1070,7 @@ class Referee:
                     self.logger.info("Kicker {color.capitalize()} {number} has fallen down and not recovered -> end of trial")
                 else:
                     self.send_penalty(player, 'BALL_MANIPULATION', sentence,
-                            f'{color.capitalize()} player {number} {sentence}.')
+                                      f'{color.capitalize()} player {number} {sentence}.')
                 continue
             ball_on_the_ground = self.game.ball_position[2] <= self.field.turf_depth + self.game.ball_radius
             if self.game.throw_in:
@@ -1074,9 +1078,9 @@ class Referee:
                 if duration >= self.config.BALL_HANDLING_TIMEOUT:
                     self.reset_ball_handling(player)
                     sentence = f'touched the ball with its hand or arm for more than {self.config.BALL_HANDLING_TIMEOUT} ' + \
-                                'seconds during throw-in'
+                        'seconds during throw-in'
                     self.send_penalty(player, 'BALL_MANIPULATION', sentence,
-                            f'{color.capitalize()} player {number} {sentence}.')
+                                      f'{color.capitalize()} player {number} {sentence}.')
                     continue
             # goalkeeper case
             if duration >= self.config.BALL_HANDLING_TIMEOUT:
@@ -1090,12 +1094,12 @@ class Referee:
                     return True  # a freekick will be awarded
                 self.reset_ball_handling(player)
                 self.logger.info(f'{color.capitalize()} goalkeeper {number} handled the ball up for more than '
-                     f'{self.config.BALL_HANDLING_TIMEOUT} seconds.')
+                                 f'{self.config.BALL_HANDLING_TIMEOUT} seconds.')
                 return True  # a freekick will be awarded
             if ball_on_the_ground and duration >= self.config.GOALKEEPER_GROUND_BALL_HANDLING:
                 self.reset_ball_handling(player)
                 self.logger.info(f'{color.capitalize()} goalkeeper {number} handled the ball on the ground for more than '
-                     f'{self.config.GOALKEEPER_GROUND_BALL_HANDLING} seconds.')
+                                 f'{self.config.GOALKEEPER_GROUND_BALL_HANDLING} seconds.')
                 return True  # a freekick will be awarded
         return False  # not free kick awarded
 
@@ -1119,7 +1123,7 @@ class Referee:
                     self.next_penalty_shootout()
                 else:
                     self.send_penalty(player, 'INCAPABLE', 'fallen down',
-                                     f'{color.capitalize()} player {number} has fallen down and not recovered in 20 seconds.')
+                                      f'{color.capitalize()} player {number} has fallen down and not recovered in 20 seconds.')
                 penalty = True
         return penalty
 
@@ -1151,7 +1155,7 @@ class Referee:
                 new_active_dist = d - self.config.INACTIVE_GOALKEEPER_PROGRESS
                 if new_active_dist > active_dist:
                     active_dist = new_active_dist
-            self.logger.info(f'Goalkeeper did not move toward the ball over the ' + \
+            self.logger.info(f'Goalkeeper did not move toward the ball over the '
                              f'last {self.config.INACTIVE_GOALKEEPER_TIMEOUT} seconds')
             self.send_penalty(player, 'INCAPABLE', 'Inactive goalkeeper')
 
@@ -1167,8 +1171,8 @@ class Referee:
             if d < distance:
                 color = team.color
                 self.send_penalty(player, 'INCAPABLE', f'too close to ball: {d:.2f} m., should be at least {distance:.2f} m.' +
-                                 f'{color.capitalize()} player {number} is too close to the ball: ' +
-                                 f'({d:.2f} m., should be at least {distance:.2f} m.)')
+                                  f'{color.capitalize()} player {number} is too close to the ball: ' +
+                                  f'({d:.2f} m., should be at least {distance:.2f} m.)')
 
     def check_penalty_kick_positions(self):
         for team in [self.red_team, self.blue_team]:
@@ -1192,7 +1196,7 @@ class Referee:
                             self.send_penalty(player, 'INCAPABLE', "Defending goalkeeper between goal line and penalty mark")
                     else:
                         self.send_penalty(player, 'INCAPABLE',
-                                "Field player of the defending team in front of the penalty mark")
+                                          "Field player of the defending team in front of the penalty mark")
                 elif near_ball:
                     if defending_team:
                         self.send_penalty(player, 'INCAPABLE', "Player of the defending team near ball (penaltykick)")
@@ -1269,9 +1273,9 @@ class Referee:
                 self.logger.info(f'Kicker {color.capitalize()} {number} left the field -> end of trial')
                 self.next_penalty_shootout()
             else:
-                self.send_penalty(player, 'INCAPABLE', f'left the field for more than ' + \
-                        f'{self.config.OUTSIDE_TURF_TIMEOUT} seconds {color.capitalize()} ' + \
-                        f'player {number} left the field for more than {self.config.OUTSIDE_TURF_TIMEOUT} seconds.')
+                self.send_penalty(player, 'INCAPABLE', f'left the field for more than '
+                                  f'{self.config.OUTSIDE_TURF_TIMEOUT} seconds {color.capitalize()} '
+                                  f'player {number} left the field for more than {self.config.OUTSIDE_TURF_TIMEOUT} seconds.')
 
     def check_outside_turf(self):
         self.check_team_outside_turf(self.red_team)
@@ -1490,7 +1494,7 @@ class Referee:
         player['stabilize_rotation'] = r
         player['position'] = t
         self.logger.info(f'{color.capitalize()} player {number} reset to {pose}: ' +
-             f'translation ({t[0]} {t[1]} {t[2]}), rotation ({r[0]} {r[1]} {r[2]} {r[3]}).')
+                         f'translation ({t[0]} {t[1]} {t[2]}), rotation ({r[0]} {r[1]} {r[2]} {r[3]}).')
         self.logger.info(f'Disabling actuators of {color} player {number}.')
         robot.getField('customData').setSFString('penalized')
         player['enable_actuators_at'] = self.sim_time.get_ms() + int(self.config.DISABLE_ACTUATORS_MIN_DURATION * 1000)
@@ -1590,8 +1594,8 @@ class Referee:
             kickoff_team = self.game.state.teams[0]
         else:
             kickoff_team = self.game.state.teams[1]
-        kickoff_team_leads = (kickoff_team.score >= self.game.state.teams[0].score
-                and kickoff_team.score >= self.game.state.teams[1].score)
+        kickoff_team_leads = (kickoff_team.score >= self.game.state.teams[0].score and
+                              kickoff_team.score >= self.game.state.teams[1].score)
         penalty_shootout_count = self.game.penalty_shootout_count % 10  # supports both regular and extended shootout kicks
         if (penalty_shootout_count == 6 and diff == 3) or (penalty_shootout_count == 8 and diff == 2):
             return True  # no need to go further, score is like 3-0 after 6 shootouts or 4-2 after 8 shootouts
@@ -1641,15 +1645,15 @@ class Referee:
                 player['invalidGoalkeeperStart'] = None
                 continue
             on_goal_line_or_behind = (player['on_outer_line'] or player['outside_field']) and \
-                                     abs(player['position'][1]) <= self.config.GOAL_WIDTH
+                abs(player['position'][1]) <= self.config.GOAL_WIDTH
             if on_goal_line_or_behind and player['inside_own_side']:
                 player['invalidGoalkeeperStart'] = None
             else:
                 if player['invalidGoalkeeperStart'] is None:
                     player['invalidGoalkeeperStart'] = self.sim_time.get_ms()
                 elif self.sim_time.get_ms() - player['invalidGoalkeeperStart'] > self.config.INVALID_GOALKEEPER_TIMEOUT * 1000:
-                    self.logger.info(f'Goalkeeper of team {defending_team.color} is not on goal line ' + \
-                            'since {self.config.INVALID_GOALKEEPER_TIMEOUT} sec')
+                    self.logger.info(f'Goalkeeper of team {defending_team.color} is not on goal line '
+                                     f'since {self.config.INVALID_GOALKEEPER_TIMEOUT} sec')
                     self.send_penalty(player, 'INCAPABLE', "Not on goal line during penalty")
 
     def interruption(self, interruption_type, team=None, location=None, is_goalkeeper_ball_manipulation=False):
@@ -1905,8 +1909,8 @@ class Referee:
         # check if the host parameter of the game.json file correspond to the actual host
         host = socket.gethostbyname(socket.gethostname())
         if host != '127.0.0.1' and host != self.game.host:
-            self.logger.warning(f'Host is not correctly defined in game.json file, ' + \
-                    'it should be {host} instead of {self.game.host}.')
+            self.logger.warning(f'Host is not correctly defined in game.json file, '
+                                f'it should be {host} instead of {self.game.host}.')
 
         try:
             JAVA_HOME = os.environ['JAVA_HOME']
@@ -1918,7 +1922,7 @@ class Referee:
                     self.clean_exit()
                 else:
                     path = os.path.join(GAME_CONTROLLER_HOME, 'build', 'jar', 'config',
-                            f'hl_sim_{self.game.field_size}', 'teams.cfg')
+                                        f'hl_sim_{self.game.field_size}', 'teams.cfg')
                     red_line = f'{self.game.red.id}={self.red_team.name}\n'
                     blue_line = f'{self.game.blue.id}={self.blue_team.name}\n'
                     with open(path, 'w') as file:
@@ -1939,7 +1943,7 @@ class Referee:
                     else:
                         self.udp_bouncer_process = None
                     self.game.controller_process = subprocess.Popen(command_line,
-                            cwd=os.path.join(GAME_CONTROLLER_HOME, 'build', 'jar'))
+                                                                    cwd=os.path.join(GAME_CONTROLLER_HOME, 'build', 'jar'))
             except KeyError:
                 self.game.controller_process = None
                 self.logger.error('GAME_CONTROLLER_HOME environment variable not set, unable to launch GameController.')
@@ -1989,8 +1993,8 @@ class Referee:
                     except socket.error as msg:
                         retry += 1
                         if retry <= 10:
-                            self.logger.warning(f'Could not connect to GameController at localhost:8750: {msg}. ' + \
-                                    f'Retrying ({retry}/10)...')
+                            self.logger.warning(f'Could not connect to GameController at localhost:8750: {msg}. '
+                                                f'Retrying ({retry}/10)...')
                             time.sleep(retry)  # give some time to allow the GameControllerSimulator to start-up
                             self.supervisor.step(0)
                         else:
@@ -2020,29 +2024,30 @@ class Referee:
         try:
             self.display.update_state_display()
             self.logger.info(f'Game type is {self.game.type}.')
-            self.logger.info(f'Red team is "{self.red_team.name}", ' + \
-                    'playing on {"left" if self.game.side_left == self.game.red.id else "right"} side.')
-            self.logger.info(f'Blue team is "{self.blue_team.name}", ' + \
-                    'playing on {"left" if self.game.side_left == self.game.blue.id else "right"} side.')
+            self.logger.info(f'Red team is "{self.red_team.name}", '
+                             f'playing on {"left" if self.game.side_left == self.game.red.id else "right"} side.')
+            self.logger.info(f'Blue team is "{self.blue_team.name}", '
+                             f'playing on {"left" if self.game.side_left == self.game.blue.id else "right"} side.')
             self.game_controller_send(f'SIDE_LEFT:{self.game.side_left}')
 
             if hasattr(self.game, 'supervisor'):  # optional supervisor used for CI tests
                 children.importMFNodeFromString(-1,
-                        f'DEF TEST_SUPERVISOR Robot {{ supervisor TRUE controller "{self.game.supervisor}" }}')
+                                                f'DEF TEST_SUPERVISOR Robot '
+                                                f'{{ supervisor TRUE controller "{self.game.supervisor}" }}')
 
             if self.game.penalty_shootout:
-                self.logger.info(f'{"Red" if self.game.kickoff == self.game.red.id else "Blue"} ' + \
-                        'team will start the penalty shoot-out.')
+                self.logger.info(f'{"Red" if self.game.kickoff == self.game.red.id else "Blue"} '
+                                 f'team will start the penalty shoot-out.')
                 self.game.phase = 'PENALTY-SHOOTOUT'
                 self.game.ready_real_time = None
-                self.logger.info(f'Penalty start: Waiting {self.config.REAL_TIME_BEFORE_FIRST_READY_STATE} ' + \
-                        'seconds (real-time) before going to SET')
+                self.logger.info(f'Penalty start: Waiting {self.config.REAL_TIME_BEFORE_FIRST_READY_STATE} '
+                                 f'seconds (real-time) before going to SET')
                 # real time for set state (penalty-shootout)
                 self.game.set_real_time = time.time() + self.config.REAL_TIME_BEFORE_FIRST_READY_STATE
                 self.game_controller_send(f'KICKOFF:{self.game.kickoff}')
             else:
-                self.logger.info(f'Regular start: Waiting {self.config.REAL_TIME_BEFORE_FIRST_READY_STATE} ' + \
-                        'seconds (real-time) before going to READY')
+                self.logger.info(f'Regular start: Waiting {self.config.REAL_TIME_BEFORE_FIRST_READY_STATE} '
+                                 f'seconds (real-time) before going to READY')
                 # real time for ready state (initial kick-off)
                 self.game.ready_real_time = time.time() + self.config.REAL_TIME_BEFORE_FIRST_READY_STATE
                 self.kickoff()
@@ -2057,7 +2062,7 @@ class Referee:
                     self.supervisor.animationStartRecording(self.game.record_simulation)
                 elif self.game.record_simulation.endswith(".mp4"):
                     self.supervisor.movieStartRecording(self.game.record_simulation, width=1280, height=720, codec=0,
-                            quality=100, acceleration=1, caption=False)
+                                                        quality=100, acceleration=1, caption=False)
                     if self.supervisor.movieFailed():
                         raise RuntimeError("Failed to Open Movie")
                 else:
@@ -2178,7 +2183,7 @@ class Referee:
                             self.flip_sides()
                             self.reset_teams('halfTimeStartingPose')
                             self.game.kickoff = self.game.blue.id if self.game.kickoff == self.game.red.id \
-                                    else self.game.red.id
+                                else self.game.red.id
                         elif self.game.type == 'NORMAL':
                             self.logger.info('End of second half.')
                         elif self.game.type == 'KNOCKOUT':
@@ -2187,7 +2192,7 @@ class Referee:
                                 self.flip_sides()
                                 self.reset_teams('halfTimeStartingPose')
                                 self.game.kickoff = self.game.blue.id if self.game.kickoff == self.game.red.id \
-                                        else self.game.red.id
+                                    else self.game.red.id
                                 self.game.overtime = True
                             else:
                                 self.logger.info('End of knockout second half.')
@@ -2202,8 +2207,8 @@ class Referee:
                          self.game.ball_position[0] - self.game.ball_radius >= self.field.size_x or
                          self.game.ball_position[0] + self.game.ball_radius <= -self.field.size_x)):
                     self.logger.info(f'Ball left the field at ({self.game.ball_position[0]} {self.game.ball_position[1]} '
-                         f'{self.game.ball_position[2]}) after being touched by {self.game.ball_last_touch_team} '
-                         f'player {self.game.ball_last_touch_player_number}.')
+                                     f'{self.game.ball_position[2]}) after being touched by {self.game.ball_last_touch_team} '
+                                     f'player {self.game.ball_last_touch_player_number}.')
                     self.game.ball_exit_translation = self.game.ball_position
                     scoring_team = None
                     right_way = None
@@ -2221,8 +2226,7 @@ class Referee:
                     if self.game.ball_exit_translation[0] - self.game.ball_radius > self.field.size_x:
                         right_way = self.game.ball_last_touch_team == 'red' and self.game.side_left == self.game.red.id or \
                                     self.game.ball_last_touch_team == 'blue' and self.game.side_left == self.game.blue.id
-                        if self.game.ball_exit_translation[1] < self.config.GOAL_HALF_WIDTH and \
-                                self.game.ball_exit_translation[1] > -self.config.GOAL_HALF_WIDTH and \
+                        if self.config.GOAL_HALF_WIDTH > self.game.ball_exit_translation[1] > -self.config.GOAL_HALF_WIDTH and \
                                 self.game.ball_exit_translation[2] < self.field.goal_height:
                             scoring_team = self.game.side_left  # goal
                         elif self.game.penalty_shootout:
@@ -2235,8 +2239,7 @@ class Referee:
                     elif self.game.ball_exit_translation[0] + self.game.ball_radius < -self.field.size_x:
                         right_way = self.game.ball_last_touch_team == 'red' and self.game.side_left == self.game.blue.id or \
                                     self.game.ball_last_touch_team == 'blue' and self.game.side_left == self.game.red.id
-                        if self.game.ball_exit_translation[1] < self.config.GOAL_HALF_WIDTH and \
-                                self.game.ball_exit_translation[1] > -self.config.GOAL_HALF_WIDTH and \
+                        if self.config.GOAL_HALF_WIDTH > self.game.ball_exit_translation[1] > -self.config.GOAL_HALF_WIDTH and \
                                 self.game.ball_exit_translation[2] < self.field.goal_height:
                             # goal
                             scoring_team = self.game.red.id if self.game.blue.id == self.game.side_left else self.game.blue.id
@@ -2252,7 +2255,7 @@ class Referee:
                         if self.game.penalty_shootout_count >= 10:  # extended penalty shootouts
                             extended_penalty_idx = self.game.penalty_shootout_count - 10
                             self.game.penalty_shootout_time_to_score[extended_penalty_idx] = \
-                                    60 - self.game.state.seconds_remaining
+                                60 - self.game.state.seconds_remaining
                         if not self.game.penalty_shootout:
                             self.game.kickoff = self.game.blue.id if scoring_team == self.game.red.id else self.game.red.id
                         i = self.team_index(self.game.ball_last_touch_team)
@@ -2261,8 +2264,8 @@ class Referee:
                                 self.logger.info(f'Invalidated direct score in {goal} goal from kick-off position.')
                                 self.goal_kick()
                             elif self.game.phase in GAME_INTERRUPTIONS:
-                                self.logger.info(f'Invalidated direct score in {goal} goal from ' + \
-                                        '{GAME_INTERRUPTIONS[self.game.phase]}.')
+                                self.logger.info(f'Invalidated direct score in {goal} goal from '
+                                                 f'{GAME_INTERRUPTIONS[self.game.phase]}.')
                                 if not right_way:  # own_goal
                                     self.corner_kick(left_side=scoring_team != self.game.side_left)
                                 else:
@@ -2272,19 +2275,19 @@ class Referee:
                             if self.game.phase == 'KICKOFF':
                                 self.logger.info(f'Invalidated direct score in {goal} goal from kick-off position.')
                             elif self.game.phase in GAME_INTERRUPTIONS:
-                                self.logger.info(f'Invalidated direct score in {goal} goal from ' + \
-                                        '{GAME_INTERRUPTIONS[self.game.phase]}.')
+                                self.logger.info(f'Invalidated direct score in {goal} goal from '
+                                                 f'{GAME_INTERRUPTIONS[self.game.phase]}.')
                             if self.game.penalty_shootout:
                                 self.next_penalty_shootout()
                             else:
                                 self.corner_kick(left_side=scoring_team != self.game.side_left)
 
                         elif (self.game.ball_last_touch_player_number is not None and
-                              self.game.state.teams[i].players[self.game.ball_last_touch_player_number - 1]\
-                                      .secs_till_unpenalized == 0):
+                              self.game.state.teams[i].players[self.game.ball_last_touch_player_number - 1]
+                                  .secs_till_unpenalized == 0):
                             self.game_controller_send(f'SCORE:{scoring_team}')
                             self.logger.info(f'Score in {goal} goal by {self.game.ball_last_touch_team} '
-                                    'player {self.game.ball_last_touch_player_number}')
+                                             f'player {self.game.ball_last_touch_player_number}')
                             if self.game.penalty_shootout:
                                 self.game.penalty_shootout_goal = True
                                 self.next_penalty_shootout()
@@ -2295,13 +2298,13 @@ class Referee:
                         elif not right_way:  # own goal
                             self.game_controller_send(f'SCORE:{scoring_team}')
                             self.logger.info(f'Score in {goal} goal by {self.game.ball_last_touch_team} player ' +
-                                 f'{self.game.ball_last_touch_player_number} (own goal)')
+                                             f'{self.game.ball_last_touch_player_number} (own goal)')
                             self.game.ready_countdown = self.config.SIMULATED_TIME_INTERRUPTION_PHASE_0
                             self.logger.info(f"Ready countdown was set to {self.game.ready_countdown}")
                             self.kickoff()
                         else:
-                            self.logger.info(f'Invalidated score in {goal} goal by penalized ' +
-                                 f'{self.game.ball_last_touch_team} player {self.game.ball_last_touch_player_number}')
+                            self.logger.info(f'Invalidated score in {goal} goal by penalized {self.game.ball_last_touch_team} '
+                                             f'player {self.game.ball_last_touch_player_number}')
                             if self.game.penalty_shootout:
                                 self.next_penalty_shootout()
                             else:
@@ -2348,14 +2351,14 @@ class Referee:
                             self.logger.info('Beginning of penalty shout-out.')
                             self.game_controller_send('STATE:PENALTY-SHOOTOUT')
                             self.game.penalty_shootout = True
-                            self.logger.info(f'Going to SET in {self.config.HALF_TIME_BREAK_REAL_TIME_DURATION} ' + \
-                                    'seconds (real-time)')
+                            self.logger.info(f'Going to SET in {self.config.HALF_TIME_BREAK_REAL_TIME_DURATION} '
+                                             f'seconds (real-time)')
                             self.game.set_real_time = time.time() + self.config.HALF_TIME_BREAK_REAL_TIME_DURATION
                         elif self.game.overtime:
                             self.logger.info('Beginning of the knockout first half.')
                             self.game_controller_send('STATE:OVERTIME-FIRST-HALF')
-                            self.logger.info(f'Going to READY in {self.config.HALF_TIME_BREAK_REAL_TIME_DURATION} ' + \
-                                    'seconds (real-time)')
+                            self.logger.info(f'Going to READY in {self.config.HALF_TIME_BREAK_REAL_TIME_DURATION} '
+                                             f'seconds (real-time)')
                             self.game.ready_real_time = time.time() + self.config.HALF_TIME_BREAK_REAL_TIME_DURATION
                 else:
                     self.game.over = True
@@ -2422,9 +2425,9 @@ class Referee:
                 if delta_time > 0:
                     time.sleep(delta_time)
                 previous_real_time = time.time()
-        
+
         # for some reason, the simulation was terminated before the end of the match (may happen during tests)
-        if not self.game.over: 
+        if not self.game.over:
             self.logger.info('Game interrupted before the end.')
         else:
             self.logger.info('End of the game.')
@@ -2452,8 +2455,8 @@ class Referee:
                 else:
                     count_red = count[1]
                     count_blue = count[0]
-                self.logger.info('The during the extended penalty shootout, ' +
-                     f'the ball reached the red goal area {count_blue} times and the blue goal area {count_red} times.')
+                self.logger.info('The during the extended penalty shootout, the ball reached '
+                                 f'the red goal area {count_blue} times and the blue goal area {count_red} times.')
                 if count_red > count_blue:
                     self.logger.info('The winner is the red team.')
                 elif count_blue > count_red:
@@ -2472,7 +2475,7 @@ class Referee:
                         count_red = count[1]
                         count_blue = count[0]
                     self.logger.info(f'The ball was touched {count_red} times by the red player '
-                            'and {count_blue} times by the blue player.')
+                                     f'and {count_blue} times by the blue player.')
                     if count_red > count_blue:
                         self.logger.info('The winner is the red team.')
                     elif count_blue > count_red:
@@ -2491,7 +2494,7 @@ class Referee:
                             sum_red = sum[1]
                             sum_blue = sum[0]
                         self.logger.info(f'The red team took {sum_red} seconds to score '
-                                'while blue team took {sum_blue} seconds.')
+                                         f'while blue team took {sum_blue} seconds.')
                         if sum_blue < sum_red:
                             self.logger.info('The winner is the blue team.')
                         elif sum_red < sum_blue:
@@ -2510,7 +2513,7 @@ class Referee:
                                 sum_red = sum[1]
                                 sum_blue = sum[0]
                             self.logger.info(f'The red team took {sum_red} seconds to send the ball to the goal area ' +
-                                 f'while blue team took {sum_blue} seconds.')
+                                             f'while blue team took {sum_blue} seconds.')
                             if sum_blue < sum_red:
                                 self.logger.info('The winner is the blue team.')
                             elif sum_red < sum_blue:
@@ -2529,7 +2532,7 @@ class Referee:
                                     sum_red = sum[1]
                                     sum_blue = sum[0]
                                 self.logger.info(f'The red team took {sum_red} seconds to touch the ball ' +
-                                     f'while blue team took {sum_blue} seconds.')
+                                                 f'while blue team took {sum_blue} seconds.')
                                 if sum_blue < sum_red:
                                     self.logger.info('The winner is the blue team.')
                                 elif sum_red < sum_blue:
@@ -2540,7 +2543,6 @@ class Referee:
                                         self.logger.info('The winer is the red team.')
                                     else:
                                         self.logger.info('The winer is the blue team.')
-
 
 
 if __name__ == '__main__':
