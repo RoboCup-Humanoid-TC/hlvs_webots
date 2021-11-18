@@ -648,7 +648,8 @@ class Referee:
                 for i in range(l2):
                     sum[i] += v[i]
             player['velocity'] = [s / l1 for s in sum]
-            n = robot.getNumberOfContactPoints(True)
+            contact_points = robot.getContactPoints(True)
+            n = len(contact_points)
             player['contact_points'] = []
             if n == 0:  # robot is asleep
                 player['asleep'] = True
@@ -671,8 +672,8 @@ class Referee:
                 outside_turf = False
                 fallen = True
             for i in range(n):
-                point = robot.getContactPoint(i)
-                node = robot.getContactPointNode(i)
+                point = contact_points[i].point
+                node = self.supervisor.getFromId(contact_points[i].node_id)
                 if not node:
                     continue
                 name_field = node.getField('name')
@@ -760,8 +761,9 @@ class Referee:
 
     def update_ball_contacts(self):
         self.ball.contact_points = []
-        for i in range(self.ball.getNumberOfContactPoints()):
-            point = self.ball.getContactPoint(i)
+        new_contact_points = self.ball.getContactPoints()
+        for contact in new_contact_points:
+            point = contact.point
             if point[2] <= self.field.turf_depth:  # contact with the ground
                 continue
             self.ball.contact_points.append(point)
