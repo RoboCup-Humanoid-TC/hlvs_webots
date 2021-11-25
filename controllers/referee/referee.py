@@ -450,7 +450,6 @@ class Referee:
         while True:
             try:
                 answers = self.game_controller_socket.recv(1024).decode('ascii').split('\n')
-                self.logger.info(answers)
                 for answer in answers:
                     if answer == '':
                         continue
