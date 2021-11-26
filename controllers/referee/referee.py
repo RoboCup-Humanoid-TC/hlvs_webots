@@ -1958,8 +1958,10 @@ class Referee:
         children = self.supervisor.getRoot().getField('children')
         children.importMFNodeFromString(-1, f'RobocupSoccerField {{ size "{self.game.field_size}" }}')
         ball_size = 1 if self.game.field_size == 'kid' else 5
+        ball_texture = random.choice(['telstar', 'teamgeist','europass', 'jabulani', 'tango'])
         # the ball is initially very far away from the field
-        children.importMFNodeFromString(-1, f'DEF BALL RobocupSoccerBall {{ translation 100 100 0.5 size {ball_size} }}')
+        children.importMFNodeFromString(-1, f'DEF BALL RobocupTexturedSoccerBall'
+                                            f'{{ translation 100 100 0.5 size {ball_size} texture "{ball_texture}" }}')
         self.ball = self.blackboard.supervisor.getFromDef('BALL')
         self.game.ball_translation = self.blackboard.supervisor.getFromDef('BALL').getField('translation')
 
