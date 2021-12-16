@@ -1956,6 +1956,13 @@ class Referee:
         self.toss_a_coin_if_needed('kickoff')
 
         children = self.supervisor.getRoot().getField('children')
+        bg = random.choice(['stadium_dry', 'shanghai_riverside', 'ulmer_muenster', 'sunset_jhbcentral',
+                            'sepulchral_chapel_rotunda', 'paul_lobe_haus', 'kiara_1_dawn'])
+        luminosity = random.random() * 0.5 + 0.75 # random value between 0.75 and 1.25
+        children.importMFNodeFromString(-1, f'RoboCupBackground {{ texture "{bg}" luminosity {luminosity}}}')
+        children.importMFNodeFromString(-1, f'RoboCupMainLight {{ texture "{bg}" luminosity {luminosity}}}')
+        children.importMFNodeFromString(-1, f'RoboCupOffLight {{ texture "{bg}" luminosity {luminosity}}}')
+        children.importMFNodeFromString(-1, f'RoboCupTopLight {{ texture "{bg}" luminosity {luminosity}}}')
         children.importMFNodeFromString(-1, f'RobocupSoccerField {{ size "{self.game.field_size}" }}')
         ball_size = 1 if self.game.field_size == 'kid' else 5
         # the ball is initially very far away from the field
