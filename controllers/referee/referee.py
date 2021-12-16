@@ -1958,7 +1958,7 @@ class Referee:
         children = self.supervisor.getRoot().getField('children')
         bg = random.choice(['stadium_dry', 'shanghai_riverside', 'ulmer_muenster', 'sunset_jhbcentral',
                             'sepulchral_chapel_rotunda', 'paul_lobe_haus', 'kiara_1_dawn'])
-        luminosity = random.random() * 0.5 + 0.75 # random value between 0.75 and 1.25
+        luminosity = random.random() * 0.5 + 0.75  # random value between 0.75 and 1.25
         children.importMFNodeFromString(-1, f'RoboCupBackground {{ texture "{bg}" luminosity {luminosity}}}')
         children.importMFNodeFromString(-1, f'RoboCupMainLight {{ texture "{bg}" luminosity {luminosity}}}')
         children.importMFNodeFromString(-1, f'RoboCupOffLight {{ texture "{bg}" luminosity {luminosity}}}')

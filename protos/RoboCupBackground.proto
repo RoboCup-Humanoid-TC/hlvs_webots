@@ -14,6 +14,11 @@ PROTO RoboCupBackground [
     const path = 'webots://projects/default/worlds/textures/cubic';
     const texture = fields.texture.value
     const extension = 'png'
+    let topTexture;
+    if (texture === 'stadium_dry')
+      topTexture = 'stadium';
+    else
+      topTexture = texture;
     >%
 
   Background {
@@ -34,7 +39,7 @@ PROTO RoboCupBackground [
     %<= '"' + path + '/' + texture + '_right.' + extension + '"' >%
     ]
     topUrl [
-    %<= '"' + path + '/' + texture + '_top.' + extension + '"' >%
+    %<= '"' + path + '/' + topTexture + '_top.' + extension + '"' >%
     ]
     luminosity IS luminosity
   }
