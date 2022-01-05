@@ -160,7 +160,7 @@ class Display:
                                             self.blackboard.config.WHITE_COLOR, 0.2, self.font)
         self.update_score_display()
 
-    def setup_display(self):
+    def update(self):
         self.update_team_display()
         self.update_time_display()
         self.update_state_display()
