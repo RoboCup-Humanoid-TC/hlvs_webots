@@ -336,7 +336,7 @@ class Referee:
                     self.logger.warning(f'Received unexpected state from GameController: {self.game.state.game_state} ' +
                                         f'while expecting {self.game.wait_for_state}')
                 else:
-                    self.logger.info(f"State has succesfully changed to {self.game.wait_for_state}")
+                    self.logger.info(f"State has successfully changed to {self.game.wait_for_state}")
                     self.game.wait_for_state = None
         new_sec_state = self.game.state.secondary_state
         new_sec_phase = self.game.state.secondary_state_info[1]
@@ -348,7 +348,7 @@ class Referee:
                                         f'{new_sec_state}:{new_sec_phase} '
                                         f'while expecting {self.game.wait_for_sec_state}:{self.game.wait_for_sec_phase}')
                 else:
-                    self.logger.info(f"State has succesfully changed to {new_sec_state}:{new_sec_phase}")
+                    self.logger.info(f"State has successfully changed to {new_sec_state}:{new_sec_phase}")
                     self.game.wait_for_sec_state = None
                     self.game.wait_for_sec_phase = None
         if self.game.state.game_state == 'STATE_PLAYING' and \
@@ -2381,7 +2381,7 @@ class Referee:
                 elif self.game.ready_real_time is not None:
                     # initial kick-off (1st, 2nd half, extended periods, penalty shootouts)
                     if self.game.ready_real_time <= time.time():
-                        self.logger.info('Real-time to wait elasped, moving to READY')
+                        self.logger.info('Real-time to wait elapsed, moving to READY')
                         self.game.ready_real_time = None
                         self.check_start_position()
                         self.game_controller_send('STATE:READY')
