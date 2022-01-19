@@ -10,9 +10,11 @@ although it did not trigger errors nor warning during the analysis.
 
 Additionally to `Webots`, you will need the python modules listed in `requirements.txt`.
 
-Generating a `pdf` report requires the `pandoc` tool:
+`pip3 install -r requirements.txt`
 
-`sudo apt install pandoc`
+Generating a `pdf` report requires the `pandoc` and `texlive` tools:
+
+`sudo apt install pandoc texlive`
 
 ## Robot inspection
 
