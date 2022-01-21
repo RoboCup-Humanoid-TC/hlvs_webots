@@ -2187,7 +2187,7 @@ class Referee:
                                 break
                         elif self.game.state.first_half:
                             game_type = 'knockout ' if self.game.type == 'KNOCKOUT' and self.game.overtime else ''
-                            self.logger.info(f'End of {game_type} first half.')
+                            self.logger.info(f'End of {game_type}first half.')
                             self.flip_sides()
                             self.reset_teams('halfTimeStartingPose')
                             self.game.kickoff = self.game.blue.id if self.game.kickoff == self.game.red.id \
