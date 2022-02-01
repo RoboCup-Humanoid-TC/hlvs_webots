@@ -159,3 +159,24 @@ The following new node with be added to the scene after the referee robot: `Robo
 A semi-automated tool allowing to check if a robot respects the rules is available in
 the `controllers/model_verifier` directory.
 The available scripts are documented in a dedicated [README](controllers/model_verifier/README.md).
+
+## game.json settings
+
+Multiple variables can be set to influence the behavior of the simulation.
+
+`record_simulation:` a file path to where the simulation should be recorded. If it ends in `.html` a 3D recording is made. If it ends in `.mp4` a video from the default perspective is generated.
+
+`press_a_key_to_terminate`: true or false, allows pressing a key to cleanly end the simulation and save the recording (used for testing)
+
+`game_controller_extra_args`: used to pass arguments to the game controller, for example 
+```json
+  "game_controller_extra_args": [
+    "--halftimeduration",
+    "120",
+    "--overtimeduration",
+    "60"
+  ],
+```
+can be used to reduce halftime duration.
+
+`texture_seed`: can be set to an integer to set the random seed used for texture (background, background luminosity, and ball)
