@@ -7,7 +7,6 @@
   "side_left": "blue",
   "press_a_key_to_terminate": true,
   "use_bouncing_server": true,
-  "random_seed": 123,
   "red": {
     "id": 8,
     "config": "team_1.json",
