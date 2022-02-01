@@ -99,7 +99,7 @@ class Display:
             right_color = self.blackboard.config.RED_COLOR
 
         strings = SimpleNamespace()
-        strings.foreground = ' ' + format_time(self.blackboard.game.state.secondary_seconds_remaining) + '  ' \
+        strings.foreground = format_time(self.blackboard.game.state.secondary_seconds_remaining) + '  ' \
             if self.blackboard.game.state.secondary_seconds_remaining > 0 else ' ' * 8
         strings.background = ' ' * 7
         strings.warning = strings.background
@@ -108,8 +108,8 @@ class Display:
         strings.white = '█' * 7
         self.update_team_details_display(left_team, left, strings)
         strings.left_background = strings.background
-        strings.background = ' ' * 28
-        space = 21 - len(left_team.players) * 3
+        strings.background = ' ' * 26
+        space = 19 - len(left_team.players) * 3
         strings.white += '█' * space
         strings.warning += ' ' * space
         strings.yellow_card += ' ' * space
@@ -119,15 +119,9 @@ class Display:
         strings.right_background = strings.background
         del strings.background
         space = 12 - 3 * len(right_team.players)
-        strings.white += '█' * (22 + space)
+        strings.white += '█' * (24 + space)
         strings.secondary_state = ' ' * 41 + self.blackboard.game.state.secondary_state[6:]
-        sr = self.blackboard.config.IN_PLAY_TIMEOUT - self.blackboard.game.interruption_seconds \
-            + self.blackboard.game.state.seconds_remaining \
-            if self.blackboard.game.interruption_seconds is not None else 0
-        if sr > 0:
-            strings.secondary_state += ' ' + format_time(sr)
-        if (self.blackboard.game.state.secondary_state[6:] != 'NORMAL' or
-                self.blackboard.game.state.secondary_state_info[1] != 0):
+        if self.blackboard.game.state.secondary_state[6:] != 'NORMAL':
             strings.secondary_state += ' [' + str(self.blackboard.game.state.secondary_state_info[1]) + ']'
         if self.blackboard.game.interruption_team is not None:  # interruption
             secondary_state_color = self.blackboard.config.RED_COLOR \
@@ -166,7 +160,7 @@ class Display:
                                             self.blackboard.config.WHITE_COLOR, 0.2, self.font)
         self.update_score_display()
 
-    def setup_display(self):
+    def update(self):
         self.update_team_display()
         self.update_time_display()
         self.update_state_display()

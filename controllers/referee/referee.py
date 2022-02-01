@@ -126,7 +126,7 @@ class Referee:
             if 'GAME_CONTROLLER_UDP_FILTER' in os.environ else None
 
         self.setup()
-        self.display.setup_display()
+        self.display.update()
 
         self.status_update_last_real_time = None
         self.status_update_last_sim_time = None
@@ -365,12 +365,12 @@ class Referee:
                     if self.game.in_play is None:
                         self.logger.info('Ball in play, can be touched by any player (10 seconds elapsed).')
                         self.game.ball_in_play(self.sim_time.get_ms())
-            self.display.update_time_display()
+            self.display.update()
         red = 0 if self.game.state.teams[0].team_color == 'RED' else 1
         blue = 1 if red == 0 else 0
         if previous_red_score != self.game.state.teams[red].score or \
                 previous_blue_score != self.game.state.teams[blue].score:
-            self.display.update_score_display()
+            self.display.update()
         # print(self.game.state.game_state)
         secondary_state = self.game.state.secondary_state
         secondary_state_info = self.game.state.secondary_state_info
@@ -406,7 +406,7 @@ class Referee:
                 previous_sec_state != new_sec_state or previous_sec_phase != new_sec_phase or \
                 previous_secondary_seconds_remaining != self.game.state.secondary_seconds_remaining or \
                 self.game.state.seconds_remaining <= 0:
-            self.display.update_state_display()
+            self.display.update()
 
     def game_controller_send(self, message):
         if message[:6] == 'STATE:' or message[:6] == 'SCORE:' or message == 'DROPPEDBALL':
@@ -1471,7 +1471,7 @@ class Referee:
         for team in [self.red_team, self.blue_team]:
             for number, player in team.players.items():
                 self.flip_poses(player)
-        self.display.update_team_display()
+        self.display.update()
 
     def reset_player(self, color, number, pose, custom_t=None, custom_r=None):
         team = self.red_team if color == 'red' else self.blue_team
@@ -2030,7 +2030,7 @@ class Referee:
             self.clean_exit()
 
         try:
-            self.display.update_state_display()
+            self.display.update()
             self.logger.info(f'Game type is {self.game.type}.')
             self.logger.info(f'Red team is "{self.red_team.name}", '
                              f'playing on {"left" if self.game.side_left == self.game.red.id else "right"} side.')
@@ -2174,7 +2174,7 @@ class Referee:
                             if self.game.penalty_shootout_time_to_reach_goal_area[c] is None:
                                 self.game.penalty_shootout_time_to_reach_goal_area[c] = 60 - self.game.state.seconds_remaining
                 if self.previous_seconds_remaining != self.game.state.seconds_remaining:
-                    self.display.update_state_display()
+                    self.display.update()
                     self.previous_seconds_remaining = self.game.state.seconds_remaining
                     # TODO find out why GC can send negative 'seconds_remaining' when secondary state is penaltykick
                     if self.game.state.game_state != "STATE_FINISHED" and self.game.state.seconds_remaining <= 0 and \
