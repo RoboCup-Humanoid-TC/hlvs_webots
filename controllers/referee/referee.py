@@ -1956,16 +1956,20 @@ class Referee:
         self.toss_a_coin_if_needed('kickoff')
 
         children = self.supervisor.getRoot().getField('children')
+        if (hasattr(self.game, "random_seed")):
+            random.seed(self.game.random_seed)
         bg = random.choice(['stadium_dry', 'shanghai_riverside', 'ulmer_muenster', 'sunset_jhbcentral',
                             'sepulchral_chapel_rotunda', 'paul_lobe_haus', 'kiara_1_dawn'])
         luminosity = random.random() * 0.5 + 0.75  # random value between 0.75 and 1.25
+        ball_texture = random.choice(['telstar', 'teamgeist', 'europass', 'jabulani', 'tango'])
+        random.seed()
         children.importMFNodeFromString(-1, f'RoboCupBackground {{ texture "{bg}" luminosity {luminosity}}}')
         children.importMFNodeFromString(-1, f'RoboCupMainLight {{ texture "{bg}" luminosity {luminosity}}}')
         children.importMFNodeFromString(-1, f'RoboCupOffLight {{ texture "{bg}" luminosity {luminosity}}}')
         children.importMFNodeFromString(-1, f'RoboCupTopLight {{ texture "{bg}" luminosity {luminosity}}}')
         children.importMFNodeFromString(-1, f'RobocupSoccerField {{ size "{self.game.field_size}" }}')
         ball_size = 1 if self.game.field_size == 'kid' else 5
-        ball_texture = random.choice(['telstar', 'teamgeist', 'europass', 'jabulani', 'tango'])
+
         # the ball is initially very far away from the field
         children.importMFNodeFromString(-1, f'DEF BALL RobocupTexturedSoccerBall'
                                             f'{{ translation 100 100 0.5 size {ball_size} texture "{ball_texture}" }}')
