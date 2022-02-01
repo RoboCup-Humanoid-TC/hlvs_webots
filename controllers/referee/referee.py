@@ -1956,8 +1956,8 @@ class Referee:
         self.toss_a_coin_if_needed('kickoff')
 
         children = self.supervisor.getRoot().getField('children')
-        if (hasattr(self.game, "random_seed")):
-            random.seed(self.game.random_seed)
+        if (hasattr(self.game, "texture_seed")):
+            random.seed(self.game.texture_seed)
         bg = random.choice(['stadium_dry', 'shanghai_riverside', 'ulmer_muenster', 'sunset_jhbcentral',
                             'sepulchral_chapel_rotunda', 'paul_lobe_haus', 'kiara_1_dawn'])
         luminosity = random.random() * 0.5 + 0.75  # random value between 0.75 and 1.25
