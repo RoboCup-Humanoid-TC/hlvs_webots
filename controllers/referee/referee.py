@@ -2418,7 +2418,10 @@ class Referee:
                 if not self.game.penalty_shootout:
                     ball_holding = self.check_ball_holding()       # check for ball holding fouls
                     if ball_holding:
-                        self.interruption('FREEKICK', ball_holding, self.game.ball_position)
+                        if self.is_game_interruption():
+                            self.game_interruption_touched(ball_holding, 0)
+                        else:
+                            self.interruption('FREEKICK', ball_holding, self.game.ball_position)
                 ball_handling = self.check_ball_handling()  # return team id if ball handling is performed by goalkeeper
                 if ball_handling and not self.game.penalty_shootout:
                     self.interruption('FREEKICK', ball_handling, self.game.ball_position, is_goalkeeper_ball_manipulation=True)
