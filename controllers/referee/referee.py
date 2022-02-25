@@ -1349,12 +1349,15 @@ class Referee:
         """
         return self.is_game_interruption() and self.game.state.secondary_state_info[1] == 0
 
-    def game_interruption_touched(self, team, number):
+    def game_interruption_touched(self, team, number=0):
         """
-        Applies the associated actions for when a robot touches the ball during step 1 and 2 of game interruptions
+        Applies the associated actions for when a robot touches the ball
+        or a team (number=0) commits a ball holding during step 1 and 2 of game interruptions
 
-        1. If opponent touches the ball, robot receives a warning and RETAKE is sent
-        2. If team with game_interruption touched the ball, player receives warning and ABORT is sent
+        1. If opponent touches the ball, robot receives a WARN and RETAKE is sent
+        2. If team with game_interruption touched the ball, player receives a WARN and ABORT is sent
+        3. If the opponent team performs a ball holding, a RETAKE is sent
+        4. If the team with game_interruption persoms a ball holding, a ABORD is sent
         """
         # Warnings only applies in step 1 and 2 of game interruptions
         team_id = self.game.red.id if team.color == 'red' else self.game.blue.id
@@ -1370,7 +1373,8 @@ class Referee:
             self.game.in_play = self.sim_time.get_ms()
             self.logger.info(f"Ball touched before execute, aborting {GAME_INTERRUPTIONS[self.game.interruption]}")
             self.game_controller_send(f'{self.game.interruption}:{self.game.interruption_team}:ABORT')
-        self.game_controller_send(f'CARD:{team_id}:{number}:WARN')
+        if number > 0:
+            self.game_controller_send(f'CARD:{team_id}:{number}:WARN')
 
     def get_first_available_spot(self, team_color, number, reentry_pos):
         """Return the first available spot to enter on one side of the field given the reentry_pos"""
@@ -2419,7 +2423,7 @@ class Referee:
                     ball_holding = self.check_ball_holding()       # check for ball holding fouls
                     if ball_holding:
                         if self.is_game_interruption():
-                            self.game_interruption_touched(ball_holding, 0)
+                            self.game_interruption_touched(ball_holding)
                         else:
                             self.interruption('FREEKICK', ball_holding, self.game.ball_position)
                 ball_handling = self.check_ball_handling()  # return team id if ball handling is performed by goalkeeper
