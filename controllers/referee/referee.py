@@ -1349,15 +1349,12 @@ class Referee:
         """
         return self.is_game_interruption() and self.game.state.secondary_state_info[1] == 0
 
-    def game_interruption_touched(self, team, number=0):
+    def game_interruption_touched(self, team, number):
         """
-        Applies the associated actions for when a robot touches the ball
-        or a team (number=0) commits a ball holding during step 1 and 2 of game interruptions
+        Applies the associated actions for when a robot touches the ball during step 1 and 2 of game interruptions
 
         1. If opponent touches the ball, robot receives a WARN and RETAKE is sent
         2. If team with game_interruption touched the ball, player receives a WARN and ABORT is sent
-        3. If the opponent team performs a ball holding, a RETAKE is sent
-        4. If the team with game_interruption persoms a ball holding, a ABORD is sent
         """
         # Warnings only applies in step 1 and 2 of game interruptions
         team_id = self.game.red.id if team.color == 'red' else self.game.blue.id
@@ -1373,8 +1370,25 @@ class Referee:
             self.game.in_play = self.sim_time.get_ms()
             self.logger.info(f"Ball touched before execute, aborting {GAME_INTERRUPTIONS[self.game.interruption]}")
             self.game_controller_send(f'{self.game.interruption}:{self.game.interruption_team}:ABORT')
-        if number > 0:
-            self.game_controller_send(f'CARD:{team_id}:{number}:WARN')
+        self.game_controller_send(f'CARD:{team_id}:{number}:WARN')
+
+    def game_interruption_ball_holding(self, team):
+        """
+        Applies the associated actions for when a robot does ball holding duing an interruption
+
+        1. If opponent commits ball holding, RETAKE is sent
+        2. If team with game_interruption does ball holding game interruption continues
+        """
+        # Warnings only applies in step 1 and 2 of game interruptions
+        team_id = self.game.red.id if team.color == 'red' else self.game.blue.id
+        opponent = team_id != self.game.interruption_team
+        if opponent:
+            self.game.in_play = None
+            self.game.ball_set_kick = True
+            self.game.interruption_countdown = self.config.SIMULATED_TIME_INTERRUPTION_PHASE_0
+            self.logger.info(f"Ball holding by opponent team, retaking {GAME_INTERRUPTIONS[self.game.interruption]}")
+            self.logger.info(f"Reset interruption_countdown to {self.game.interruption_countdown}")
+            self.game_controller_send(f'{self.game.interruption}:{self.game.interruption_team}:RETAKE')
 
     def get_first_available_spot(self, team_color, number, reentry_pos):
         """Return the first available spot to enter on one side of the field given the reentry_pos"""
@@ -2423,12 +2437,12 @@ class Referee:
                     ball_holding = self.check_ball_holding()       # check for ball holding fouls
                     if ball_holding:
                         if self.is_game_interruption():
-                            self.game_interruption_touched(ball_holding)
+                            self.game_interruption_ball_holding(ball_holding)
                         else:
                             self.interruption('FREEKICK', ball_holding, self.game.ball_position)
                 ball_handling = self.check_ball_handling()  # return team id if ball handling is performed by goalkeeper
                 if ball_handling and not self.game.penalty_shootout:
-                    self.interruption('FREEKICK', ball_handling, self.game.ball_position, is_goalkeeper_ball_manipulation=True)
+                    self.interruption('FREEKICK', ball_handling, self.game.ball_position, is_goalkeeper_ball_manipulation=True) # TODO check logic here 
             self.check_penalized_in_field()                    # check for penalized robots inside the field
             if self.game.state.game_state != 'STATE_INITIAL':  # send penalties if needed
                 self.send_penalties()
