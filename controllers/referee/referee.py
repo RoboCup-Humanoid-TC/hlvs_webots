@@ -1380,8 +1380,7 @@ class Referee:
         2. If team with game_interruption does ball holding game interruption continues
         """
         # Warnings only applies in step 1 and 2 of game interruptions
-        team_id = self.game.red.id if team.color == 'red' else self.game.blue.id
-        opponent = team_id != self.game.interruption_team
+        opponent = team != self.game.interruption_team
         if opponent:
             self.game.in_play = None
             self.game.ball_set_kick = True
