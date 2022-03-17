@@ -45,7 +45,7 @@
     },
     {
         "timing" : {
-            "time" : 13.0,
+            "time" : 17.0,
             "clock_type" : "Simulated",
             "state" : "PLAYING"
         },
@@ -173,11 +173,11 @@
                 "position" : [2.7, -1.0, 0.24]
             },
             {
-                "target" : "BLUE_PLAYER_1",
-                "position" : [4.0, -1.0, 0.24]
+                "target" : "RED_PLAYER_2",
+                "position" : [3.5, -1.0, 0.24]
             },
             {
-                "target" : "RED_PLAYER_2",
+                "target" : "BLUE_PLAYER_1",
                 "position" : [-2.5, 2.0, 0.24]
             }
         ]

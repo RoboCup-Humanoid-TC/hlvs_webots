@@ -111,7 +111,7 @@
     {
         "description" : "Testing transition to penaltykick",
         "timing" : {
-            "time" : 14,
+            "time" : 18,
             "clock_type" : "Simulated",
             "state" : "PLAYING"
         },

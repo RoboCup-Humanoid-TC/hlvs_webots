@@ -14,7 +14,7 @@ IN_PLAY_TIMEOUT: 10                      # time after which the ball is consider
 FALLEN_TIMEOUT: 20                       # if a robot is down (fallen) for more than this amount of time, it gets penalized
 REMOVAL_PENALTY_TIMEOUT: 30              # removal penalty lasts for 30 seconds
 GOALKEEPER_BALL_HOLDING_TIMEOUT: 6       # a goalkeeper may hold the ball up to 6 seconds on the ground
-PLAYERS_BALL_HOLDING_TIMEOUT: 1          # field players may hold the ball up to 1 second
+PLAYERS_BALL_HOLDING_TIMEOUT: 5          # field players may hold the ball up to 5 second
 BALL_HANDLING_TIMEOUT: 10                # a player throwing in or a goalkeeper may hold the ball up to 10 seconds in hands
 BALL_LIFT_THRESHOLD: 0.05                # during a throw-in with the hands, the ball must be lifted by at least 5 cm
 GOALKEEPER_GROUND_BALL_HANDLING: 6       # a goalkeeper may handle the ball on the ground for up to 6 seconds

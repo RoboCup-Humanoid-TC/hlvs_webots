@@ -7,13 +7,13 @@ specified.
 - R1 is at less than 30 centimeters from the ball
 - R2 is exactly on the other side of the ball
   - a+b. 30 centimeters away from the ball
-  - c. 1 meters away from the ball
+  - c. 0.5 meters away from the ball
 - a+c. R1 and R2 are from the same team
 - b. R1 and R2 are from opposite team
 
 ## Procedure:
 
-- 1 seconds elapses with all robots static
+- 5 seconds elapses with all robots static
 
 ## Expected outcome
 

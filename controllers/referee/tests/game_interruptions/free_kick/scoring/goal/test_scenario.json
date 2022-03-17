@@ -59,11 +59,11 @@
         "actions" : [
             {
                 "target" : "RED_PLAYER_1",
-                "position" : [-0.5, -0.4, 0.24]
+                "position" : [-0.5, -0.3, 0.24]
             },
             {
                 "target" : "RED_PLAYER_2",
-                "position" : [-0.5, 0.4, 0.24]
+                "position" : [-0.5, 0.3, 0.24]
             },
             {
                 "target" : "BALL",
@@ -74,7 +74,7 @@
     {
         "description" : "Testing Setup + moving players away",
         "timing" : {
-            "time" : 14,
+            "time" : 18,
             "clock_type" : "Simulated",
             "state" : "PLAYING"
         },
