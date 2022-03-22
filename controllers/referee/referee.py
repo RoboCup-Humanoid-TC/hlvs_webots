@@ -2441,7 +2441,8 @@ class Referee:
                             self.interruption('FREEKICK', ball_holding, self.game.ball_position)
                 ball_handling = self.check_ball_handling()  # return team id if ball handling is performed by goalkeeper
                 if ball_handling and not self.game.penalty_shootout:
-                    self.interruption('FREEKICK', ball_handling, self.game.ball_position, is_goalkeeper_ball_manipulation=True) # TODO check logic here 
+                    # TODO check logic of the interruption
+                    self.interruption('FREEKICK', ball_handling, self.game.ball_position, is_goalkeeper_ball_manipulation=True)
             self.check_penalized_in_field()                    # check for penalized robots inside the field
             if self.game.state.game_state != 'STATE_INITIAL':  # send penalties if needed
                 self.send_penalties()
