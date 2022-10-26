@@ -1,6 +1,5 @@
-#VRML_SIM R2021b utf8
+#VRML_SIM R2022b utf8
 # template language: javascript
-
 PROTO RoboCupOffLight [
   field SFString{"stadium_dry", "twilight_cloudy_empty", "shanghai_riverside", "ulmer_muenster", "sunset_jhbcentral", "sepulchral_chapel_rotunda","paul_lobe_haus", "kiara_1_dawn"}
                  texture      "stadium_dry"

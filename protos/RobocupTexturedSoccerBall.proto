@@ -1,10 +1,9 @@
-#VRML_SIM R2021b utf8
+#VRML_SIM R2022b utf8
 # license: Copyright Cyberbotics Ltd. Licensed for use only with Webots.
 # license url: https://cyberbotics.com/webots_assets_license
 # A textured soccer ball with customizable radius and mass.
 # This object is physics-enabled so it will roll or bounce when hit.
 # template language: javascript
-
 PROTO RobocupTexturedSoccerBall [
   field SFVec3f    translation  0 0 0
   field SFRotation rotation     0 0 1 0
@@ -32,7 +31,7 @@ PROTO RobocupTexturedSoccerBall [
           roughness 0.5
           metalness 0.1
           baseColorMap ImageTexture{
-			      url [ %<= '"textures/' + fields.texture.value + '.jpg"'>% ]
+			      url [ %<= '"ball_textures/' + fields.texture.value + '.jpg"'>% ]
           }
         }
         geometry Sphere {
