@@ -1,12 +1,23 @@
-#VRML_SIM R2021b utf8
+#VRML_SIM R2022b utf8
+
+IMPORTABLE EXTERNPROTO "../protos/RoboCupBackground.proto"
+#IMPORTABLE EXTERNPROTO "../protos/RobocupGoal.proto"
+IMPORTABLE EXTERNPROTO "../protos/RobocupSoccerField.proto"
+IMPORTABLE EXTERNPROTO "../protos/RobocupTexturedSoccerBall.proto"
+IMPORTABLE EXTERNPROTO "../protos/lighting/RoboCupMainLight.proto"
+IMPORTABLE EXTERNPROTO "../protos/lighting/RoboCupOffLight.proto"
+IMPORTABLE EXTERNPROTO "../protos/lighting/RoboCupTopLight.proto"
+
+IMPORTABLE EXTERNPROTO "../protos/robots/RoboCupRobot/RobocupRobot.proto"
+IMPORTABLE EXTERNPROTO "../protos/robots/WolfgangRobocup/WolfgangRobocup.proto"
+
 WorldInfo {
   info [
     "Description: official soccer simulation for the 2021 Robocup Virtual Humanoid League (kid size)"
-    "Version 0.2"
+    "Version 0.3"
   ]
   title "Robocup V-HL Kid"
   basicTimeStep 8
-  optimalThreadCount 1
   physicsDisableTime 0.1
   physicsDisableLinearThreshold 0.1
   physicsDisableAngularThreshold 0.1
@@ -34,10 +45,10 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.8938498316033444 -0.2697810913064417 -0.35812098698090605 1.4005817359063022
-  position -8.658964597484593 -10.448717096347492 4.001015029323764
+  orientation -0.175077 -0.367436 0.9134 5.32156
+  position -9.61058 11.1227 5.86
 }
 Robot {
-  supervisor TRUE
   controller "referee"
+  supervisor TRUE
 }
