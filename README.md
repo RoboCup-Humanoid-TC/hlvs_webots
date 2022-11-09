@@ -1,6 +1,6 @@
-# Robocup Virtual Humanoid League 2021
+# Robocup Virtual Humanoid League
 
-This folder contains the simulation setup for the Robocup Virtual Humanoid League 2021.
+This folder contains the simulation setup for the Robocup Virtual Humanoid League.
 
 ## Requirements
 
@@ -9,32 +9,7 @@ You will also need to get familiar with Webots by reading the [Webots User Guide
 
 ## Installation
 
-1. Build Webots from the source from the release branch on the official RoboCup Humanoid TC fork: https://github.com/RoboCup-Humanoid-TC/webots
-
-   ```
-   git clone --recurse-submodules --branch release https://github.com/RoboCup-Humanoid-TC/webots
-   cd webots
-   ./scripts/install/linux_compilation_dependencies.sh
-   make -j
-   echo WEBOTS_HOME=/path/to/webots >> ~/.bashrc
-   ```
-
-   If you already cloned the repo, update Webots like this:
-
-   ```
-   git pull --recurse-submodules
-   ./scripts/install/linux_compilation_dependencies.sh
-   git clean -xfd
-   make clean
-
-   # make sure that you have no modified files before continuing
-   git status
-
-   make -j
-   ```
-
-   Also see the Webots wiki for more information: https://github.com/cyberbotics/webots/wiki
-
+1. Install Webots 2022b from https://cyberbotics.com/
 2. Build the latest version of the official RoboCup Humanoid TC fork of the [GameController](https://github.com/RoboCup-Humanoid-TC/GameController).
    ```
    apt-get install ant
