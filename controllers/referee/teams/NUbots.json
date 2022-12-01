@@ -70,11 +70,11 @@
       "dockerCmd": "webotsrobocup",
       "halfTimeStartingPose": {
         "translation": [-0.75, 3.31, 0.51],
-        "rotation": [0, 0, 1, 1.57]
+        "rotation": [0, 0, 1, -1.57]
       },
       "reentryStartingPose": {
         "translation": [-0.75, 3.31, 0.51],
-        "rotation": [0, 0, 1, 1.57]
+        "rotation": [0, 0, 1, -1.57]
       },
       "shootoutStartingPose": {
         "translation": [2.7625, 0, 0.525],
