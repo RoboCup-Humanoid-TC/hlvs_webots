@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "referee"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "../../README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+construct = "^2.10.68"
+numpy = "^1.23.5"
+transforms3d = "^0.4.1"
+scipy = "^1.9.3"
+pyyaml = "^6.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
