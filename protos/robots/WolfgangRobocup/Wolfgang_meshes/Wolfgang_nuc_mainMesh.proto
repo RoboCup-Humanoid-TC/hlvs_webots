@@ -4,6 +4,8 @@
 # tags: hidden
 # Extracted from: wolfgang.urdf
 
+EXTERNPROTO "../Wolfgang_textures/WolfgangNUC.proto"
+
 PROTO Wolfgang_nuc_mainMesh [
 ]
 {

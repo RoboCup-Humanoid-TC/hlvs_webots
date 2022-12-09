@@ -4,6 +4,8 @@
 # tags: hidden
 # Extracted from: wolfgang.urdf
 
+EXTERNPROTO "../Wolfgang_textures/WolfgangMetal.proto"
+
 PROTO Wolfgang_basler_ace_gige_c-mount_v01Mesh [
 ]
 {
