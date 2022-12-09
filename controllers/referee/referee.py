@@ -576,14 +576,14 @@ class Referee:
         goalkeeper_number = None
         for number, player in team.players.items():
             d = distance2(player['position'], self.game.ball_position)
-            if d <= self.field.ball_vincity:
+            if d <= self.field.ball_vicinity:
                 if self.is_goalkeeper(team, number):
                     goalkeeper_number = number
                 players_close_to_the_ball.append(player)
                 numbers.append(number)
 
         goalkeeper_hold_ball = False
-        if goalkeeper_number is not None:  # goalkeeper is in vincity of ball
+        if goalkeeper_number is not None:  # goalkeeper is in vicinity of ball
             goalkeeper = team.players[goalkeeper_number]
             points = np.empty([4, 2])
             aabb = None
@@ -677,7 +677,7 @@ class Referee:
             # if less then 3 contact points, the contacts do not include contacts with the ground,
             # so don't update the following value based on ground collisions
             if n >= 3:
-                player['outside_circle'] = True        # true if fully outside the center cicle
+                player['outside_circle'] = True        # true if fully outside the center circle
                 player['outside_field'] = True         # true if fully outside the field
                 player['inside_field'] = True          # true if fully inside the field
                 player['on_outer_line'] = False        # true if robot is partially on the line surrounding the field
@@ -921,8 +921,8 @@ class Referee:
         if foul_far_from_ball or not self.game.in_play or self.game.penalty_shootout:
             self.send_penalty(player, 'PHYSICAL_CONTACT', 'forceful contact foul')
         else:
-            offence_location = team.players[number]['position']
-            self.interruption('FREEKICK', freekick_team_id, offence_location)
+            offense_location = team.players[number]['position']
+            self.interruption('FREEKICK', freekick_team_id, offense_location)
 
     def goalkeeper_inside_own_goal_area(self, team, number):
         if self.is_goalkeeper(team, number):
@@ -971,7 +971,7 @@ class Referee:
             red_number = opponent_number
             blue_number = number
         if self.forceful_contact_matrix.long_collision(red_number, blue_number):
-            if d1 < self.config.FOUL_VINCITY_DISTANCE and d1 - d2 > self.config.FOUL_DISTANCE_THRESHOLD:
+            if d1 < self.config.FOUL_VICINITY_DISTANCE and d1 - d2 > self.config.FOUL_DISTANCE_THRESHOLD:
                 collision_time = self.forceful_contact_matrix.get_collision_time(red_number, blue_number)
                 debug_messages.append(f"Pushing time: {collision_time} > {self.config.FOUL_PUSHING_TIME} "
                                       f"over the last {self.config.FOUL_PUSHING_PERIOD}")
@@ -989,8 +989,8 @@ class Referee:
                               f"speed: {math.sqrt(v1_squared):.2f}")
         debug_messages.append(f"{p2_str:6s}: velocity: {self.readable_number_list(v2[:3])}, "
                               f"speed: {math.sqrt(v2_squared):.2f}")
-        if d1 < self.config.FOUL_VINCITY_DISTANCE:
-            debug_messages.append(f"{p1_str} is close to the ball ({d1:.2f} < {self.config.FOUL_VINCITY_DISTANCE})")
+        if d1 < self.config.FOUL_VICINITY_DISTANCE:
+            debug_messages.append(f"{p1_str} is close to the ball ({d1:.2f} < {self.config.FOUL_VICINITY_DISTANCE})")
             if self.moves_to_ball(p2, v2, v2_squared):
                 if not self.moves_to_ball(p1, v1, v1_squared):
                     self.logger.info(debug_messages)
@@ -1319,7 +1319,7 @@ class Referee:
                 continue
             if not player['outside_circle']:
                 color = team.color
-                self.send_penalty(player, 'INCAPABLE', 'entered circle during oppenent\'s kick-off',
+                self.send_penalty(player, 'INCAPABLE', 'entered circle during opponent\'s kick-off',
                                   f'{color.capitalize()} player {number} entering circle during opponent\'s kick-off.')
                 penalty = True
         return penalty
@@ -1378,7 +1378,7 @@ class Referee:
 
     def game_interruption_ball_holding(self, team):
         """
-        Applies the associated actions for when a robot does ball holding duing an interruption
+        Applies the associated actions for when a robot does ball holding during an interruption
 
         1. If opponent commits ball holding, RETAKE is sent
         2. If team with game_interruption does ball holding game interruption continues
@@ -1644,7 +1644,7 @@ class Referee:
             self.logger.info('Starting extended penalty shootout without a goalkeeper and goal area entrance allowed.')
         # Only prepare next penalty if team has a kicker available
         self.flip_sides()
-        self.logger.info(f'fliped sides: game.side_left = {self.game.side_left}')
+        self.logger.info(f'Flipped sides: game.side_left = {self.game.side_left}')
         if self.penalty_kicker_player():
             self.game_controller_send('STATE:SET')
             self.set_penalty_positions()
@@ -1807,12 +1807,12 @@ class Referee:
 
     def get_alternative_ball_locations(self, original_pos):
         if (self.game.interruption_team == self.game.red.id) ^ (self.game.side_left == self.game.blue.id):
-            prefered_x_dir = 1
+            preferred_x_dir = 1
         else:
-            prefered_x_dir = -1
-        prefered_y_dir = -1 if original_pos[1] > 0 else 1
-        offset_x = prefered_x_dir * self.field.place_ball_safety_dist * np.array([1, 0, 0])
-        offset_y = prefered_y_dir * self.field.place_ball_safety_dist * np.array([0, 1, 0])
+            preferred_x_dir = -1
+        preferred_y_dir = -1 if original_pos[1] > 0 else 1
+        offset_x = preferred_x_dir * self.field.place_ball_safety_dist * np.array([1, 0, 0])
+        offset_y = preferred_y_dir * self.field.place_ball_safety_dist * np.array([0, 1, 0])
         locations = []
         if self.game.interruption == "DIRECT_FREEKICK" or self.game.interruption == "INDIRECT_FREEKICK":
             # TODO If indirect free kick in opponent penalty area on line parallel to goal line, move it along this line
@@ -2486,7 +2486,7 @@ class Referee:
                 self.logger.info(f'The winner is the {self.game.state.teams[winner].team_color.lower()} team.')
             elif self.game.penalty_shootout_count < 20:
                 self.logger.info('This is a draw.')
-            else:  # extended penatly shoutout rules to determine the winner
+            else:  # extended penalty shootout rules to determine the winner
                 count = [0, 0]
                 for i in range(5):
                     if self.game.penalty_shootout_time_to_reach_goal_area[2 * i] is not None:
@@ -2584,9 +2584,9 @@ class Referee:
                                 else:
                                     self.logger.info('Tossing a coin to determine the winner.')
                                     if bool(random.getrandbits(1)):
-                                        self.logger.info('The winer is the red team.')
+                                        self.logger.info('The winner is the red team.')
                                     else:
-                                        self.logger.info('The winer is the blue team.')
+                                        self.logger.info('The winner is the blue team.')
 
 
 if __name__ == '__main__':
