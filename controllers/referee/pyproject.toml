@@ -12,6 +12,7 @@ numpy = "^1.23.5"
 transforms3d = "^0.4.1"
 scipy = "^1.9.3"
 pyyaml = "^6.0"
+pandas = "^1.5.2"
 
 
 [build-system]
