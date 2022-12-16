@@ -15,17 +15,20 @@ TODOs
 AUTOSAVE_INTERVAL : int = 2 * 60  # in seconds
 
 def _autosave(match: Match, is_active: bool) -> None:
-    """Saves match data automatically in a interval.
+    """Saves match data automatically in AUTOSAVE_INTERVAL.
 
     :param Match: Match data to save
     :type Match: List[Step]
     :param is_active: Flag to indicate if autosave should be active
     :type is_active: bool
     """
-    while is_active:
-        time.sleep(AUTOSAVE_INTERVAL)
-        current_time : str = datetime.now().astimezone().isoformat()
-        match.save(f"referee_data_collection_autosave_{current_time}")
+    next_autosave_time : float = time.time() + AUTOSAVE_INTERVAL
+    while is_active:  # Set to False to stop autosave thread
+        time.sleep(5)  # Sleep for shorter time than autosave interval to join thread faster
+        now : float = time.time()
+        if now >= next_autosave_time:
+            next_autosave_time = now + AUTOSAVE_INTERVAL
+            match.save(f"referee_data_collection_autosave_{datetime.now().astimezone().isoformat()}")
 
 
 class DataCollector:
@@ -58,5 +61,4 @@ class DataCollector:
         self.autosave_thread.join()
 
         # Save match data
-        current_time : str = datetime.now().astimezone().isoformat()
-        self.match.save(f"referee_data_collection_complete_{current_time}")
+        self.match.save(f"referee_data_collection_complete_{datetime.now().astimezone().isoformat()}")
