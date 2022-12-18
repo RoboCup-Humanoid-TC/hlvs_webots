@@ -42,6 +42,7 @@ from game import Game
 from team import Team
 from sim_time import SimTime
 from blackboard import blackboard
+from data_collection.data_collector import DataCollector
 
 
 # game interruptions requiring a free kick procedure
@@ -80,6 +81,7 @@ class Referee:
         self.blackboard.config = self.config
         self.blackboard.start_real_time = time.time()
         self.logger = logger
+        self.data_collector = DataCollector("dataframes/", self.supervisor)
 
         # determine configuration file name
         self.game_config_file = os.environ['WEBOTS_ROBOCUP_GAME'] if 'WEBOTS_ROBOCUP_GAME' in os.environ \
@@ -254,10 +256,10 @@ class Referee:
             port = self.game.red.ports[n] if color == 'red' else self.game.blue.ports[n]
             if red_on_right:  # symmetry with respect to the central line of the field
                 self.flip_poses(player)
-            defname = color.upper() + '_PLAYER_' + number
+            def_name = color.upper() + '_PLAYER_' + number
             halfTimeStartingTranslation = player['halfTimeStartingPose']['translation']
             halfTimeStartingRotation = player['halfTimeStartingPose']['rotation']
-            string = f'DEF {defname} {model}{{name "{color} player {number}" ' + \
+            string = f'DEF {def_name} {model}{{name "{color} player {number}" ' + \
                      f'translation {halfTimeStartingTranslation[0]} ' + \
                      f'{halfTimeStartingTranslation[1]} {halfTimeStartingTranslation[2]} ' + \
                      f'rotation {halfTimeStartingRotation[0]} ' + \
@@ -268,9 +270,9 @@ class Referee:
                 string += f', "{h}"'
             string += '] }'
             children.importMFNodeFromString(-1, string)
-            player['robot'] = self.supervisor.getFromDef(defname)
+            player['robot'] = self.supervisor.getFromDef(def_name)
             player['position'] = player['robot'].getCenterOfMass()
-            self.logger.info(f'Spawned {defname} {model} on port {port} at halfTimeStartingPose: translation (' +
+            self.logger.info(f'Spawned {def_name} {model} on port {port} at halfTimeStartingPose: translation (' +
                              f'{halfTimeStartingTranslation[0]} {halfTimeStartingTranslation[1]} ' +
                              f'{halfTimeStartingTranslation[2]}), rotation ({halfTimeStartingRotation[0]} ' +
                              f'{halfTimeStartingRotation[1]} {halfTimeStartingRotation[2]} {halfTimeStartingRotation[3]}).')
@@ -1816,16 +1818,16 @@ class Referee:
         locations = []
         if self.game.interruption == "DIRECT_FREEKICK" or self.game.interruption == "INDIRECT_FREEKICK":
             # TODO If indirect free kick in opponent penalty area on line parallel to goal line, move it along this line
-            for dist_mult in range(1, self.config.GAME_INTERRUPTION_PLACEMENT_NB_STEPS+1):
-                locations.append(original_pos + offset_x * dist_mult)
-                locations.append(original_pos + offset_y * dist_mult)
-                locations.append(original_pos - offset_y * dist_mult)
-                locations.append(original_pos - offset_x * dist_mult)
+            for dist_multiplier in range(1, self.config.GAME_INTERRUPTION_PLACEMENT_NB_STEPS+1):
+                locations.append(original_pos + offset_x * dist_multiplier)
+                locations.append(original_pos + offset_y * dist_multiplier)
+                locations.append(original_pos - offset_y * dist_multiplier)
+                locations.append(original_pos - offset_x * dist_multiplier)
         elif self.game.interruption == "THROWIN":
-            for dist_mult in range(1, self.config.GAME_INTERRUPTION_PLACEMENT_NB_STEPS+1):
-                locations.append(original_pos + offset_x * dist_mult)
-            for dist_mult in range(1, self.config.GAME_INTERRUPTION_PLACEMENT_NB_STEPS+1):
-                locations.append(original_pos - offset_x * dist_mult)
+            for dist_multiplier in range(1, self.config.GAME_INTERRUPTION_PLACEMENT_NB_STEPS+1):
+                locations.append(original_pos + offset_x * dist_multiplier)
+            for dist_multiplier in range(1, self.config.GAME_INTERRUPTION_PLACEMENT_NB_STEPS+1):
+                locations.append(original_pos - offset_x * dist_multiplier)
         return locations
 
     def get_obstacles_positions(self, team, number):
@@ -1853,9 +1855,9 @@ class Referee:
                         player_2_ball = [1, 0, 0]
                         dist = 1
                     offset = player_2_ball / dist * self.field.place_ball_safety_dist
-                    for dist_mult in range(1, self.config.GAME_INTERRUPTION_PLACEMENT_NB_STEPS+1):
+                    for dist_multiplier in range(1, self.config.GAME_INTERRUPTION_PLACEMENT_NB_STEPS+1):
                         allowed = True
-                        pos = target_location + offset * dist_mult
+                        pos = target_location + offset * dist_multiplier
                         for o in obstacles:
                             if distance2(o, pos) < self.field.place_ball_safety_dist:
                                 allowed = False
