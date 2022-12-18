@@ -1,3 +1,6 @@
+# TODO: collection information about the match (docker hash, commit hash, etc.)
+
+
 class Simulation:
     def __init__(self, is_simulated: bool, basic_time_step: int) -> None:
         """Holds data about a match simulation.

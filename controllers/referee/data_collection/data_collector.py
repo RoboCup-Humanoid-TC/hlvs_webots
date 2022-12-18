@@ -7,11 +7,6 @@ import pandas as pd
 from controller import Supervisor
 from data_collection.match import Match
 
-"""
-TODOs
-~~~~~
-- Collect and store meta data
-"""
 
 AUTOSAVE_INTERVAL: int = 2 * 60  # in seconds
 
