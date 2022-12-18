@@ -29,7 +29,31 @@ class Step:
             Tuple[int]
         ] = time_to_calculate_simulation
 
-        self.ball: Ball
-        self.teams: Teams
-        self.collision_matrix: ForcefulContactMatrix
+        self.ball: Optional[Ball] = None
+        self.teams: Teams = Teams()
+        self.collision_matrix: Optional[ForcefulContactMatrix] = None
         # TODO: GameController events
+
+        def set_ball(self, ball: Ball) -> None:
+            """Set ball data.
+
+            :param ball: Ball data
+            :type ball: Ball
+            """
+            self.ball = ball
+
+        def set_teams(self, teams: Teams) -> None:
+            """Set team data.
+
+            :param teams: Team data
+            :type teams: Teams
+            """
+            self.teams = teams
+
+        def set_collision_matrix(self, collision_matrix: ForcefulContactMatrix) -> None:
+            """Set collision matrix.
+
+            :param collision_matrix: Collision matrix
+            :type collision_matrix: ForcefulContactMatrix
+            """
+            self.collision_matrix = collision_matrix
