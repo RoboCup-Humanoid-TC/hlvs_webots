@@ -30,7 +30,7 @@ class Step:
         ] = time_to_calculate_simulation
 
         self.ball: Optional[Ball] = None
-        self.teams: Teams = Teams()
+        self.teams: Optional[Teams] = None
         self.collision_matrix: Optional[ForcefulContactMatrix] = None
         # TODO: GameController events
 

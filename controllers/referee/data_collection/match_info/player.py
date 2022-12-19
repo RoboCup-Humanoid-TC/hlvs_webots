@@ -2,6 +2,7 @@ from enum import Enum, unique
 from typing import List
 from data_collection.match_info.frame import Frame
 
+from data_collection.match_info.camera import Camera
 from data_collection.match_info.match_object import MatchObject
 
 
@@ -43,7 +44,13 @@ class Action(Enum):
 
 class Player(MatchObject):
     def __init__(
-        self, id: int, mass: float, frames: List[Frame], platform: str, DOF: int
+        self,
+        id: int,
+        mass: float,
+        frames: List[Frame],
+        cameras: List[Camera],
+        DOF: int,
+        platform: str,
     ) -> None:
         """Initialize Player.
 
@@ -53,14 +60,17 @@ class Player(MatchObject):
         :type mass: float
         :param frames: List of frames that are part of the player
         :type frames: List[Frame]
-        :param platform: Robot platform of the player
-        :type platform: str
+        :param cameras: List of cameras that are part of the player
+        :type cameras: List[Camera]
         :param DOF: Degrees of freedom of the player
         :type DOF: int
+        :param platform: Robot platform of the player
+        :type platform: str
         """
         super().__init__(id, mass, frames)
-        self.platform: str = platform
+        self.cameras: List[Camera] = cameras
         self.DOF: int = DOF
+        self.platform: str = platform
 
         self.state: State = State.UNKNOWN_STATE
         self.role: Role = Role.ROLE_UNDEFINED

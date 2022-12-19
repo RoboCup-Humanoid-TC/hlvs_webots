@@ -7,22 +7,22 @@ import pandas as pd
 from controller import Supervisor
 from data_collection.match import Match
 
-
 AUTOSAVE_INTERVAL: int = 2 * 60  # in seconds
 
 
 class DataCollector:
-    def __init__(self, save_dir: str, supervisor: Supervisor) -> None:
+    def __init__(self, save_dir: str, supervisor: Supervisor, match: Match) -> None:
         """Initialize DataCollector.
         :param save_dir: Path to directory where to store match data
         :type save_dir: str
         :param supervisor: Webots supervisor controller to receive match data from
         :type supervisor: Supervisor
+        :param match: Match data
+        :type match: Match
         """
         self.save_dir: str = save_dir
         self.sv: Supervisor = supervisor
-
-        self.match: Match = Match()
+        self.match: Match = match
 
         self.autosave_tread_active: bool = True
         self.autosave_thread: Thread = Thread(
