@@ -133,12 +133,41 @@ class Referee:
         self.status_update_last_real_time = None
         self.status_update_last_sim_time = None
 
+        if self.config.DATA_COLLECTION:
+            self.data_collector: dc.DataCollector = self.init_data_collector()
+
         try:
             self.main_loop()
         except Exception:
             self.logger.error(f"Unexpected exception in main referee loop: {traceback.format_exc()}")
 
         self.clean_exit()
+
+    def init_data_collector(self) -> dc.DataCollector:
+        """Initializes the data collector."""
+        simulation: dc.Simulation = dc.Simulation(True, self.time_step)
+
+        field: dc.Field = dc.Field()
+
+        ball: dc.Ball = dc.Ball()
+
+        teams: dc.Teams = dc.Teams()
+
+        match: dc.Match = dc.Match(
+            "TODO",  # TODO: get match id
+            self.game.type,  # TODO: create enum for game types
+            simulation,
+            field,
+            ball,
+            teams,
+        )
+
+        return dc.DataCollector(
+            self.game.data_collection_dir,
+            self.config.DATA_COLLECTION_AUTOSAVE_INTERVAL,
+            self.supervisor,
+            match,
+        )
 
     def announce_final_score(self):
         """ Prints score of the match to the console and saves it to the log. """

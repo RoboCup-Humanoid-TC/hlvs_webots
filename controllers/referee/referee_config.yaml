@@ -22,7 +22,7 @@ END_OF_GAME_TIMEOUT: 5                   # Once the game is finished, let the re
 BALL_IN_PLAY_MOVE: 0.05                  # the ball must move 5 cm after interruption or kickoff to be considered in play
 FOUL_PUSHING_TIME: 1                     # 1 second
 FOUL_PUSHING_PERIOD: 2                   # 2 seconds
-FOUL_VICINITY_DISTANCE: 2                 # 2 meters
+FOUL_VICINITY_DISTANCE: 2                # 2 meters
 FOUL_DISTANCE_THRESHOLD: 0.1             # 0.1 meter
 FOUL_SPEED_THRESHOLD: 0.2                # 0.2 m/s
 FOUL_DIRECTION_THRESHOLD: 0.523599       # 30 degrees
@@ -42,3 +42,5 @@ STATUS_PRINT_PERIOD: 20                  # Real time between two status updates 
 DISABLE_ACTUATORS_MIN_DURATION: 1.0      # The minimal simulated time [s] until enabling actuators again after a reset
 FONT_SIZE: 0.096                         # Font size for the display
 FONT: 'Lucida Console'                   # Font typeface for the display
+DATA_COLLECTION: true                    # Wether to start data collection of this game
+DATA_COLLECTION_AUTOSAVE_INTERVAL: 120   # in seconds. Automatically saves collected data during the game. Set to -1 to disable auto save
