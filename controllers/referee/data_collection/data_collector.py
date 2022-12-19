@@ -7,14 +7,20 @@ import pandas as pd
 from controller import Supervisor
 from data_collection.match import Match
 
-AUTOSAVE_INTERVAL: int = 2 * 60  # in seconds
-
 
 class DataCollector:
-    def __init__(self, save_dir: str, supervisor: Supervisor, match: Match) -> None:
+    def __init__(
+        self,
+        save_dir: str,
+        autosave_interval: int,
+        supervisor: Supervisor,
+        match: Match,
+    ) -> None:
         """Initialize DataCollector.
         :param save_dir: Path to directory where to store match data
         :type save_dir: str
+        :param autosave_interval: Interval in seconds to autosave match data. Set to -1 to disable autosave
+        :type autosave_interval: int
         :param supervisor: Webots supervisor controller to receive match data from
         :type supervisor: Supervisor
         :param match: Match data
@@ -24,10 +30,13 @@ class DataCollector:
         self.sv: Supervisor = supervisor
         self.match: Match = match
 
-        self.autosave_tread_active: bool = True
-        self.autosave_thread: Thread = Thread(
-            target=_autosave, args=[self.match, self.autosave_tread_active]
-        )
+        self.autosave_interval: int = autosave_interval
+        if autosave_interval >= 0:
+            self.autosave_tread_active: bool = True
+            self.autosave_thread: Thread = Thread(
+                target=_autosave,
+                args=[self.autosave_interval, self.match, self.autosave_tread_active],
+            )
 
     def collect_step(self) -> None:
         """Collect data for current step."""
@@ -62,9 +71,13 @@ def save(save_dir: str, file_name: str, also_as_pickle: bool = True) -> None:
         df.to_pickle(os.path.join(save_dir, file_name + ".pkl"))
 
 
-def _autosave(save_dir: str, data: DataCollector, is_active: bool) -> None:
+def _autosave(
+    autosave_interval: int, save_dir: str, data: DataCollector, is_active: bool
+) -> None:
     """Saves match data automatically in AUTOSAVE_INTERVAL.
 
+    :param autosave_interval: Interval in seconds to autosave match data
+    :type autosave_interval: int
     :param save_dir: Path to directory where to store match data
     :type save_dir: str
     :param data: Match data to save
@@ -72,14 +85,14 @@ def _autosave(save_dir: str, data: DataCollector, is_active: bool) -> None:
     :param is_active: Whether autosave thread should be active
     :type is_active: bool
     """
-    next_autosave_time: float = time.time() + AUTOSAVE_INTERVAL
+    next_autosave_time: float = time.time() + autosave_interval
     while is_active:  # Set to False to stop autosave thread
         time.sleep(
             5
         )  # Sleep for shorter time than autosave interval to join thread faster
         now: float = time.time()
         if now >= next_autosave_time:
-            next_autosave_time = now + AUTOSAVE_INTERVAL
+            next_autosave_time = now + autosave_interval
             save(
                 save_dir,
                 f"referee_data_collection_autosave_{datetime.now().astimezone().isoformat()}",

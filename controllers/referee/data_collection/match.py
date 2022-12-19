@@ -11,9 +11,10 @@ from data_collection.step import Step
 class MatchType(Enum):
     """Match type enum."""
 
-    KnockOut = 0
-    RoundRobin = 1
-    DropIn = 2
+    NORMAL = "NORMAL"
+    KNOCKOUT = "KNOCKOUT"
+    PENALTY = "PENALTY"
+    DROPIN = "DROPIN"
 
 
 class Match:
