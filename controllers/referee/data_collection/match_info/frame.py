@@ -1,23 +1,17 @@
-from typing import Optional
+from dataclasses import dataclass
 
 from data_collection.match_info.pose import Pose
 
 
+@dataclass(frozen=True)
 class Frame:
-    def __init__(self, id: str) -> None:
-        """Initialize Frame.
+    """Frame of a match object in 3D space.
 
-        :param id: ID of the frame (e.g. "base_link")
-        :type id: str
-        """
-        self.id: str = id
+    :param id: Unique id of the frame
+    :type id: str
+    :param pose: Pose of the frame
+    :type pose: Pose
+    """
 
-        self.pose: Optional[Pose] = None
-
-    def set_pose(self, pose: Pose) -> None:
-        """Set pose of the frame.
-
-        :param pose: Pose of the frame
-        :type pose: Pose
-        """
-        self.pose = pose
+    id: str
+    pose: Pose

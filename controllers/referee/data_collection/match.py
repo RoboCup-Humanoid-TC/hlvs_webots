@@ -1,20 +1,11 @@
-from enum import Enum, unique
 from typing import List
 
 from data_collection.match_info.ball import Ball
 from data_collection.match_info.field import Field
 from data_collection.match_info.simulation import Simulation
+from data_collection.match_info.static import MatchType
 from data_collection.match_info.team import Teams
 from data_collection.step import Step
-
-
-class MatchType(Enum):
-    """Match type enum."""
-
-    NORMAL = "NORMAL"
-    KNOCKOUT = "KNOCKOUT"
-    PENALTY = "PENALTY"
-    DROPIN = "DROPIN"
 
 
 class Match:
@@ -62,9 +53,9 @@ class Match:
     def current_step(self) -> Step:
         """Get the current step.
 
+        :raises Exception: If there are no steps in the match
         :return: Current step
         :rtype: Step
-        :raises Exception: If there are no steps in the match
         """
         if len(self.steps) == 0:
             raise Exception("No steps in match")

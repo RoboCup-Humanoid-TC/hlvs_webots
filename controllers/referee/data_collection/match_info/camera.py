@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Tuple
 
 from data_collection.match_info.frame import Frame
@@ -11,28 +12,21 @@ from data_collection.match_info.frame import Frame
 # return (0.0, 0.0)  # TODO
 
 
+@dataclass(frozen=True)
 class Camera:
-    def __init__(
-        self,
-        frame: Frame,
-        FPS: float,
-        FOV: float,
-        resolution: Tuple[int, int],
-    ) -> None:
-        """Initialize Camera.
+    """Static information about a camera.
 
-        :param frame: Frame of the camera
-        :type frame: Frame
-        :param FPS: Frames per second
-        :type FPS: float
-        :param FOV: Field of view of the camera
-        :type FOV: float
-        :param resolution: Resolution of the camera
-        :type resolution: Tuple[int, int]
-        """
-        self.frame: Frame = frame
-        self.FPS: float = FPS
-        self.FOV: float = FOV
-        self.resolution: Tuple[int, int] = resolution
+    :param frame_id: Id of the frame that this camera is attached to
+    :type frame_id: str
+    :param FPS: Frames per second
+    :type FPS: float
+    :param FOV: Field of view of the camera
+    :type FOV: float
+    :param resolution: Resolution of the camera
+    :type resolution: Tuple[int, int]
+    """
 
-        # self.camera_matrix: CameraMatrix = CameraMatrix()
+    frame_id: str
+    FPS: float
+    FOV: float
+    resolution: Tuple[int, int]

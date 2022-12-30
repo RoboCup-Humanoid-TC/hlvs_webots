@@ -1,9 +1,10 @@
+from dataclasses import dataclass
 from enum import Enum, unique
 from typing import List
-from data_collection.match_info.frame import Frame
 
 from data_collection.match_info.camera import Camera
-from data_collection.match_info.match_object import MatchObject
+from data_collection.match_info.frame import Frame
+from data_collection.match_info.match_object import MatchObject, StaticMatchObject
 
 
 @unique
@@ -42,35 +43,66 @@ class Action(Enum):
     ACTION_LOCALIZING = 7
 
 
+@dataclass(frozen=True)
+class StaticPlayer(StaticMatchObject):
+    """Static information about a player.
+
+    :param id: Unique id of the player object
+    :type id: str
+    :param mass: Mass of the player in kg
+    :type mass: float
+    :param cameras: List of cameras that are part of the player
+    :type cameras: List[Camera]
+    :param DOF: Degrees of freedom of the player
+    :type DOF: int
+    :param platform: Robot platform of the player
+    :type platform: str
+    """
+
+    cameras: List[Camera]
+    DOF: int
+    platform: str
+
+    def is_mono_camera(self) -> bool:
+        """Check if the player has a mono camera.
+        This is the case if the player has exactly one camera and
+        the frame_id is "camera_frame".
+
+        :return: True if the player has a mono camera, False otherwise
+        :rtype: bool
+        """
+        return len(self.cameras) == 1 and self.cameras[0].frame_id == "camera_frame"
+
+    def is_stereo_camera(self) -> bool:
+        """Check if the player has a stereo camera.
+        This is the case if the player has exactly two cameras and
+        the frame_ids are "l_camera_frame" and "r_camera_frame".
+
+        :return: True if the player has a stereo camera, False otherwise
+        :rtype: bool
+        """
+        # Check for correct frame_ids
+        our_frame_ids = set([camera.frame_id for camera in self.cameras])
+        correct_frame_ids = set(["l_camera_frame", "r_camera_frame"])
+        frame_ids_OK = our_frame_ids == correct_frame_ids
+
+        return len(self.cameras) == 2 and frame_ids_OK
+
+
 class Player(MatchObject):
     def __init__(
         self,
-        id: int,
-        mass: float,
+        id: str,
         frames: List[Frame],
-        cameras: List[Camera],
-        DOF: int,
-        platform: str,
     ) -> None:
         """Initialize Player.
 
         :param id: Unique id of the player object
-        :type id: int
-        :param mass: Mass of the player in kg
-        :type mass: float
+        :type id: str
         :param frames: List of frames that are part of the player
         :type frames: List[Frame]
-        :param cameras: List of cameras that are part of the player
-        :type cameras: List[Camera]
-        :param DOF: Degrees of freedom of the player
-        :type DOF: int
-        :param platform: Robot platform of the player
-        :type platform: str
         """
-        super().__init__(id, mass, frames)
-        self.cameras: List[Camera] = cameras
-        self.DOF: int = DOF
-        self.platform: str = platform
+        super().__init__(id, frames)
 
         self.state: State = State.UNKNOWN_STATE
         self.role: Role = Role.ROLE_UNDEFINED
