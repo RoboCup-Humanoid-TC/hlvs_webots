@@ -107,3 +107,140 @@ class Player(MatchObject):
         self.state: State = State.UNKNOWN_STATE
         self.role: Role = Role.ROLE_UNDEFINED
         self.action: Action = Action.ACTION_UNDEFINED
+
+    def set_state(self, state: State) -> None:
+        """Set the state of the player.
+
+        :param state: State of the player
+        :type state: State
+        """
+        self.state = state
+
+    def set_role(self, role: Role) -> None:
+        """Set the role of the player.
+
+        :param role: Role of the player
+        :type role: Role
+        """
+        self.role = role
+
+    def set_action(self, action: Action) -> None:
+        """Set the action of the player.
+
+        :param action: Action of the player
+        :type action: Action
+        """
+        self.action = action
+
+    def get_frame(self, frame_id: str) -> Frame:
+        """Returns the frame with the given id.
+
+        :param frame_id: Id of the frame
+        :type frame_id: str
+        :raises ValueError: If no frame with the given id exists
+        :return: Frame with the given id
+        :rtype: Frame
+        """
+        for frame in self.frames:
+            if frame.id == frame_id:
+                return frame
+        raise ValueError(f"Frame with id {frame_id} not found")
+
+    def get_base_link(self) -> Frame:
+        """Returns the base link frame of the player.
+
+        :raises ValueError: If no base link frame exists
+        :return: Base link frame of the player
+        :rtype: Frame
+        """
+        return self.get_frame("base_link")
+
+    def get_l_sole(self) -> Frame:
+        """Returns the left sole frame of the player.
+
+        :raises ValueError: If no left sole frame exists
+        :return: Left sole frame of the player
+        :rtype: Frame
+        """
+        return self.get_frame("l_sole")
+
+    def get_r_sole(self) -> Frame:
+        """Returns the right sole frame of the player.
+
+        :raises ValueError: If no right sole frame exists
+        :return: Right sole frame of the player
+        :rtype: Frame
+        """
+        return self.get_frame("r_sole")
+
+    def get_soles(self) -> List[Frame]:
+        """Returns the left and right sole frames of the player.
+
+        :raises ValueError: If no left or right sole frame exists
+        :return: Left and right sole frames of the player
+        :rtype: List[Frame]
+        """
+        return [self.get_l_sole(), self.get_r_sole()]
+
+    def get_l_gripper(self) -> Frame:
+        """Returns the left gripper frame of the player.
+
+        :raises ValueError: If no left gripper frame exists
+        :return: Left gripper frame of the player
+        :rtype: Frame
+        """
+        return self.get_frame("l_gripper")
+
+    def get_r_gripper(self) -> Frame:
+        """Returns the right gripper frame of the player.
+
+        :raises ValueError: If no right gripper frame exists
+        :return: Right gripper frame of the player
+        :rtype: Frame
+        """
+        return self.get_frame("r_gripper")
+
+    def get_grippers(self) -> List[Frame]:
+        """Returns the left and right gripper frames of the player.
+
+        :raises ValueError: If no left or right gripper frame exists
+        :return: Left and right gripper frames of the player
+        :rtype: List[Frame]
+        """
+        return [self.get_l_gripper(), self.get_r_gripper()]
+
+    def get_camera_frame(self) -> Frame:
+        """Returns the camera frame of the player.
+
+        :raises ValueError: If no camera frame exists
+        :return: Camera frame of the player
+        :rtype: Frame
+        """
+        return self.get_frame("camera_frame")
+
+    def get_l_camera_frame(self) -> Frame:
+        """Returns the left camera frame of the player.
+
+        :raises ValueError: If no left camera frame exists
+        :return: Left camera frame of the player
+        :rtype: Frame
+        """
+        return self.get_frame("l_camera_frame")
+
+    def get_r_camera_frame(self) -> Frame:
+        """Returns the right camera frame of the player.
+
+        :raises ValueError: If no right camera frame exists
+        :return: Right camera frame of the player
+        :rtype: Frame
+        """
+        return self.get_frame("r_camera_frame")
+
+    def get_camera_frames(self) -> List[Frame]:
+        """Returns the left and right camera frames of the player.
+
+        :raises ValueError: If no left or right camera frame exists
+        :return: Left and right camera frames of the player
+        :rtype: List[Frame]
+        """
+        return [self.get_l_camera_frame(), self.get_r_camera_frame()]
