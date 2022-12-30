@@ -1,13 +1,15 @@
 from dataclasses import dataclass
-from enum import Enum, unique
+from enum import StrEnum, unique
 
 from data_collection.match_info.ball import StaticBall
 from data_collection.match_info.field import Field
 from data_collection.match_info.simulation import Simulation
+from data_collection.match_info.team import StaticTeams
+from dataclasses_json import DataClassJsonMixin
 
 
 @unique
-class MatchType(Enum):
+class MatchType(StrEnum):  # Inherit from str to make it JSON serializable
     """Match type enum."""
 
     NORMAL = "NORMAL"
@@ -17,7 +19,7 @@ class MatchType(Enum):
 
 
 @dataclass(frozen=True)
-class StaticMatchInfo:
+class StaticMatchInfo(DataClassJsonMixin):
     """Static information about a match.
 
     :param id: Match id
@@ -30,6 +32,8 @@ class StaticMatchInfo:
     :type field: Field
     :param ball: Ball data
     :type ball: StaticBall
+    :param teams: Team data
+    :type teams: StaticTeams
     """
 
     id: str
@@ -37,3 +41,4 @@ class StaticMatchInfo:
     simulation: Simulation
     field: Field
     ball: StaticBall
+    teams: StaticTeams

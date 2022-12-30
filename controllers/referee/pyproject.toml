@@ -13,6 +13,8 @@ transforms3d = "^0.4.1"
 scipy = "^1.9.3"
 pyyaml = "^6.0"
 pandas = "^1.5.2"
+pytest = "^7.2.0"
+dataclasses-json = "^0.5.7"
 
 
 [build-system]

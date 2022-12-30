@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from enum import Enum, unique
+from enum import IntEnum, unique
 from typing import List
 
 from data_collection.match_info.camera import Camera
@@ -8,7 +8,7 @@ from data_collection.match_info.match_object import MatchObject, StaticMatchObje
 
 
 @unique
-class State(Enum):
+class State(IntEnum):
     """Enum for player states."""
 
     UNKNOWN_STATE = 0
@@ -17,7 +17,7 @@ class State(Enum):
 
 
 @unique
-class Role(Enum):
+class Role(IntEnum):
     """Enum for player roles."""
 
     ROLE_UNDEFINED = 0
@@ -30,7 +30,7 @@ class Role(Enum):
 
 
 @unique
-class Action(Enum):
+class Action(IntEnum):
     """Enum for the current action of the robot."""
 
     ACTION_UNDEFINED = 0

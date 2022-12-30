@@ -1,16 +1,16 @@
 from dataclasses import dataclass
-from enum import Enum, unique
+from enum import StrEnum, unique
 from typing import List, Tuple
 
 from data_collection.match_info.player import Player
 
 
 @unique
-class TeamColor(Enum):
+class TeamColor(StrEnum):  # Inherit from str to make it JSON serializable
     """Enum for team colors."""
 
-    RED = "red"
-    BLUE = "blue"
+    RED = "RED"
+    BLUE = "BLUE"
 
 
 @dataclass(frozen=True)
