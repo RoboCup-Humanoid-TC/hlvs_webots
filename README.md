@@ -32,7 +32,7 @@ You will also need to get familiar with Webots by reading the [Webots User Guide
 
 1. Open the [robocup.wbt](worlds/robocup.wbt) world file in Webots and run it until you see the GameController window showing up.
    ```
-   export GAME_CONTROLLER_HOME=/path/to/GameController JAVA_HOME=/usr webots ./worlds/robocup.wbt
+   GAME_CONTROLLER_HOME=/path/to/GameController JAVA_HOME=/usr webots ./worlds/robocup.wbt
    ```
    You have to pass the environment variables `GAME_CONTROLLER_HOME` which points to the `GameController` folder and `JAVA_HOME` which points to your Java installation (which might be under `/usr`).
 2. You can manually move the robots and the ball using the mouse (<kbd>Shift</kbd>-right-click-and-drag).
