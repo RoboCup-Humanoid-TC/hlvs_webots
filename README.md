@@ -24,7 +24,7 @@ You will also need to get familiar with Webots by reading the [Webots User Guide
 4. Build the controllers:
    ```
    apt-get install protobuf-compiler libprotobuf-dev libjpeg9-dev
-   cd webots/projects/samples/contests/robocup
+   export WEBOTS_HOME=/usr/local/webots # Set WEBOTS_HOME. This might be a different location, depending on your installation type
    make # This requires the environment variable WEBOTS_HOME to be set
    ```
 
