@@ -1,8 +1,9 @@
 from dataclasses import dataclass
-from typing import List
 
-from data_collection.match_info.frame import Frame
-from data_collection.match_info.match_object import MatchObject, StaticMatchObject
+from dataclasses_json import DataClassJsonMixin
+
+from .frame import Frame
+from .match_object import MatchObject, StaticMatchObject
 
 
 @dataclass(frozen=True)
@@ -23,13 +24,14 @@ class StaticBall(StaticMatchObject):
     diameter: float
 
 
-class Ball(MatchObject):
-    def __init__(self, id: str, frames: List[Frame]) -> None:
-        """Initialize Ball.
+@dataclass
+class Ball(MatchObject, DataClassJsonMixin):
+    """Ball object.
 
-        :param id: Unique id of the object
-        :type id: str
-        :param frames: List of frames that are part of the object
-        :type frames: List[Frame]
-        """
-        super().__init__(id, frames)
+    :param id: Unique id of the ball object
+    :type id: str
+    :param frame: Frame that are part of the ball object
+    :type frame: Frame
+    """
+
+    frame: Frame

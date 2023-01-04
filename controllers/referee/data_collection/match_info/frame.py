@@ -1,10 +1,12 @@
 from dataclasses import dataclass
 
-from data_collection.match_info.pose import Pose
+from dataclasses_json import DataClassJsonMixin
+
+from .pose import Pose
 
 
 @dataclass(frozen=True)
-class Frame:
+class Frame(DataClassJsonMixin):
     """Frame of a match object in 3D space.
 
     :param id: Unique id of the frame

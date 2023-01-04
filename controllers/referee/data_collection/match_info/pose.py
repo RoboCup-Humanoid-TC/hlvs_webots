@@ -2,10 +2,11 @@ from dataclasses import dataclass
 from typing import Tuple
 
 import transforms3d
+from dataclasses_json import DataClassJsonMixin
 
 
 @dataclass(frozen=True)
-class Position:
+class Position(DataClassJsonMixin):
     """Position of an object in 3D space.
 
     :param x: X coordinate of the position
@@ -22,7 +23,7 @@ class Position:
 
 
 @dataclass(frozen=True)
-class Rotation:
+class Rotation(DataClassJsonMixin):
     """Rotation of an object in 3D space as a quaternion.
 
     :param x: X component of the quaternion
@@ -58,7 +59,7 @@ class Rotation:
 
 
 @dataclass(frozen=True)
-class Pose:
+class Pose(DataClassJsonMixin):
     """Pose of an object in 3D space.
 
     :param position: Position of the object

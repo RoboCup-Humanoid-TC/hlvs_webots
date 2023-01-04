@@ -1,29 +1,29 @@
 from typing import Optional
 
-import data_collection.match_info as ma
+import data_collection.match_info as mi
 
 # Define test objects in global scope
 id: str = "test_id"
-match_type: Optional[ma.MatchType] = None
-simulation: Optional[ma.Simulation] = None
-field: Optional[ma.Field] = None
-ball: Optional[ma.StaticBall] = None
-teams: Optional[ma.StaticTeams] = None
-static_match_info: Optional[ma.StaticMatchInfo] = None
+match_type: Optional[mi.MatchType] = None
+simulation: Optional[mi.Simulation] = None
+field: Optional[mi.Field] = None
+ball: Optional[mi.StaticBall] = None
+teams: Optional[mi.StaticTeams] = None
+static_match_info: Optional[mi.StaticMatchInfo] = None
 
 # Create a test StaticMatchInfo object
 def test_create_static_match_info():
     global id, match_type, simulation, field, ball, teams, static_match_info
-    match_type = ma.MatchType.NORMAL
-    simulation = ma.Simulation(True, 0)
-    field = ma.Field("test_location_id", "test_location_name", (6, 9), 1.0)
-    ball = ma.StaticBall("test_ball_id", 0.5, "test_ball_texture", 0.14)
-    teams = ma.StaticTeams(
-        ma.StaticTeam("test_team_1", "test_team_1_name", ma.TeamColor.RED),
-        ma.StaticTeam("test_team_2", "test_team_2_name", ma.TeamColor.BLUE),
+    match_type = mi.MatchType.NORMAL
+    simulation = mi.Simulation(True, 0)
+    field = mi.Field("test_location_id", "test_location_name", 6, 9, 1.0)
+    ball = mi.StaticBall("test_ball_id", 0.5, "test_ball_texture", 0.14)
+    teams = mi.StaticTeams(
+        mi.StaticTeam("test_team_1", "test_team_1_name", mi.TeamColor.RED),
+        mi.StaticTeam("test_team_2", "test_team_2_name", mi.TeamColor.BLUE),
     )
 
-    static_match_info = ma.StaticMatchInfo(
+    static_match_info = mi.StaticMatchInfo(
         id, match_type, simulation, field, ball, teams
     )
 
@@ -40,7 +40,7 @@ def test_json_dump_ans_load_static_match_info():
     json_string = static_match_info.to_json()  # type: ignore
 
     # Load the object from the JSON string
-    json_static_match_info = ma.StaticMatchInfo.from_json(json_string)
+    json_static_match_info = mi.StaticMatchInfo.from_json(json_string)
 
     assert (
         json_static_match_info == static_match_info

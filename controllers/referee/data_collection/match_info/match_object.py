@@ -1,7 +1,4 @@
 from dataclasses import dataclass
-from typing import List
-
-from data_collection.match_info.frame import Frame
 
 
 @dataclass(frozen=True)
@@ -18,14 +15,12 @@ class StaticMatchObject:
     mass: float
 
 
+@dataclass
 class MatchObject:
-    def __init__(self, id: str, frames: List[Frame]):
-        """Initialize MatchObject.
+    """Match object.
 
-        :param id: Unique id of the object
-        :type id: str
-        :param frames: List of frames that are part of the object
-        :type frames: List[Frame]
-        """
-        self.id: str = id
-        self.frames: List[Frame] = frames
+    :param id: Unique id of the object
+    :type id: str
+    """
+
+    id: str

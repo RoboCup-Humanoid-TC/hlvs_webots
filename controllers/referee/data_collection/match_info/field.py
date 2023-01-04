@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional, Tuple
+from typing import Optional
 
 
 @dataclass(frozen=True)
@@ -10,8 +10,10 @@ class Field:
     :type location_id: str
     :param location_name: Name of the location
     :type location_name: str
-    :param size: Size of the field in m
-    :type size: Tuple[int, int]
+    :param size_x: Size of the field in x direction
+    :type size_x: int
+    :param size_y: Size of the field in y direction
+    :type size_y: int
     :param friction: Friction of the field, defaults to None
     :type friction: Optional[float], optional
     :param natural_light: Whether the field has natural light, defaults to None
@@ -22,7 +24,8 @@ class Field:
 
     location_id: str
     location_name: str
-    size: Tuple[int, int]
+    size_x: int
+    size_y: int
     friction: Optional[float] = None
     natural_light: Optional[bool] = None
     weather: Optional[str] = None

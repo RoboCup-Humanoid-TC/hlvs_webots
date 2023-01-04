@@ -1,8 +1,4 @@
 from dataclasses import dataclass
-from typing import Tuple
-
-from data_collection.match_info.frame import Frame
-
 
 # class CameraMatrix:
 # def __init__(self) -> None:
@@ -22,11 +18,14 @@ class Camera:
     :type FPS: float
     :param FOV: Field of view of the camera
     :type FOV: float
-    :param resolution: Resolution of the camera
-    :type resolution: Tuple[int, int]
+    :param pixel_count_x: Number of pixels in x direction
+    :type pixel_count_x: int
+    :param pixel_count_y: Number of pixels in y direction
+    :type pixel_count_y: int
     """
 
     frame_id: str
     FPS: float
     FOV: float
-    resolution: Tuple[int, int]
+    pixel_count_x: int
+    pixel_count_y: int

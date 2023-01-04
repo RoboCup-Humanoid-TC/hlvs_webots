@@ -1,8 +1,10 @@
 from dataclasses import dataclass
 from enum import StrEnum, unique
-from typing import List, Tuple
+from typing import Optional, Tuple
 
-from data_collection.match_info.player import Player
+from dataclasses_json import DataClassJsonMixin
+
+from .player import Player
 
 
 @unique
@@ -28,39 +30,6 @@ class StaticTeam:
     id: str
     name: str
     color: TeamColor
-
-
-class Team:
-    def __init__(self, id: str):
-        """Dynamic data about a team.
-        :param id: Team id
-        :type id: str
-        """
-        self.id: str = id
-
-        self.players: List[Player] = []
-
-        def set_players(self, players: List[Player]) -> None:
-            """Set the players of the team.
-
-            :param players: Players of the team
-            :type players: List[Player]
-            """
-            self.players = players
-
-        def get_player_by_id(self, id: str) -> Player:
-            """Returns the player with the given id.
-
-            :param id: Id of the player
-            :type id: str
-            :raises ValueError: If no player with the given id exists
-            :return: Player with the given id
-            :rtype: Player
-            """
-            for player in self.players:
-                if player.id == id:
-                    return player
-            raise ValueError(f"Player with id {id} not found")
 
 
 @dataclass(frozen=True)
@@ -145,8 +114,31 @@ class StaticTeams:
         raise ValueError(f"Team with name {name} not found")
 
 
+@dataclass
+class Team(DataClassJsonMixin):
+    """Dynamic data about a team.
+    :param id: Team id
+    :type id: str
+    :param player1: First player, defaults to None
+    :type player1: Optional[Player], optional
+    :param player2: Second player, defaults to None
+    :type player2: Optional[Player], optional
+    :param player3: Third player, defaults to None
+    :type player3: Optional[Player], optional
+    :param player4: Fourth player, defaults to None
+    :type player4: Optional[Player], optional
+    """
+
+    id: str
+
+    player1: Optional[Player] = None
+    player2: Optional[Player] = None
+    player3: Optional[Player] = None
+    player4: Optional[Player] = None
+
+
 @dataclass(frozen=True)
-class Teams:
+class Teams(DataClassJsonMixin):
     """Holds both teams.
 
     :param team1: First team

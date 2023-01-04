@@ -1,11 +1,12 @@
 from dataclasses import dataclass
 from enum import StrEnum, unique
 
-from data_collection.match_info.ball import StaticBall
-from data_collection.match_info.field import Field
-from data_collection.match_info.simulation import Simulation
-from data_collection.match_info.team import StaticTeams
 from dataclasses_json import DataClassJsonMixin
+
+from .ball import StaticBall
+from .field import Field
+from .simulation import Simulation
+from .team import StaticTeams
 
 
 @unique
@@ -24,7 +25,7 @@ class StaticMatchInfo(DataClassJsonMixin):
 
     :param id: Match id
     :type id: str
-    :param match_type: Type of this match (KnockOut, RoundRobin, DropIn)
+    :param match_type: Type of this match (Normal, KnockOut, RoundRobin, DropIn)
     :type match_type: MatchType
     :param simulation: Simulation data
     :type simulation: Simulation

@@ -1,4 +1,2 @@
-from .data_collector import DataCollector
-from .match import Match
+# from .data_collector import DataCollector
 from .match_info import *
-from .step import Step
