@@ -1,19 +1,8 @@
-from typing import Optional
-
 import data_collection.match_info as mi
 
-# Define test objects in global scope
-id: str = "test_id"
-match_type: Optional[mi.MatchType] = None
-simulation: Optional[mi.Simulation] = None
-field: Optional[mi.Field] = None
-ball: Optional[mi.StaticBall] = None
-teams: Optional[mi.StaticTeams] = None
-static_match_info: Optional[mi.StaticMatchInfo] = None
 
 # Create a test StaticMatchInfo object
-def test_create_static_match_info():
-    global id, match_type, simulation, field, ball, teams, static_match_info
+def _create_static_match_info(id: str = "test_id") -> mi.StaticMatchInfo:
     match_type = mi.MatchType.NORMAL
     simulation = mi.Simulation(True, 0)
     field = mi.Field("test_location_id", "test_location_name", 6, 9, 1.0)
@@ -34,8 +23,16 @@ def test_create_static_match_info():
     assert static_match_info.ball == ball
     assert static_match_info.teams == teams
 
+    return static_match_info
 
-def test_json_dump_ans_load_static_match_info():
+
+def test_create_static_match_info():
+    _create_static_match_info()
+
+
+def test_json_dump_and_load_static_match_info():
+    static_match_info = _create_static_match_info()
+
     # Dump the object to a JSON string
     json_string = static_match_info.to_json()  # type: ignore
 
@@ -49,4 +46,4 @@ def test_json_dump_ans_load_static_match_info():
 
 if __name__ == "__main__":
     test_create_static_match_info()
-    test_json_dump_ans_load_static_match_info()
+    test_json_dump_and_load_static_match_info()

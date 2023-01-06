@@ -1,9 +1,9 @@
 import data_collection.match_info as mi
-from data_collection import Step
-from forceful_contact_matrix import ForcefulContactMatrix
+
+# from forceful_contact_matrix import ForcefulContactMatrix
 
 
-def _create_step(id: int = 42) -> Step:
+def _create_step(id: int = 42) -> mi.Step:
     time: int = 42 * 8
     time_to_calculate_simulation: int = 30
     ball: mi.Ball = mi.Ball(
@@ -47,7 +47,7 @@ def _create_step(id: int = 42) -> Step:
     #     len(teams.team1.players), len(teams.team2.players), 1, 1, 1
     # )
 
-    step = Step(
+    step = mi.Step(
         id, time, time_to_calculate_simulation, ball, teams
     )  # , collision_matrix)
 
