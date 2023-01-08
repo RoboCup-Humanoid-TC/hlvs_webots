@@ -2,11 +2,12 @@ import os
 import time
 from datetime import datetime
 from threading import Event, Thread
+from typing import Optional
 
 import pandas as pd
-
-# from controller import Supervisor
+from controller import Supervisor
 from data_collection.match_info import Match
+from ..logger import Logger
 
 
 class DataCollector:
@@ -14,8 +15,9 @@ class DataCollector:
         self,
         save_dir: os.PathLike,
         autosave_interval: int,
-        # supervisor: Supervisor,
+        supervisor: Supervisor,
         match: Match,
+        logger: Optional[Logger] = None,
     ) -> None:
         """Initialize DataCollector.
         :param save_dir: Path to directory where to store match data
@@ -26,9 +28,12 @@ class DataCollector:
         :type supervisor: Supervisor
         :param match: Match data
         :type match: Match
+        :param logger: Logger, defaults to None
+        :type logger: Optional[Logger], optional
         """
         self.save_dir: os.PathLike = save_dir
         # self.sv: Supervisor = supervisor
+        self.logger: Optional[Logger] = logger
         self.match: Match = match
 
         self.autosave_interval: int = autosave_interval
@@ -41,6 +46,7 @@ class DataCollector:
                     self.autosave_interval,
                     self.save_dir,
                     self.match,
+                    self.logger,
                 ],
             )
             self.autosave_thread.start()
@@ -63,11 +69,16 @@ class DataCollector:
             self.save_dir,
             self.match,
             f"referee_data_collection_complete_{datetime.utcnow().strftime('%Y-%m-%dT%H-%M-%S')}",
+            self.logger,
         )
 
 
 def save(
-    save_dir: os.PathLike, match: Match, file_name: str, also_as_pickle: bool = True
+    save_dir: os.PathLike,
+    match: Match,
+    file_name: str,
+    logger: Optional[Logger] = None,
+    also_as_pickle: bool = True,
 ) -> None:
     """Save match as a dataframe to filesystem.
 
@@ -77,8 +88,14 @@ def save(
     :type data: Match
     :param file_name: Name under which to store the match data (without file extension)
     :type file_name: str
-    :param also_as_pickle: Whether dynamic match data should also be saved as a pickle file
+    :param logger: Logger, defaults to None
+    :type logger: Optional[Logger], optional
+    :param also_as_pickle: Whether dynamic match data should also be saved as a pickle file, defaults to True
+    :type also_as_pickle: bool, optional
     """
+    if logger:
+        logger.info(f"Saving data collection to '{save_dir}' as '{file_name}.*'...")
+
     # Save static match info
     json_data: str = match.get_static_match_info().to_json()
     with open(os.path.join(save_dir, file_name + ".json"), "w") as f:
@@ -94,7 +111,11 @@ def save(
 
 
 def _autosave(
-    stop_event: Event, autosave_interval: int, save_dir: os.PathLike, match: Match
+    stop_event: Event,
+    autosave_interval: int,
+    save_dir: os.PathLike,
+    match: Match,
+    logger: Optional[Logger] = None,
 ) -> None:
     """Saves match data automatically in AUTOSAVE_INTERVAL.
     Old autosave files are being removed after new autosave was successful.
@@ -107,6 +128,8 @@ def _autosave(
     :type save_dir: os.PathLike
     :param data: Match data to save
     :type data: DataCollector
+    :param logger: Logger, defaults to None
+    :type logger: Optional[Logger], optional
     """
     previous_autosave_filename: str = ""  # Path to last autosave filename
     next_autosave_time: float = time.time() + autosave_interval
@@ -117,7 +140,7 @@ def _autosave(
         if now >= next_autosave_time:
             next_autosave_time = now + autosave_interval
             filename: str = f"referee_data_collection_autosave_{datetime.utcnow().strftime('%Y-%m-%dT%H-%M-%S')}"
-            save(save_dir, match, filename)
+            save(save_dir, match, filename, logger)
 
             # Remove previous autosave file
             if previous_autosave_filename:

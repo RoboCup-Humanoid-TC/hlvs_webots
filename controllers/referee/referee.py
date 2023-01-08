@@ -167,6 +167,7 @@ class Referee:
             self.config.DATA_COLLECTION_AUTOSAVE_INTERVAL,
             self.supervisor,
             match,
+            self.logger,
         )
 
     def announce_final_score(self):

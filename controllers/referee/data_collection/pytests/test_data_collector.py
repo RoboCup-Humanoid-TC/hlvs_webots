@@ -1,10 +1,10 @@
-import os
 import glob
+import os
 import time
-import pytest
+
+from controller import Supervisor
 from data_collection import match_info as mi
 from data_collection.data_collector import DataCollector
-
 from data_collection.pytests.test_static import _create_static_match_info
 from data_collection.pytests.test_step import _create_step
 
@@ -12,9 +12,10 @@ from data_collection.pytests.test_step import _create_step
 def _create_data_collector(tmp_path) -> DataCollector:
     save_dir = tmp_path
 
+    supervisor = Supervisor()
     match = mi.Match(_create_static_match_info())
 
-    data_collector = DataCollector(save_dir, 5, match)
+    data_collector = DataCollector(save_dir, 5, supervisor, match)
 
     assert data_collector.save_dir == save_dir
     assert data_collector.match == match
