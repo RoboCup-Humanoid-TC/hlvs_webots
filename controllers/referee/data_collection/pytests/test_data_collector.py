@@ -72,5 +72,8 @@ def test_create_data_collector(tmp_path):
     ), "Three files should be saved for the final save (referee_data_collection_complete_* [.json, .feather and .pkl])"
 
 
+# TODO: Test data collector failure case (__del__)
+
+
 if __name__ == "__main__":
     test_create_data_collector("REPLACE_WITH_PATH")

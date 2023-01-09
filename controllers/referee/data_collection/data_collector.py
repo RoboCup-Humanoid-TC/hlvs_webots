@@ -36,6 +36,10 @@ class DataCollector:
         self.logger: Optional[Logger] = logger
         self.match: Match = match
 
+        self._finalized = (
+            False  # True, if finalized was successful, to prevent saving two times
+        )
+
         self.autosave_interval: int = autosave_interval
         if autosave_interval >= 0:
             self.autosave_stop_tread_event: Event = Event()
@@ -51,15 +55,12 @@ class DataCollector:
             )
             self.autosave_thread.start()
 
-    def __del__(self) -> None:  # Cleanup in case of failures
-        self.finalize()
+    def _close(self, filename_state: str):
+        """Stop autosave thread and save one last time manually.
 
-    def collect_step(self) -> None:
-        """Collect data for current step."""
-        pass
-
-    def finalize(self) -> None:
-        """Finalize the data collection and save to filesystem."""
+        :param filename_state: State to include in save filenames (e.g. "COMPLETE", "FAILURE")
+        :type filename_state: str
+        """
         # Stop autosave thread
         self.autosave_stop_tread_event.set()
         self.autosave_thread.join()
@@ -68,9 +69,22 @@ class DataCollector:
         save(
             self.save_dir,
             self.match,
-            f"referee_data_collection_complete_{datetime.utcnow().strftime('%Y-%m-%dT%H-%M-%S')}",
+            f"referee_data_collection_{filename_state}_{datetime.utcnow().strftime('%Y-%m-%dT%H-%M-%S')}",
             self.logger,
         )
+
+    def __del__(self) -> None:  # Cleanup in case of failures
+        if not self._finalized:
+            self._close("FAILURE")
+
+    def finalize(self) -> None:
+        """Finalize the data collection and save to filesystem."""
+        self._close("COMPLETE")
+        self._finalized = True
+
+    def collect_step(self) -> None:
+        """Collect data for current step."""
+        pass
 
 
 def save(
