@@ -4,6 +4,7 @@ import data_collection.match_info as mi
 # Create a test StaticMatchInfo object
 def _create_static_match_info(id: str = "test_id") -> mi.StaticMatchInfo:
     match_type = mi.MatchType.NORMAL
+    league_sub_type = mi.LeagueSubType.KID
     simulation = mi.Simulation(True, 0)
     field = mi.Field("test_location_id", "test_location_name", 6, 9, 1.0)
     ball = mi.StaticBall("test_ball_id", 0.5, "test_ball_texture", 0.14)
@@ -13,11 +14,12 @@ def _create_static_match_info(id: str = "test_id") -> mi.StaticMatchInfo:
     )
 
     static_match_info = mi.StaticMatchInfo(
-        id, match_type, simulation, field, ball, teams
+        id, match_type, league_sub_type, simulation, field, ball, teams
     )
 
     assert static_match_info.id == id
     assert static_match_info.match_type == match_type
+    assert static_match_info.league_sub_type == league_sub_type
     assert static_match_info.simulation == simulation
     assert static_match_info.field == field
     assert static_match_info.ball == ball

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from enum import StrEnum, unique
+from enum import Enum, unique
 from typing import Optional, Tuple
 
 from dataclasses_json import DataClassJsonMixin
@@ -8,7 +8,7 @@ from .player import Player
 
 
 @unique
-class TeamColor(StrEnum):  # Inherit from str to make it JSON serializable
+class TeamColor(Enum, str):  # Inherit from str to make it JSON serializable
     """Enum for team colors."""
 
     RED = "RED"
