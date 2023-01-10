@@ -7,7 +7,8 @@ from typing import Optional
 import pandas as pd
 from controller import Supervisor
 from data_collection import match_info as mi
-from ..logger import Logger
+
+# from ..logger import Logger
 
 
 class DataCollector:
@@ -17,7 +18,7 @@ class DataCollector:
         autosave_interval: int,
         supervisor: Supervisor,
         match: mi.Match,
-        logger: Optional[Logger] = None,
+        logger=None,
     ) -> None:
         """Initialize DataCollector.
         :param save_dir: Path to directory where to store match data
@@ -33,8 +34,11 @@ class DataCollector:
         """
         self.save_dir: os.PathLike = save_dir
         self.sv: Supervisor = supervisor
-        self.logger: Optional[Logger] = logger
+        self.logger = logger
         self.match: mi.Match = match
+
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
 
         self._finalized = (
             False  # True, if finalized was successful, to prevent saving two times
@@ -103,7 +107,7 @@ def save(
     save_dir: os.PathLike,
     match: mi.Match,
     file_name: str,
-    logger: Optional[Logger] = None,
+    logger=None,
     also_as_pickle: bool = True,
 ) -> None:
     """Save match as a dataframe to filesystem.
@@ -141,7 +145,7 @@ def _autosave(
     autosave_interval: int,
     save_dir: os.PathLike,
     match: mi.Match,
-    logger: Optional[Logger] = None,
+    logger=None,
 ) -> None:
     """Saves match data automatically in AUTOSAVE_INTERVAL.
     Old autosave files are being removed after new autosave was successful.

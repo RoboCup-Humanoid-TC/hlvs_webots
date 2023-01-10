@@ -8,7 +8,7 @@ from .player import Player
 
 
 @unique
-class TeamColor(Enum, str):  # Inherit from str to make it JSON serializable
+class TeamColor(str, Enum):  # Inherit from str to make it JSON serializable
     """Enum for team colors."""
 
     RED = "RED"

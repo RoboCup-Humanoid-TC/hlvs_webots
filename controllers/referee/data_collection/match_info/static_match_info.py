@@ -10,7 +10,7 @@ from .team import StaticTeams
 
 
 @unique
-class MatchType(Enum, str):  # Inherit from str to make it JSON serializable
+class MatchType(str, Enum):  # Inherit from str to make it JSON serializable
     """Match type enum."""
 
     NORMAL = "NORMAL"
@@ -20,7 +20,7 @@ class MatchType(Enum, str):  # Inherit from str to make it JSON serializable
 
 
 @unique
-class LeagueSubType(Enum, str):  # Inherit from str to make it JSON serializable
+class LeagueSubType(str, Enum):  # Inherit from str to make it JSON serializable
     """League sub type enum."""
 
     KID = "KID"

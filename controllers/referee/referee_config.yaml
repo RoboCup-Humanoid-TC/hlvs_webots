@@ -43,4 +43,5 @@ DISABLE_ACTUATORS_MIN_DURATION: 1.0      # The minimal simulated time [s] until 
 FONT_SIZE: 0.096                         # Font size for the display
 FONT: 'Lucida Console'                   # Font typeface for the display
 DATA_COLLECTION: true                    # Wether to start data collection of this game
+DATA_COLLECTION_DIR: './data'            # Where to store data collection files # TODO
 DATA_COLLECTION_AUTOSAVE_INTERVAL: 120   # in seconds. Automatically saves collected data during the game. Set to -1 to disable auto save
