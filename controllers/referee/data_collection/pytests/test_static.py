@@ -12,9 +12,10 @@ def _create_static_match_info(id: str = "test_id") -> mi.StaticMatchInfo:
         mi.StaticTeam("test_team_1", "test_team_1_name", mi.TeamColor.RED),
         mi.StaticTeam("test_team_2", "test_team_2_name", mi.TeamColor.BLUE),
     )
+    kick_off_team = "test_team_1"
 
     static_match_info = mi.StaticMatchInfo(
-        id, match_type, league_sub_type, simulation, field, ball, teams
+        id, match_type, league_sub_type, simulation, field, ball, teams, kick_off_team
     )
 
     assert static_match_info.id == id

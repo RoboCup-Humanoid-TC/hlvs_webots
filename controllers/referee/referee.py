@@ -30,12 +30,19 @@ from scipy.spatial import ConvexHull
 
 from types import SimpleNamespace
 
-from controller import Supervisor, Node
 
-from gamestate import GameState
+import numpy as np
+import yaml
+
+import data_collection as dc
+import data_collection.match_info as mi
+from blackboard import blackboard
+from controller import Node, Supervisor
+from display import Display
 from field import Field
 from forceful_contact_matrix import ForcefulContactMatrix
 from logger import logger
+from gamestate import GameState
 from geometry import distance2, rotate_along_z, aabb_circle_collision, polygon_circle_collision, update_aabb
 from display import Display
 from game import Game
@@ -145,22 +152,31 @@ class Referee:
 
     def init_data_collector(self) -> dc.DataCollector:
         """Initializes the data collector."""
-        simulation: dc.Simulation = dc.Simulation(True, self.time_step)
+        simulation: mi.Simulation = mi.Simulation(True, self.time_step)
 
-        field: dc.Field = dc.Field()
+        field = mi.Field("test_location_id", "test_location_name", 6, 9, 1.0)  # TODO
+        ball = mi.StaticBall("test_ball_id", 0.5, "test_ball_texture", 0.14)  # TODO
+        teams = mi.StaticTeams(  # TODO
+            mi.StaticTeam("test_team_1", "test_team_1_name", mi.TeamColor.RED),  # TODO
+            mi.StaticTeam("test_team_2", "test_team_2_name", mi.TeamColor.BLUE),  # TODO
+        )  # TODO
+        kick_off_team = mi.TeamColor.RED  # TODO
 
-        ball: dc.Ball = dc.Ball()
-
-        teams: dc.Teams = dc.Teams()
-
-        match: dc.Match = dc.Match(
-            "TODO",  # TODO: get match id
-            self.game.type,  # TODO: create enum for game types
+        match_id = "TODO"  # TODO: Add match id
+        match_type = mi.MatchType.NORMAL  # TODO
+        league_sub_type = mi.LeagueSubType.KID  # TODO
+        static_match_info: mi.StaticMatchInfo = mi.StaticMatchInfo(
+            match_id,
+            match_type,
+            league_sub_type,
             simulation,
             field,
             ball,
             teams,
+            kick_off_team,
         )
+
+        match = mi.Match(static_match_info)
 
         return dc.DataCollector(
             self.game.data_collection_dir,
@@ -1935,6 +1951,88 @@ class Referee:
         self.game.reset_ball_touched()
         self.logger.info(f'Ball respawned at {target_location[0]} {target_location[1]} {target_location[2]}.')
 
+    def get_player_frame_poses(self, team, number):
+        """Returns the poses of frames from a player.
+        
+        :param team: team of the player
+        :param number: number of the player
+        """
+        robot = team.players[number]["robot"]
+        frame_ids = [
+            "base_link",
+            "l_sole",
+            "r_sole",
+            "l_gripper",
+            "r_gripper",
+            "camera_frame",
+            "l_camera_frame",
+            "r_camera_frame",
+            ]
+
+        (self, solid, active_tag=None):  # we list only the hands and feet
+        solids = []
+        tagged_solids = dict()
+        name_field = solid.getField("name")
+        if name_field:
+            name = name_field.getSFString()
+            tag_start = name.rfind("[")
+            tag_end = name.rfind("]")
+            if tag_start != -1 and tag_end != -1:
+                active_tag = name[tag_start + 1 : tag_end]
+            if name.endswith("[hand]") or name.endswith("[foot]"):
+                solids.append(solid)
+            if active_tag is not None:
+                tagged_solids[name] = active_tag
+        children = (
+            solid.getProtoField("children")
+            if solid.isProto()
+            else solid.getField("children")
+        )
+        for i in range(children.getCount()):
+            child = children.getMFNode(i)
+            if child.getType() in [
+                Node.ROBOT,
+                Node.SOLID,
+                Node.GROUP,
+                Node.TRANSFORM,
+                Node.ACCELEROMETER,
+                Node.CAMERA,
+                Node.GYRO,
+                Node.TOUCH_SENSOR,
+            ]:
+                s, ts = self.append_solid(child, active_tag)
+                solids.extend(s)
+                tagged_solids.update(ts)
+                continue
+            if child.getType() in [
+                Node.HINGE_JOINT,
+                Node.HINGE_2_JOINT,
+                Node.SLIDER_JOINT,
+                Node.BALL_JOINT,
+            ]:
+                endPoint = (
+                    child.getProtoField("endPoint")
+                    if child.isProto()
+                    else child.getField("endPoint")
+                )
+                solid = endPoint.getSFNode()
+                if (
+                    solid.getType() == Node.NO_NODE
+                    or solid.getType() == Node.SOLID_REFERENCE
+                ):
+                    continue
+                s, ts = self.append_solid(
+                    solid, None
+                )  # active tag is reset after a joint
+                solids.extend(s)
+                tagged_solids.update(ts)
+        return solids, tagged_solids
+
+
+    def collect_team_player_data(self):
+        """Collects data about the players of the teams."""
+        pass
+
     def setup(self):
         # check game type
         if self.game.type not in ['NORMAL', 'KNOCKOUT', 'PENALTY']:
@@ -2146,10 +2244,15 @@ class Referee:
             if self.game.state is None:
                 self.sim_time.progress_ms(self.time_step)
                 continue
+            self.data_collector.create_new_step(self.sim_time.get_ms())
             self.stabilize_robots()
             send_play_state_after_penalties = False
             previous_position = copy.deepcopy(self.game.ball_position)
             self.game.ball_position = self.game.ball_translation.getSFVec3f()
+            self.data_collector.current_step.frame = mi.Frame(
+                "ball_frame",
+                mi.Pose(mi.Position(*self.game.ball_position), mi.Rotation(0, 0, 0, 1)),
+            )
             if self.game.ball_position != previous_position:
                 self.game.ball_last_move = self.sim_time.get_ms()
             self.update_contacts()  # check for collisions with the ground and ball
@@ -2482,6 +2585,9 @@ class Referee:
                 self.send_penalties()
                 if send_play_state_after_penalties:
                     self.game_controller_send('STATE:PLAY')
+
+            # Collect team player data
+            self.collect_team_player_data()
 
             self.sim_time.progress_ms(self.time_step)
 

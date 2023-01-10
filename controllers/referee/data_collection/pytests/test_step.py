@@ -3,8 +3,7 @@ import data_collection.match_info as mi
 # from forceful_contact_matrix import ForcefulContactMatrix
 
 
-def _create_step(id: int = 42) -> mi.Step:
-    time: int = 42 * 8
+def _create_step(time: int) -> mi.Step:
     time_to_calculate_simulation: int = 30
     ball: mi.Ball = mi.Ball(
         "ball_id",
@@ -48,10 +47,9 @@ def _create_step(id: int = 42) -> mi.Step:
     # )
 
     step = mi.Step(
-        id, time, time_to_calculate_simulation, ball, teams
+        time, time_to_calculate_simulation, ball, teams
     )  # , collision_matrix)
 
-    assert step.id == id
     assert step.time == time
     assert step.time_to_calculate_simulation == time_to_calculate_simulation
     assert step.ball == ball
@@ -62,7 +60,7 @@ def _create_step(id: int = 42) -> mi.Step:
 
 
 def test_create_step():
-    assert _create_step() is not None
+    assert _create_step(0) is not None
 
 
 def test_convert_steps_to_dataframe():

@@ -45,6 +45,8 @@ class StaticMatchInfo(DataClassJsonMixin):
     :type ball: StaticBall
     :param teams: Team data
     :type teams: StaticTeams
+    :param kick_off_team: Id of the team that kicks off
+    :type kick_off_team: str
     :param version: Version of the match_info package
     :type version: str
     """
@@ -56,5 +58,6 @@ class StaticMatchInfo(DataClassJsonMixin):
     field: Field
     ball: StaticBall
     teams: StaticTeams
+    kick_off_team: str
 
     version: str = "0.0.1"

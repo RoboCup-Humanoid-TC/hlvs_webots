@@ -12,8 +12,6 @@ from .team import Teams
 class Step(DataClassJsonMixin):
     """Holds data about a step.
 
-    :param id: Step id
-    :type id: int
     :param time: Time of step in milliseconds
     :type time: int
     :param time_to_calculate_simulation: Time to calculate simulation in milliseconds, defaults to None
@@ -26,7 +24,6 @@ class Step(DataClassJsonMixin):
     :type collision_matrix: Optional[ForcefulContactMatrix], optional
     """
 
-    id: int
     time: int
 
     time_to_calculate_simulation: Optional[int] = None

@@ -6,7 +6,7 @@ from typing import Optional
 
 import pandas as pd
 from controller import Supervisor
-from data_collection.match_info import Match
+from data_collection import match_info as mi
 from ..logger import Logger
 
 
@@ -16,7 +16,7 @@ class DataCollector:
         save_dir: os.PathLike,
         autosave_interval: int,
         supervisor: Supervisor,
-        match: Match,
+        match: mi.Match,
         logger: Optional[Logger] = None,
     ) -> None:
         """Initialize DataCollector.
@@ -27,14 +27,14 @@ class DataCollector:
         :param supervisor: Webots supervisor controller to receive match data from
         :type supervisor: Supervisor
         :param match: Match data
-        :type match: Match
+        :type match: mi.Match
         :param logger: Logger, defaults to None
         :type logger: Optional[Logger], optional
         """
         self.save_dir: os.PathLike = save_dir
-        # self.sv: Supervisor = supervisor
+        self.sv: Supervisor = supervisor
         self.logger: Optional[Logger] = logger
-        self.match: Match = match
+        self.match: mi.Match = match
 
         self._finalized = (
             False  # True, if finalized was successful, to prevent saving two times
@@ -82,14 +82,26 @@ class DataCollector:
         self._close("COMPLETE")
         self._finalized = True
 
-    def collect_step(self) -> None:
-        """Collect data for current step."""
-        pass
+    def create_new_step(self, time: int) -> None:
+        """Creates a new empty step.
+
+        :param time: Time of the step in milliseconds
+        :type time: int
+        """
+        self.match.add_step(mi.Step(time=time))
+
+    def current_step(self) -> mi.Step:
+        """Get the current step.
+
+        :return: Current step
+        :rtype: mi.Step
+        """
+        return self.match.current_step()
 
 
 def save(
     save_dir: os.PathLike,
-    match: Match,
+    match: mi.Match,
     file_name: str,
     logger: Optional[Logger] = None,
     also_as_pickle: bool = True,
@@ -99,7 +111,7 @@ def save(
     :param save_dir: Path to directory where to store match data
     :type save_dir: os.PathLike
     :param data: Match data to save
-    :type data: Match
+    :type data: mi.Match
     :param file_name: Name under which to store the match data (without file extension)
     :type file_name: str
     :param logger: Logger, defaults to None
@@ -128,7 +140,7 @@ def _autosave(
     stop_event: Event,
     autosave_interval: int,
     save_dir: os.PathLike,
-    match: Match,
+    match: mi.Match,
     logger: Optional[Logger] = None,
 ) -> None:
     """Saves match data automatically in AUTOSAVE_INTERVAL.
@@ -140,8 +152,8 @@ def _autosave(
     :type autosave_interval: int
     :param save_dir: Path to directory where to store match data
     :type save_dir: os.PathLike
-    :param data: Match data to save
-    :type data: DataCollector
+    :param match: Match data
+    :type match: mi.Match
     :param logger: Logger, defaults to None
     :type logger: Optional[Logger], optional
     """
