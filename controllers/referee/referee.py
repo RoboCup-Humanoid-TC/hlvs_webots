@@ -142,6 +142,7 @@ class Referee:
 
         if self.config.DATA_COLLECTION:
             self.data_collector: dc.DataCollector = self.init_data_collector()
+            self.collect_team_player_frame_nodes()
 
         try:
             self.main_loop()
@@ -1951,11 +1952,13 @@ class Referee:
         self.game.reset_ball_touched()
         self.logger.info(f'Ball respawned at {target_location[0]} {target_location[1]} {target_location[2]}.')
 
-    def get_player_frame_poses(self, team, number):
-        """Returns the poses of frames from a player.
+    def get_player_frame_nodes(self, team, number) -> Dict[str, Node]:
+        """Returns the nodes of frames from a player.
 
         :param team: team of the player
         :param number: number of the player
+        :return: a dictionary of nodes indexed by frame id
+        :rtype: Dict[str, Node]
         """
         robot = team.players[number]["robot"]
         frame_ids = [
@@ -1968,69 +1971,39 @@ class Referee:
             "l_camera_frame",
             "r_camera_frame",
         ]
+        nodes = {}
+        for frame_id in frame_ids:
+            node = robot.getDefFromProto(frame_id)
+            if node is None:
+                continue
+            poses[node]
+        return nodes
 
-        # (self, solid, active_tag=None):  # we list only the hands and feet
-        # solids = []
-        # tagged_solids = dict()
-        # name_field = solid.getField("name")
-        # if name_field:
-        #     name = name_field.getSFString()
-        #     tag_start = name.rfind("[")
-        #     tag_end = name.rfind("]")
-        #     if tag_start != -1 and tag_end != -1:
-        #         active_tag = name[tag_start + 1 : tag_end]
-        #     if name.endswith("[hand]") or name.endswith("[foot]"):
-        #         solids.append(solid)
-        #     if active_tag is not None:
-        #         tagged_solids[name] = active_tag
-        # children = (
-        #     solid.getProtoField("children")
-        #     if solid.isProto()
-        #     else solid.getField("children")
-        # )
-        # for i in range(children.getCount()):
-        #     child = children.getMFNode(i)
-        #     if child.getType() in [
-        #         Node.ROBOT,
-        #         Node.SOLID,
-        #         Node.GROUP,
-        #         Node.TRANSFORM,
-        #         Node.ACCELEROMETER,
-        #         Node.CAMERA,
-        #         Node.GYRO,
-        #         Node.TOUCH_SENSOR,
-        #     ]:
-        #         s, ts = self.append_solid(child, active_tag)
-        #         solids.extend(s)
-        #         tagged_solids.update(ts)
-        #         continue
-        #     if child.getType() in [
-        #         Node.HINGE_JOINT,
-        #         Node.HINGE_2_JOINT,
-        #         Node.SLIDER_JOINT,
-        #         Node.BALL_JOINT,
-        #     ]:
-        #         endPoint = (
-        #             child.getProtoField("endPoint")
-        #             if child.isProto()
-        #             else child.getField("endPoint")
-        #         )
-        #         solid = endPoint.getSFNode()
-        #         if (
-        #             solid.getType() == Node.NO_NODE
-        #             or solid.getType() == Node.SOLID_REFERENCE
-        #         ):
-        #             continue
-        #         s, ts = self.append_solid(
-        #             solid, None
-        #         )  # active tag is reset after a joint
-        #         solids.extend(s)
-        #         tagged_solids.update(ts)
-        # return solids, tagged_solids
+    def collect_team_player_frame_nodes(self):
+        """Collects the nodes of the team player's frames."""
+        self.team_player_frame_fields = {}
+        for team in self.teams:
+            self.team_player_frame_nodes[team.color] = {}
+            for number in range(len(team.players)):
+                self.team_player_frame_fields[team.color][
+                    number
+                ] = self.get_player_frame_fields(team, number)
 
-    def collect_team_player_data(self):
-        """Collects data about the players of the teams."""
-        pass
+    def get_team_player_poses(self) -> Dict[str, Dict[int, Dict[str, List[float]]]]:
+        """Returns the pose of the team players.
+
+        :return: Dictionary of poses (List of 16 floats to be interpreted as 4x4 matrix),
+            indexed by team color, player number and frame id
+        :rtype: Dict[str, Dict[int, Dict[str, List[float]]]]
+        """
+        poses = {}
+        for team, players in self.team_player_frame_nodes:
+            poses[team] = {}
+            for number, frames in players:
+                poses[team][number] = {}
+                for frame_id, node in frames:
+                    poses[team][number][frame_id] = node.getPose()
+        return poses
 
     def setup(self):
         # check game type
