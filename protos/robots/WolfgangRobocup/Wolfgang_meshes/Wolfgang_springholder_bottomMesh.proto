@@ -4,6 +4,8 @@
 # tags: hidden
 # Extracted from: wolfgang.urdf
 
+EXTERNPROTO "../Wolfgang_textures/WolfgangPlastic.proto"
+
 PROTO Wolfgang_springholder_bottomMesh [
 ]
 {
