@@ -79,12 +79,6 @@ class Player(MatchObject, DataClassJsonMixin):
 
     :param id: Unique id of the player object
     :type id: str
-    :param state: Current state of the player
-    :type state: State
-    :param role: Current role of the player
-    :type role: Role
-    :param action: Current action of the player
-    :type action: Action
     :param base_link: Base link frame of the player
     :type base_link: Frame
     :param l_sole: Left sole frame of the player
@@ -101,11 +95,13 @@ class Player(MatchObject, DataClassJsonMixin):
     :type l_camera: Optional[Frame]
     :param r_camera: Right camera frame of the player
     :type r_camera: Optional[Frame]
+    :param state: Current state of the player, defaults to State.UNKNOWN_STATE
+    :type state: State, optional
+    :param role: Current role of the player, defaults to Role.ROLE_UNDEFINED
+    :type role: Role, optional
+    :param action: Current action of the player, defaults to Action.ACTION_UNDEFINED
+    :type action: Action, optional
     """
-
-    state: State
-    role: Role
-    action: Action
 
     base_link: Frame
     l_sole: Frame
@@ -116,6 +112,10 @@ class Player(MatchObject, DataClassJsonMixin):
     camera_frame: Optional[Frame] = None
     l_camera: Optional[Frame] = None
     r_camera: Optional[Frame] = None
+
+    state: State = State.UNKNOWN_STATE
+    role: Role = Role.ROLE_UNDEFINED
+    action: Action = Action.ACTION_UNDEFINED
 
     def get_soles(self) -> Tuple[Frame, Frame]:
         """Returns the left and right sole frames of the player.

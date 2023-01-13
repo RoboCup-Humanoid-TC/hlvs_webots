@@ -1981,13 +1981,13 @@ class Referee:
 
     def collect_team_player_frame_nodes(self):
         """Collects the nodes of the team player's frames."""
-        self.team_player_frame_fields = {}
-        for team in self.teams:
-            self.team_player_frame_nodes[team.color] = {}
+        self.team_player_frame_nodes = {}
+        for color, team in {"blue": self.blue_team, "red": self.red_team}.items():
+            self.team_player_frame_nodes[color] = {}
             for number in range(len(team.players)):
-                self.team_player_frame_fields[team.color][
+                self.team_player_frame_nodes[color][
                     number
-                ] = self.get_player_frame_fields(team, number)
+                ] = self.get_player_frame_nodes(team, number)
 
     def get_team_player_poses(self) -> Dict[str, Dict[int, Dict[str, List[float]]]]:
         """Returns the pose of the team players.
@@ -1997,13 +1997,75 @@ class Referee:
         :rtype: Dict[str, Dict[int, Dict[str, List[float]]]]
         """
         poses = {}
-        for team, players in self.team_player_frame_nodes:
+        for team, players in self.team_player_frame_nodes.items():
             poses[team] = {}
-            for number, frames in players:
+            for number, nodes in players.items():
                 poses[team][number] = {}
-                for frame_id, node in frames:
+                for frame_id, node in nodes.items():
                     poses[team][number][frame_id] = node.getPose()
         return poses
+
+    def data_collection_set_player_poses(self):
+        """Sets the player poses in the data collection."""
+        poses = self.get_team_player_poses()
+
+        def create_player(number, poses):
+            """Creates a player for the data collection.
+
+            :param number: number of the player
+            :type number: int
+            :param poses: poses of the player
+            :type poses: Dict[str, List[float]]
+            :return: the player
+            :rtype: Player
+            """
+            try:
+                camera_frame = mi.pose_from_affine(frames["camera_frame"])
+            except KeyError:
+                camera_frame = None
+            try:
+                l_camera_frame = mi.pose_from_affine(frames["l_camera_frame"])
+            except KeyError:
+                l_camera_frame = None
+            try:
+                r_camera_frame = mi.pose_from_affine(frames["r_camera_frame"])
+            except KeyError:
+                r_camera_frame = None
+
+            return mi.Player(
+                id=number,
+                base_link=mi.pose_from_affine(frames["base_link"]),
+                l_sole=mi.pose_from_affine(frames["l_sole"]),
+                r_sole=mi.pose_from_affine(frames["r_sole"]),
+                l_gripper=mi.pose_from_affine(frames["l_gripper"]),
+                r_gripper=mi.pose_from_affine(frames["r_gripper"]),
+                camera_frame=camera_frame,
+                l_camera_frame=l_camera_frame,
+                r_camera_frame=r_camera_frame,
+            )
+
+        # Team1 is always blue
+        blue_players = poses["blue"]
+        team1 = mi.Team(
+            id=self.dc.match.get_static_match_info().teams.blue().id,
+            player1=create_player(1, blue_players[1]),
+            player2=create_player(2, blue_players[2]),
+            player3=create_player(3, blue_players[3]),
+            player4=create_player(4, blue_players[4]),
+        )
+
+        # Team2 is always red
+        red_players = poses["red"]
+        team2 = mi.Team(
+            id=self.dc.match.get_static_match_info().teams.red().id,
+            player1=create_player(1, red_players[1]),
+            player2=create_player(2, red_players[2]),
+            player3=create_player(3, red_players[3]),
+            player4=create_player(4, red_players[4]),
+        )
+
+        teams = mi.Teams(team1=team1, team2=team2)
+        self.dc.current_step().teams = teams
 
     def setup(self):
         # check game type
@@ -2221,10 +2283,16 @@ class Referee:
             send_play_state_after_penalties = False
             previous_position = copy.deepcopy(self.game.ball_position)
             self.game.ball_position = self.game.ball_translation.getSFVec3f()
-            self.data_collector.current_step.frame = mi.Frame(
-                "ball_frame",
-                mi.Pose(mi.Position(*self.game.ball_position), mi.Rotation(0, 0, 0, 1)),
-            )
+            self.data_collector.current_step.ball = mi.Ball(
+                "ball",
+                mi.Frame(
+                    "ball_frame",
+                    mi.Pose(
+                        mi.Position(*self.game.ball_position), mi.Rotation(0, 0, 0, 1)
+                    ),
+                ),
+            )  # TODO: use ball node and get pose from it
+            self.data_collection_set_player_poses()
             if self.game.ball_position != previous_position:
                 self.game.ball_last_move = self.sim_time.get_ms()
             self.update_contacts()  # check for collisions with the ground and ball

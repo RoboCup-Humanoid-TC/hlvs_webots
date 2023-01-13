@@ -70,3 +70,20 @@ class Pose(DataClassJsonMixin):
 
     position: Position
     rotation: Rotation
+
+
+def pose_from_affine(affine: np.ndarray) -> Pose:
+    """Convert a 4x4 or 16(x1) affine matrix to a Pose.
+
+    :param affine: Affine matrix
+    :type affine: np.ndarray
+    :return: Pose
+    :rtype: Pose
+    """
+    # Reshape 16x1 to 4x4
+    if affine.shape == (16,):
+        affine = affine.reshape(4, 4)
+
+    position = Position(affine[0, 3], affine[1, 3], affine[2, 3])
+    rotation = Rotation(*transforms3d.quaternions.mat2quat(affine[:3, :3]))
+    return Pose(position, rotation)

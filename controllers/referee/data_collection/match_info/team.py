@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from enum import Enum, unique
+from enum import IntEnum, unique
 from typing import Optional, Tuple
 
 from dataclasses_json import DataClassJsonMixin
@@ -8,11 +8,19 @@ from .player import Player
 
 
 @unique
-class TeamColor(str, Enum):  # Inherit from str to make it JSON serializable
+class TeamColor(IntEnum):
     """Enum for team colors."""
 
-    RED = "RED"
-    BLUE = "BLUE"
+    BLUE = 0
+    RED = 1
+    YELLOW = 2
+    BLACK = 3
+    WHITE = 4
+    GREEN = 5
+    ORANGE = 6
+    PURPLE = 7
+    BROWN = 8
+    GRAY = 9
 
 
 @dataclass(frozen=True)
