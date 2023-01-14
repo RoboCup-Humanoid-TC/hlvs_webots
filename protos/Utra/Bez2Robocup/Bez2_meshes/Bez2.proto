@@ -1,8 +1,12 @@
-#VRML_SIM R2021b utf8
+#VRML_SIM R2022b utf8
 # license: Apache License 2.0
 # license url: http://www.apache.org/licenses/LICENSE-2.0
 # This is a proto file for Webots for the Bez2
 # Extracted from: /home/manx52/catkin_ws/src/soccerbot/bez2_description/urdf/bez2_simple.urdf
+
+EXTERNPROTO "HingeJointWithBacklash.proto"
+EXTERNPROTO "JerseyFront.proto"
+EXTERNPROTO "JerseyBack.proto"
 
 PROTO Bez2 [
   field  SFVec3f     translation     0 0 0
@@ -99,7 +103,7 @@ PROTO Bez2 [
               metalness 0
             }
             geometry DEF base_link Mesh {
-              url "Bez2_meshes/base_link.stl"
+              url "base_link.stl"
             }
           }
 
@@ -137,7 +141,7 @@ HingeJointWithBacklash {
                     metalness 0
                   }
                   geometry DEF biceps_v3_1 Mesh {
-                    url "Bez2_meshes/biceps_v3_1.stl"
+                    url "biceps_v3_1.stl"
                   }
                 }
               ]
@@ -176,7 +180,7 @@ HingeJointWithBacklash {
                           metalness 0
                         }
                         geometry DEF Arm_Assembly-bez3_v12_2 Mesh {
-                          url "Bez2_meshes/Arm_Assembly-bez3_v12_2.stl"
+                          url "Arm_Assembly-bez3_v12_2.stl"
                         }
                       }
                     ]
@@ -287,7 +291,7 @@ HingeJointWithBacklash {
                 Shape {
                   appearance USE plastic_glossy_black
                   geometry DEF biceps_v3_2 Mesh {
-                    url "Bez2_meshes/biceps_v3_2.stl"
+                    url "biceps_v3_2.stl"
                   }
                 }
               ]
@@ -322,7 +326,7 @@ HingeJointWithBacklash {
                       Shape {
                         appearance USE abs_white
                         geometry DEF Arm_Assembly-bez3_v12_1 Mesh {
-                          url "Bez2_meshes/Arm_Assembly-bez3_v12_1.stl"
+                          url "Arm_Assembly-bez3_v12_1.stl"
                         }
                       }
                     ]
@@ -433,7 +437,7 @@ HingeJointWithBacklash {
                 Shape {
                   appearance USE abs_white
                   geometry DEF Hip_Printable_v2_v10_2 Mesh {
-                    url "Bez2_meshes/Hip_Printable_v2_v10_2.stl"
+                    url "Hip_Printable_v2_v10_2.stl"
                   }
                 }
               ]
@@ -471,7 +475,7 @@ HingeJointWithBacklash {
                           metalness 0
                         }
                         geometry DEF hip_motors_v4_2 Mesh {
-                          url "Bez2_meshes/hip_motors_v4_2.stl"
+                          url "hip_motors_v4_2.stl"
                         }
                       }
                     ]
@@ -506,7 +510,7 @@ HingeJointWithBacklash {
                             Shape {
                               appearance USE abs_white
                               geometry DEF Upper_left_leg_support__bottom__v8_1 Mesh {
-                                url "Bez2_meshes/Upper_left_leg_support__bottom__v8_1.stl"
+                                url "Upper_left_leg_support__bottom__v8_1.stl"
                               }
                             }
                           ]
@@ -541,7 +545,7 @@ HingeJointWithBacklash {
                                   Shape {
                                     appearance USE abs_white
                                     geometry DEF lower_leg_v4_2 Mesh {
-                                      url "Bez2_meshes/lower_leg_v4_2.stl"
+                                      url "lower_leg_v4_2.stl"
                                     }
                                   }
                                 ]
@@ -580,7 +584,7 @@ HingeJointWithBacklash {
                                             metalness 0
                                           }
                                           geometry DEF ankle_motors_v4_1 Mesh {
-                                            url "Bez2_meshes/ankle_motors_v4_1.stl"
+                                            url "ankle_motors_v4_1.stl"
                                           }
                                         }
                                       ]
@@ -615,7 +619,7 @@ HingeJointWithBacklash {
                                               Shape {
                                                 appearance USE abs_white
                                                 geometry DEF New_right_foot_upperhalf_v3_1 Mesh {
-                                                  url "Bez2_meshes/New_right_foot_upperhalf_v3_1.stl"
+                                                  url "New_right_foot_upperhalf_v3_1.stl"
                                                 }
                                               }
                                             ]
@@ -921,7 +925,7 @@ HingeJointWithBacklash {
                 Shape {
                   appearance USE abs_white
                   geometry DEF Hip_Printable_v2_v10_1 Mesh {
-                    url "Bez2_meshes/Hip_Printable_v2_v10_1.stl"
+                    url "Hip_Printable_v2_v10_1.stl"
                   }
                 }
               ]
@@ -956,7 +960,7 @@ HingeJointWithBacklash {
                       Shape {
                         appearance USE silver_default
                         geometry DEF hip_motors_v4_1 Mesh {
-                          url "Bez2_meshes/hip_motors_v4_1.stl"
+                          url "hip_motors_v4_1.stl"
                         }
                       }
                     ]
@@ -991,7 +995,7 @@ HingeJointWithBacklash {
                             Shape {
                               appearance USE abs_white
                               geometry DEF Upper_left_leg_support__bottom__v8_2 Mesh {
-                                url "Bez2_meshes/Upper_left_leg_support__bottom__v8_2.stl"
+                                url "Upper_left_leg_support__bottom__v8_2.stl"
                               }
                             }
                           ]
@@ -1026,7 +1030,7 @@ HingeJointWithBacklash {
                                   Shape {
                                     appearance USE abs_white
                                     geometry DEF lower_leg_v4_1 Mesh {
-                                      url "Bez2_meshes/lower_leg_v4_1.stl"
+                                      url "lower_leg_v4_1.stl"
                                     }
                                   }
                                 ]
@@ -1061,7 +1065,7 @@ HingeJointWithBacklash {
                                         Shape {
                                           appearance USE steel_satin
                                           geometry DEF ankle_motors_v4_2 Mesh {
-                                            url "Bez2_meshes/ankle_motors_v4_2.stl"
+                                            url "ankle_motors_v4_2.stl"
                                           }
                                         }
                                       ]
@@ -1095,7 +1099,7 @@ HingeJointWithBacklash {
                                               Shape {
                                                 appearance USE abs_white
                                                 geometry DEF New_left_foot_upperhalf_v5_1 Mesh {
-                                                  url "Bez2_meshes/New_left_foot_upperhalf_v5_1.stl"
+                                                  url "New_left_foot_upperhalf_v5_1.stl"
                                                 }
                                               }
                                             ]
@@ -1401,7 +1405,7 @@ HingeJointWithBacklash {
                 Shape {
                   appearance USE abs_white
                   geometry DEF custom_servo_support__middle_neck__v9_1 Mesh {
-                    url "Bez2_meshes/custom_servo_support__middle_neck__v9_1.stl"
+                    url "custom_servo_support__middle_neck__v9_1.stl"
                   }
                 }
               ]
@@ -1436,7 +1440,7 @@ HingeJointWithBacklash {
                       Shape {
                         appearance USE plastic_glossy_black
                         geometry DEF head_v4_1 Mesh {
-                          url "Bez2_meshes/head_v4_1.stl"
+                          url "head_v4_1.stl"
                         }
                       }
                     ]
