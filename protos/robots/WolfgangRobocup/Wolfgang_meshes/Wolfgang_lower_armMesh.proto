@@ -4,11 +4,13 @@
 # tags: hidden
 # Extracted from: wolfgang.urdf
 
+EXTERNPROTO "../Wolfgang_textures/WolfgangCarbonFiberAppearance.proto"
+
 PROTO Wolfgang_lower_armMesh [
 ]
 {
   Shape {
-    appearance CarbonFiberAppearance {}
+    appearance WolfgangCarbonFiberAppearance {}
     geometry DEF lower_arm IndexedFaceSet {
       coord Coordinate {
         point [

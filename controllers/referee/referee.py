@@ -266,7 +266,7 @@ class Referee:
             hosts = self.game.red.hosts if color == 'red' else self.game.blue.hosts
             for h in hosts:
                 string += f', "{h}"'
-            string += '] }}'
+            string += '] }'
             children.importMFNodeFromString(-1, string)
             player['robot'] = self.supervisor.getFromDef(defname)
             player['position'] = player['robot'].getCenterOfMass()
