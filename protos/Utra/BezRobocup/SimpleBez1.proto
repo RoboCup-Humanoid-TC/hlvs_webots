@@ -1519,7 +1519,7 @@ PROTO SimpleBez1 [
                       translation 0.015000 0.001450 0.047400
                       rotation 0.0 0.0 -1.0 1.5708
                       children [
-                        Camera {
+                        DEF CAMERA Camera {
                             rotation 0.0 0.0 1.0 1.5708
                             name "camera"
                             fieldOfView 1.39626

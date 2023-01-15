@@ -8,11 +8,11 @@ orthographicViewHeight: 1
 textFiles: -1
 consoles: Console:All:All
 renderingDevicePerspectives: blue player 1:Camera;1;1;0;0
-renderingDevicePerspectives: blue player 1:camera;0;1;0;0
+renderingDevicePerspectives: blue player 1:camera;1;1;0;0
 renderingDevicePerspectives: blue player 2:Camera;1;1;0;0
 renderingDevicePerspectives: blue player 3:Camera;1;1;0;0
 renderingDevicePerspectives: red player 1:Camera;1;1;0;0
-renderingDevicePerspectives: red player 1:camera;1;0.86875;0;0
+renderingDevicePerspectives: red player 1:camera;1;1;0;0
 renderingDevicePerspectives: red player 2:Camera;1;1;0;0
 renderingDevicePerspectives: red player 3:Camera;1;1;0;0
 renderingDevicePerspectives: red player 4:Camera;1;1;0;0
