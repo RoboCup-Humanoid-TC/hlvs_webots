@@ -1,0 +1,2345 @@
+#VRML_SIM R2022a utf8
+# license: Apache License 2.0
+# license url: http://www.apache.org/licenses/LICENSE-2.0
+# This is a proto file for Webots for the Bez3
+# Extracted from: /home/nam/catkin_ws/src/soccerbot/bez3_description/urdf/bez3_simple.urdf
+
+PROTO Bez3 [
+  field  SFVec3f     translation     0 0 0
+  field  SFRotation  rotation        0 0 1 0
+  field  SFString    name            "Bez3"  # Is `Robot.name`.
+  field  SFString    controller      "player"  # Is `Robot.controller`.
+  field  MFString    controllerArgs  []      # Is `Robot.controllerArgs`.
+  field  SFString    customData      ""      # Is `Robot.customData`.
+  field  SFBool      supervisor      FALSE   # Is `Robot.supervisor`.
+  field  SFBool      synchronization TRUE    # Is `Robot.synchronization`.
+  field  SFBool      selfCollision   TRUE   # Is `Robot.selfCollision`.
+]
+{
+  Robot {
+    translation IS translation
+    rotation IS rotation
+    controller IS controller
+    controllerArgs IS controllerArgs
+    customData IS customData
+    supervisor IS supervisor
+    synchronization IS synchronization
+    selfCollision IS selfCollision
+    children [
+      Shape {
+        appearance DEF steel_satin PBRAppearance {
+          baseColor 0.500000 0.500000 0.500000
+          transparency 0.000000
+          roughness 1.000000
+          metalness 0
+          emissiveColor 0.000000 0.000000 0.000000
+        }
+        geometry DEF base_link Mesh {
+          url "Bez3_meshes/base_link.stl"
+        }
+      }
+      Solid {
+        translation 0.000000 0.005000 0.000000
+        rotation 0.000000 0.000000 1.000000 0.000000
+        children [
+          Transform {
+            translation -0.000000 -0.005000 -0.000000
+            rotation 0.000000 0.000000 1.000000 0.000000
+            children [
+              Shape {
+                appearance DEF polymide_kapton PBRAppearance {
+                  baseColor 0.500000 0.500000 0.500000
+                  transparency 0.000000
+                  roughness 1.000000
+                  metalness 0
+                  emissiveColor 0.000000 0.000000 0.000000
+                }
+                geometry DEF torso_1 Mesh {
+                  url "Bez3_meshes/torso_1.stl"
+                }
+              }
+            ]
+          }
+          Solid {
+            translation -0.022500 0.049500 -0.136990
+            rotation 0.000000 0.000000 1.000000 0.000000
+            children [
+              Transform {
+                translation 0.022500 -0.054500 0.136990
+                rotation 0.000000 0.000000 1.000000 0.000000
+                children [
+                  Shape {
+                    appearance DEF plastic_matte_black PBRAppearance {
+                      baseColor 0.500000 0.500000 0.500000
+                      transparency 0.000000
+                      roughness 1.000000
+                      metalness 0
+                      emissiveColor 0.000000 0.000000 0.000000
+                    }
+                    geometry DEF JX_servo_v12_1 Mesh {
+                      url "Bez3_meshes/JX_servo_v12_1.stl"
+                    }
+                  }
+                ]
+              }
+              HingeJoint {
+                jointParameters HingeJointParameters {
+                  axis 0.000000 0.000000 -1.000000
+                  anchor 0.018000 0.000000 -0.026400
+                  dampingConstant 0.0
+                  staticFriction 0.0
+                }
+                device [
+                  RotationalMotor {
+                    name "left_leg_motor_0"
+                    maxTorque 10000
+                  }
+                  PositionSensor {
+                    name "left_leg_motor_0_sensor"
+                  }
+                ]
+                endPoint Solid {
+                  translation 0.018000 0.000000 -0.026400
+                  rotation 0.000000 0.000000 1.000000 0.000000
+                  children [
+                    Transform {
+                      translation 0.004500 -0.054500 0.163390
+                      rotation 0.000000 0.000000 1.000000 0.000000
+                      children [
+                        Shape {
+                          appearance DEF plastic_glossy_black PBRAppearance {
+                            baseColor 0.500000 0.500000 0.500000
+                            transparency 0.000000
+                            roughness 1.000000
+                            metalness 0
+                            emissiveColor 0.000000 0.000000 0.000000
+                          }
+                          geometry DEF left_hip_side_1 Mesh {
+                            url "Bez3_meshes/left_hip_side_1.stl"
+                          }
+                        }
+                      ]
+                    }
+                    HingeJoint {
+                      jointParameters HingeJointParameters {
+                        axis 1.000000 -0.000000 -0.000000
+                        anchor -0.030000 0.000000 -0.035336
+                        dampingConstant 0.0
+                        staticFriction 0.0
+                      }
+                      device [
+                        RotationalMotor {
+                          name "left_leg_motor_1 [hip]"
+                          maxTorque 10000
+                        }
+                        PositionSensor {
+                          name "left_leg_motor_1_sensor"
+                        }
+                      ]
+                      endPoint Solid {
+                        translation -0.030000 0.000000 -0.035336
+                        rotation 0.000000 0.000000 1.000000 0.000000
+                        children [
+                          Transform {
+                            translation 0.034500 -0.054500 0.198726
+                            rotation 0.000000 0.000000 1.000000 0.000000
+                            children [
+                              Shape {
+                                appearance USE plastic_matte_black
+                                geometry DEF JX_servo_v12_8 Mesh {
+                                  url "Bez3_meshes/JX_servo_v12_8.stl"
+                                }
+                              }
+                            ]
+                          }
+                          Solid {
+                            translation -0.026400 -0.008500 0.018900
+                            rotation 0.000000 0.000000 1.000000 0.000000
+                            children [
+                              Transform {
+                                translation 0.060900 -0.046000 0.179826
+                                rotation 0.000000 0.000000 1.000000 0.000000
+                                children [
+                                  Shape {
+                                    appearance USE plastic_glossy_black
+                                    geometry DEF left_hip_front_1 Mesh {
+                                      url "Bez3_meshes/left_hip_front_1.stl"
+                                    }
+                                  }
+                                ]
+                              }
+                              Solid {
+                                translation 0.064400 0.023900 -0.073800
+                                rotation 0.000000 0.000000 1.000000 0.000000
+                                children [
+                                  Transform {
+                                    translation -0.003500 -0.069900 0.253626
+                                    rotation 0.000000 0.000000 1.000000 0.000000
+                                    children [
+                                      Shape {
+                                        appearance USE plastic_matte_black
+                                        geometry DEF JX_servo_v12_9 Mesh {
+                                          url "Bez3_meshes/JX_servo_v12_9.stl"
+                                        }
+                                      }
+                                    ]
+                                  }
+                                  HingeJoint {
+                                    jointParameters HingeJointParameters {
+                                      axis 0.000000 -1.000000 0.000000
+                                      anchor -0.008500 0.022500 0.054900
+                                      dampingConstant 0.0
+                                      staticFriction 0.0
+                                    }
+                                    device [
+                                      RotationalMotor {
+                                        name "left_leg_motor_2"
+                                        maxTorque 10000
+                                      }
+                                      PositionSensor {
+                                        name "left_leg_motor_2_sensor"
+                                      }
+                                    ]
+                                    endPoint Solid {
+                                      translation -0.008500 0.022500 0.054900
+                                      rotation 0.000000 0.000000 1.000000 0.000000
+                                      children [
+                                        Transform {
+                                          translation 0.005000 -0.092400 0.198726
+                                          rotation 0.000000 0.000000 1.000000 0.000000
+                                          children [
+                                            Shape {
+                                              appearance USE plastic_glossy_black
+                                              geometry DEF left_thigh_1 Mesh {
+                                                url "Bez3_meshes/left_thigh_1.stl"
+                                              }
+                                            }
+                                          ]
+                                        }
+                                        HingeJoint {
+                                          jointParameters HingeJointParameters {
+                                            axis 0.000000 -1.000000 0.000000
+                                            anchor 0.000000 0.000000 -0.124000
+                                            dampingConstant 0.0
+                                            staticFriction 0.0
+                                          }
+                                          device [
+                                            RotationalMotor {
+                                              name "left_leg_motor_3"
+                                              maxTorque 10000
+                                            }
+                                            PositionSensor {
+                                              name "left_leg_motor_3_sensor"
+                                            }
+                                          ]
+                                          endPoint Solid {
+                                            translation 0.000000 0.000000 -0.124000
+                                            rotation 0.000000 0.000000 1.000000 0.000000
+                                            children [
+                                              Transform {
+                                                translation 0.005000 -0.092400 0.322726
+                                                rotation 0.000000 0.000000 1.000000 0.000000
+                                                children [
+                                                  Shape {
+                                                    appearance USE plastic_matte_black
+                                                    geometry DEF JX_servo_v12_11 Mesh {
+                                                      url "Bez3_meshes/JX_servo_v12_11.stl"
+                                                    }
+                                                  }
+                                                ]
+                                              }
+                                              Solid {
+                                                translation 0.008500 -0.026400 -0.054900
+                                                rotation 0.000000 0.000000 1.000000 0.000000
+                                                children [
+                                                  Transform {
+                                                    translation -0.003500 -0.066000 0.377626
+                                                    rotation 0.000000 0.000000 1.000000 0.000000
+                                                    children [
+                                                      Shape {
+                                                        appearance USE plastic_glossy_black
+                                                        geometry DEF left_calve_1 Mesh {
+                                                          url "Bez3_meshes/left_calve_1.stl"
+                                                        }
+                                                      }
+                                                    ]
+                                                  }
+                                                  HingeJoint {
+                                                    jointParameters HingeJointParameters {
+                                                      axis 0.000000 -1.000000 0.000000
+                                                      anchor -0.008550 0.028000 -0.085005
+                                                      dampingConstant 0.0
+                                                      staticFriction 0.0
+                                                    }
+                                                    device [
+                                                      RotationalMotor {
+                                                        name "left_leg_motor_4"
+                                                        maxTorque 10000
+                                                      }
+                                                      PositionSensor {
+                                                        name "left_leg_motor_4_sensor"
+                                                      }
+                                                    ]
+                                                    endPoint Solid {
+                                                      translation -0.008550 0.028000 -0.085005
+                                                      rotation 0.000000 0.000000 1.000000 0.000000
+                                                      children [
+                                                        Transform {
+                                                          translation 0.005050 -0.094000 0.462631
+                                                          rotation 0.000000 0.000000 1.000000 0.000000
+                                                          children [
+                                                            Shape {
+                                                              appearance USE plastic_matte_black
+                                                              geometry DEF JX_servo_v12_12 Mesh {
+                                                                url "Bez3_meshes/JX_servo_v12_12.stl"
+                                                              }
+                                                            }
+                                                          ]
+                                                        }
+                                                        Solid {
+                                                          translation 0.008500 -0.022500 0.054900
+                                                          rotation 0.000000 0.000000 1.000000 0.000000
+                                                          children [
+                                                            Transform {
+                                                              translation -0.003450 -0.071500 0.407731
+                                                              rotation 0.000000 0.000000 1.000000 0.000000
+                                                              children [
+                                                                Shape {
+                                                                  appearance USE plastic_glossy_black
+                                                                  geometry DEF left_hip_front_2 Mesh {
+                                                                    url "Bez3_meshes/left_hip_front_2.stl"
+                                                                  }
+                                                                }
+                                                              ]
+                                                            }
+                                                            Solid {
+                                                              translation -0.064400 -0.025000 0.000000
+                                                              rotation 0.000000 0.000000 1.000000 0.000000
+                                                              children [
+                                                                Transform {
+                                                                  translation 0.060950 -0.046500 0.407731
+                                                                  rotation 0.000000 0.000000 1.000000 0.000000
+                                                                  children [
+                                                                    Shape {
+                                                                      appearance USE plastic_matte_black
+                                                                      geometry DEF JX_servo_v12_13 Mesh {
+                                                                        url "Bez3_meshes/JX_servo_v12_13.stl"
+                                                                      }
+                                                                    }
+                                                                  ]
+                                                                }
+                                                                HingeJoint {
+                                                                  jointParameters HingeJointParameters {
+                                                                    axis 1.000000 -0.000000 -0.000000
+                                                                    anchor 0.026400 0.008500 -0.054900
+                                                                    dampingConstant 0.0
+                                                                    staticFriction 0.0
+                                                                  }
+                                                                  device [
+                                                                    RotationalMotor {
+                                                                      name "left_leg_motor_5"
+                                                                      maxTorque 10000
+                                                                    }
+                                                                    PositionSensor {
+                                                                      name "left_leg_motor_5_sensor"
+                                                                    }
+                                                                  ]
+                                                                  endPoint Solid {
+                                                                    translation 0.026400 0.008500 -0.054900
+                                                                    rotation 0.000000 0.000000 1.000000 0.000000
+                                                                    children [
+                                                                      Transform {
+                                                                        translation 0.034550 -0.055000 0.462631
+                                                                        rotation 0.000000 0.000000 1.000000 0.000000
+                                                                        children [
+                                                                          Shape {
+                                                                            appearance USE plastic_glossy_black
+                                                                            geometry DEF left_foot_1 Mesh {
+                                                                              url "Bez3_meshes/left_foot_1.stl"
+                                                                            }
+                                                                          }
+                                                                        ]
+                                                                      }
+                                                                    ]
+                                                                    name "left_foot_1 [foot]"
+                                                                    boundingObject Transform {
+                                                                      translation 0.027000 0.009000 -0.008836
+                                                                      rotation -0.707107 0.000000 0.707107 3.141593
+                                                                      children [
+                                                                        Box {
+                                                                           size 0.065000 0.090000 0.170000
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                    physics Physics {
+                                                                      density -1
+                                                                      mass 0.037043
+                                                                      centerOfMass [ 0.036782 -0.001413 -0.021045 ]
+                                                                      inertiaMatrix [
+                                                                        1.900000e-05 4.800000e-05 4.400000e-05
+                                                                        -1.000000e-06 4.000000e-06 -1.000000e-06
+                                                                      ]
+                                                                    }
+                                                                  }
+                                                                }
+                                                              ]
+                                                              name "JX_servo_v12_13"
+                                                              boundingObject Transform {
+                                                                translation -0.009883 0.008447 -0.036700
+                                                                rotation 0.707107 -0.707107 -0.000000 3.141593
+                                                                children [
+                                                                  Box {
+                                                                     size 0.040547 0.073207 0.082789
+                                                                  }
+                                                                ]
+                                                              }
+                                                              physics Physics {
+                                                                density -1
+                                                                mass 0.198535
+                                                                centerOfMass [ -0.012510 0.008500 -0.037174 ]
+                                                                inertiaMatrix [
+                                                                  9.000000e-05 1.370000e-04 7.700000e-05
+                                                                  0.000000e+00 6.000000e-06 0.000000e+00
+                                                                ]
+                                                              }
+                                                            }
+                                                          ]
+                                                          name "left_hip_front_2"
+                                                          boundingObject Transform {
+                                                            translation -0.029225 -0.016501 -0.033449
+                                                            rotation 0.003835 -0.003838 -0.999985 1.571583
+                                                            children [
+                                                              Box {
+                                                                 size 0.041059 0.079152 0.088313
+                                                              }
+                                                            ]
+                                                          }
+                                                          physics Physics {
+                                                            density -1
+                                                            mass 0.025976
+                                                            centerOfMass [ -0.040641 -0.017336 -0.008852 ]
+                                                            inertiaMatrix [
+                                                              2.200000e-05 3.100000e-05 2.000000e-05
+                                                              -0.000000e+00 -8.000000e-06 -0.000000e+00
+                                                            ]
+                                                          }
+                                                        }
+                                                      ]
+                                                      name "JX_servo_v12_12"
+                                                      boundingObject Transform {
+                                                        translation 0.000180 -0.035962 0.018128
+                                                        rotation 0.999998 0.001958 -0.000011 3.130451
+                                                        children [
+                                                          Box {
+                                                             size 0.040008 0.072785 0.081838
+                                                          }
+                                                        ]
+                                                      }
+                                                      physics Physics {
+                                                        density -1
+                                                        mass 0.198535
+                                                        centerOfMass [ 0.000000 -0.038910 0.017726 ]
+                                                        inertiaMatrix [
+                                                          1.370000e-04 9.000000e-05 7.700000e-05
+                                                          -0.000000e+00 -0.000000e+00 6.000000e-06
+                                                        ]
+                                                      }
+                                                    }
+                                                  }
+                                                ]
+                                                name "left_calve_1"
+                                                boundingObject Transform {
+                                                  translation -0.008516 -0.009238 -0.050511
+                                                  rotation 1.000000 -0.000000 -0.000000 3.141593
+                                                  children [
+                                                    Box {
+                                                       size 0.040092 0.089350 0.109048
+                                                    }
+                                                  ]
+                                                }
+                                                physics Physics {
+                                                  density -1
+                                                  mass 0.035688
+                                                  centerOfMass [ -0.008550 -0.011777 -0.035312 ]
+                                                  inertiaMatrix [
+                                                    7.300000e-05 3.900000e-05 4.300000e-05
+                                                    -0.000000e+00 0.000000e+00 -2.000000e-06
+                                                  ]
+                                                }
+                                              }
+                                            ]
+                                            name "JX_servo_v12_11"
+                                            boundingObject Transform {
+                                              translation -0.000180 -0.035962 -0.018128
+                                              rotation 0.001958 0.999983 0.005570 3.141614
+                                              children [
+                                                Box {
+                                                   size 0.040008 0.072785 0.081838
+                                                }
+                                              ]
+                                            }
+                                            physics Physics {
+                                              density -1
+                                              mass 0.198535
+                                              centerOfMass [ 0.000000 -0.038910 -0.017726 ]
+                                              inertiaMatrix [
+                                                1.370000e-04 9.000000e-05 7.700000e-05
+                                                0.000000e+00 -0.000000e+00 -6.000000e-06
+                                              ]
+                                            }
+                                          }
+                                        }
+                                      ]
+                                      name "left_thigh_1"
+                                      boundingObject Transform {
+                                        translation 0.000031 -0.037489 -0.061988
+                                        rotation -0.000000 1.000000 -0.000000 3.141568
+                                        children [
+                                          Box {
+                                             size 0.040071 0.088834 0.164005
+                                          }
+                                        ]
+                                      }
+                                      physics Physics {
+                                        density -1
+                                        mass 0.046987
+                                        centerOfMass [ 0.003552 -0.037286 -0.067385 ]
+                                        inertiaMatrix [
+                                          1.440000e-04 8.900000e-05 6.900000e-05
+                                          -0.000000e+00 3.000000e-06 0.000000e+00
+                                        ]
+                                      }
+                                    }
+                                  }
+                                ]
+                                name "JX_servo_v12_9"
+                                boundingObject Transform {
+                                  translation -0.008680 -0.013462 0.036772
+                                  rotation 0.001958 0.999983 0.005571 3.141614
+                                  children [
+                                    Box {
+                                       size 0.040008 0.072785 0.081838
+                                    }
+                                  ]
+                                }
+                                physics Physics {
+                                  density -1
+                                  mass 0.198535
+                                  centerOfMass [ -0.008500 -0.016410 0.037174 ]
+                                  inertiaMatrix [
+                                    1.370000e-04 9.000000e-05 7.700000e-05
+                                    0.000000e+00 -0.000000e+00 -6.000000e-06
+                                  ]
+                                }
+                              }
+                            ]
+                            name "left_hip_front_1"
+                            boundingObject Transform {
+                              translation 0.035200 0.008500 -0.040104
+                              rotation 0.707107 -0.707107 -0.000000 3.141593
+                              children [
+                                Box {
+                                   size 0.041000 0.078400 0.088208
+                                }
+                              ]
+                            }
+                            physics Physics {
+                              density -1
+                              mass 0.025976
+                              centerOfMass [ 0.023759 0.009336 -0.064948 ]
+                              inertiaMatrix [
+                                2.200000e-05 3.100000e-05 2.000000e-05
+                                0.000000e+00 8.000000e-06 -0.000000e+00
+                              ]
+                            }
+                          }
+                        ]
+                        name "JX_servo_v12_8"
+                        boundingObject Transform {
+                          translation -0.035962 0.000180 -0.018128
+                          rotation 0.708485 0.705715 0.003947 3.133730
+                          children [
+                            Box {
+                               size 0.040008 0.072785 0.081838
+                            }
+                          ]
+                        }
+                        physics Physics {
+                          density -1
+                          mass 0.198535
+                          centerOfMass [ -0.038910 0.000000 -0.017726 ]
+                          inertiaMatrix [
+                            9.000000e-05 1.370000e-04 7.700000e-05
+                            -0.000000e+00 -6.000000e-06 0.000000e+00
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                  name "left_hip_side_1"
+                  boundingObject Transform {
+                    translation 0.001005 0.000000 -0.029622
+                    rotation 0.577350 -0.577350 -0.577350 2.094395
+                    children [
+                      Box {
+                         size 0.040000 0.059244 0.062010
+                      }
+                    ]
+                  }
+                  physics Physics {
+                    density -1
+                    mass 0.019000
+                    centerOfMass [ -0.000660 0.000000 -0.021142 ]
+                    inertiaMatrix [
+                      9.000000e-06 1.800000e-05 1.400000e-05
+                      0.000000e+00 -0.000000e+00 0.000000e+00
+                    ]
+                  }
+                }
+              }
+            ]
+            name "JX_servo_v12_1"
+            boundingObject Transform {
+              translation -0.000200 0.000053 0.009883
+              rotation 0.577350 0.577350 0.577350 2.094395
+              children [
+                Box {
+                   size 0.040547 0.073207 0.082789
+                }
+              ]
+            }
+            physics Physics {
+              density -1
+              mass 0.198535
+              centerOfMass [ 0.000274 0.000000 0.012510 ]
+              inertiaMatrix [
+                7.700000e-05 1.370000e-04 9.000000e-05
+                0.000000e+00 6.000000e-06 0.000000e+00
+              ]
+            }
+          }
+          Solid {
+            translation -0.022500 -0.059500 -0.137000
+            rotation 0.000000 0.000000 1.000000 0.000000
+            children [
+              Transform {
+                translation 0.022500 0.054500 0.137000
+                rotation 0.000000 0.000000 1.000000 0.000000
+                children [
+                  Shape {
+                    appearance USE plastic_matte_black
+                    geometry DEF JX_servo_v12_14 Mesh {
+                      url "Bez3_meshes/JX_servo_v12_14.stl"
+                    }
+                  }
+                ]
+              }
+              HingeJoint {
+                jointParameters HingeJointParameters {
+                  axis -0.000000 0.000000 1.000000
+                  anchor 0.018000 0.000000 -0.026400
+                  dampingConstant 0.0
+                  staticFriction 0.0
+                }
+                device [
+                  RotationalMotor {
+                    name "right_leg_motor_0"
+                    maxTorque 10000
+                  }
+                  PositionSensor {
+                    name "right_leg_motor_0_sensor"
+                  }
+                ]
+                endPoint Solid {
+                  translation 0.018000 0.000000 -0.026400
+                  rotation 0.000000 0.000000 1.000000 0.000000
+                  children [
+                    Transform {
+                      translation 0.004500 0.054500 0.163400
+                      rotation 0.000000 0.000000 1.000000 0.000000
+                      children [
+                        Shape {
+                          appearance USE plastic_glossy_black
+                          geometry DEF right_hip_side_1 Mesh {
+                            url "Bez3_meshes/right_hip_side_1.stl"
+                          }
+                        }
+                      ]
+                    }
+                    HingeJoint {
+                      jointParameters HingeJointParameters {
+                        axis -1.000000 0.000000 0.000000
+                        anchor -0.030000 0.000000 -0.035336
+                        dampingConstant 0.0
+                        staticFriction 0.0
+                      }
+                      device [
+                        RotationalMotor {
+                          name "right_leg_motor_1 [hip]"
+                          maxTorque 10000
+                        }
+                        PositionSensor {
+                          name "right_leg_motor_1_sensor"
+                        }
+                      ]
+                      endPoint Solid {
+                        translation -0.030000 0.000000 -0.035336
+                        rotation 0.000000 0.000000 1.000000 0.000000
+                        children [
+                          Transform {
+                            translation 0.034500 0.054500 0.198736
+                            rotation 0.000000 0.000000 1.000000 0.000000
+                            children [
+                              Shape {
+                                appearance USE plastic_matte_black
+                                geometry DEF JX_servo_v12_15 Mesh {
+                                  url "Bez3_meshes/JX_servo_v12_15.stl"
+                                }
+                              }
+                            ]
+                          }
+                          Solid {
+                            translation -0.026400 0.008500 0.018900
+                            rotation 0.000000 0.000000 1.000000 0.000000
+                            children [
+                              Transform {
+                                translation 0.060900 0.046000 0.179836
+                                rotation 0.000000 0.000000 1.000000 0.000000
+                                children [
+                                  Shape {
+                                    appearance USE plastic_glossy_black
+                                    geometry DEF right_ankle_1 Mesh {
+                                      url "Bez3_meshes/right_ankle_1.stl"
+                                    }
+                                  }
+                                ]
+                              }
+                              Solid {
+                                translation 0.064400 -0.023900 -0.073800
+                                rotation 0.000000 0.000000 1.000000 0.000000
+                                children [
+                                  Transform {
+                                    translation -0.003500 0.069900 0.253636
+                                    rotation 0.000000 0.000000 1.000000 0.000000
+                                    children [
+                                      Shape {
+                                        appearance USE plastic_matte_black
+                                        geometry DEF JX_servo_v12_16 Mesh {
+                                          url "Bez3_meshes/JX_servo_v12_16.stl"
+                                        }
+                                      }
+                                    ]
+                                  }
+                                  HingeJoint {
+                                    jointParameters HingeJointParameters {
+                                      axis 0.000000 -1.000000 0.000000
+                                      anchor -0.008500 -0.022500 0.054900
+                                      dampingConstant 0.0
+                                      staticFriction 0.0
+                                    }
+                                    device [
+                                      RotationalMotor {
+                                        name "right_leg_motor_2"
+                                        maxTorque 10000
+                                      }
+                                      PositionSensor {
+                                        name "right_leg_motor_2_sensor"
+                                      }
+                                    ]
+                                    endPoint Solid {
+                                      translation -0.008500 -0.022500 0.054900
+                                      rotation 0.000000 0.000000 1.000000 0.000000
+                                      children [
+                                        Transform {
+                                          translation 0.005000 0.092400 0.198736
+                                          rotation 0.000000 0.000000 1.000000 0.000000
+                                          children [
+                                            Shape {
+                                              appearance USE plastic_glossy_black
+                                              geometry DEF right_thigh_1 Mesh {
+                                                url "Bez3_meshes/right_thigh_1.stl"
+                                              }
+                                            }
+                                          ]
+                                        }
+                                        HingeJoint {
+                                          jointParameters HingeJointParameters {
+                                            axis -0.000000 -1.000000 -0.000000
+                                            anchor 0.000000 0.000000 -0.124000
+                                            dampingConstant 0.0
+                                            staticFriction 0.0
+                                          }
+                                          device [
+                                            RotationalMotor {
+                                              name "right_leg_motor_3"
+                                              maxTorque 10000
+                                            }
+                                            PositionSensor {
+                                              name "right_leg_motor_3_sensor"
+                                            }
+                                          ]
+                                          endPoint Solid {
+                                            translation 0.000000 0.000000 -0.124000
+                                            rotation 0.000000 0.000000 1.000000 0.000000
+                                            children [
+                                              Transform {
+                                                translation 0.005000 0.092400 0.322736
+                                                rotation 0.000000 0.000000 1.000000 0.000000
+                                                children [
+                                                  Shape {
+                                                    appearance USE plastic_matte_black
+                                                    geometry DEF JX_servo_v12_17 Mesh {
+                                                      url "Bez3_meshes/JX_servo_v12_17.stl"
+                                                    }
+                                                  }
+                                                ]
+                                              }
+                                              Solid {
+                                                translation 0.008500 0.026400 -0.054900
+                                                rotation 0.000000 0.000000 1.000000 0.000000
+                                                children [
+                                                  Transform {
+                                                    translation -0.003500 0.066000 0.377636
+                                                    rotation 0.000000 0.000000 1.000000 0.000000
+                                                    children [
+                                                      Shape {
+                                                        appearance USE plastic_glossy_black
+                                                        geometry DEF right_calve_1 Mesh {
+                                                          url "Bez3_meshes/right_calve_1.stl"
+                                                        }
+                                                      }
+                                                    ]
+                                                  }
+                                                  HingeJoint {
+                                                    jointParameters HingeJointParameters {
+                                                      axis -0.000000 -1.000000 -0.000000
+                                                      anchor -0.008550 -0.028000 -0.085005
+                                                      dampingConstant 0.0
+                                                      staticFriction 0.0
+                                                    }
+                                                    device [
+                                                      RotationalMotor {
+                                                        name "right_leg_motor_4"
+                                                        maxTorque 10000
+                                                      }
+                                                      PositionSensor {
+                                                        name "right_leg_motor_4_sensor"
+                                                      }
+                                                    ]
+                                                    endPoint Solid {
+                                                      translation -0.008550 -0.028000 -0.085005
+                                                      rotation 0.000000 0.000000 1.000000 0.000000
+                                                      children [
+                                                        Transform {
+                                                          translation 0.005050 0.094000 0.462641
+                                                          rotation 0.000000 0.000000 1.000000 0.000000
+                                                          children [
+                                                            Shape {
+                                                              appearance USE plastic_matte_black
+                                                              geometry DEF JX_servo_v12_18 Mesh {
+                                                                url "Bez3_meshes/JX_servo_v12_18.stl"
+                                                              }
+                                                            }
+                                                          ]
+                                                        }
+                                                        Solid {
+                                                          translation 0.008500 0.022500 0.054900
+                                                          rotation 0.000000 0.000000 1.000000 0.000000
+                                                          children [
+                                                            Transform {
+                                                              translation -0.003450 0.071500 0.407741
+                                                              rotation 0.000000 0.000000 1.000000 0.000000
+                                                              children [
+                                                                Shape {
+                                                                  appearance USE plastic_glossy_black
+                                                                  geometry DEF right_ankle_2 Mesh {
+                                                                    url "Bez3_meshes/right_ankle_2.stl"
+                                                                  }
+                                                                }
+                                                              ]
+                                                            }
+                                                            Solid {
+                                                              translation -0.064400 0.025000 0.000000
+                                                              rotation 0.000000 0.000000 1.000000 0.000000
+                                                              children [
+                                                                Transform {
+                                                                  translation 0.060950 0.046500 0.407741
+                                                                  rotation 0.000000 0.000000 1.000000 0.000000
+                                                                  children [
+                                                                    Shape {
+                                                                      appearance USE plastic_matte_black
+                                                                      geometry DEF JX_servo_v12_19 Mesh {
+                                                                        url "Bez3_meshes/JX_servo_v12_19.stl"
+                                                                      }
+                                                                    }
+                                                                  ]
+                                                                }
+                                                                HingeJoint {
+                                                                  jointParameters HingeJointParameters {
+                                                                    axis -1.000000 0.000000 -0.000000
+                                                                    anchor 0.026400 -0.008500 -0.054900
+                                                                    dampingConstant 0.0
+                                                                    staticFriction 0.0
+                                                                  }
+                                                                  device [
+                                                                    RotationalMotor {
+                                                                      name "right_leg_motor_5"
+                                                                      maxTorque 10000
+                                                                    }
+                                                                    PositionSensor {
+                                                                      name "right_leg_motor_5_sensor"
+                                                                    }
+                                                                  ]
+                                                                  endPoint Solid {
+                                                                    translation 0.026400 -0.008500 -0.054900
+                                                                    rotation 0.000000 0.000000 1.000000 0.000000
+                                                                    children [
+                                                                      Transform {
+                                                                        translation 0.034550 0.055000 0.462641
+                                                                        rotation 0.000000 0.000000 1.000000 0.000000
+                                                                        children [
+                                                                          Shape {
+                                                                            appearance USE plastic_glossy_black
+                                                                            geometry DEF right_foot_1 Mesh {
+                                                                              url "Bez3_meshes/right_foot_1.stl"
+                                                                            }
+                                                                          }
+                                                                        ]
+                                                                      }
+                                                                    ]
+                                                                    name "right_foot_1 [foot]"
+                                                                    boundingObject Transform {
+                                                                      translation 0.027000 -0.009000 -0.008836
+                                                                      rotation 0.000000 1.000000 -0.000000 1.570796
+                                                                      children [
+                                                                        Box {
+                                                                           size 0.065000 0.090000 0.170000
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                    physics Physics {
+                                                                      density -1
+                                                                      mass 0.037043
+                                                                      centerOfMass [ 0.036782 0.001413 -0.021045 ]
+                                                                      inertiaMatrix [
+                                                                        1.900000e-05 4.800000e-05 4.400000e-05
+                                                                        1.000000e-06 4.000000e-06 1.000000e-06
+                                                                      ]
+                                                                    }
+                                                                  }
+                                                                }
+                                                              ]
+                                                              name "JX_servo_v12_19"
+                                                              boundingObject Transform {
+                                                                translation -0.009883 -0.008553 -0.036700
+                                                                rotation 0.707107 -0.707107 -0.000000 3.141593
+                                                                children [
+                                                                  Box {
+                                                                     size 0.040547 0.073207 0.082789
+                                                                  }
+                                                                ]
+                                                              }
+                                                              physics Physics {
+                                                                density -1
+                                                                mass 0.198535
+                                                                centerOfMass [ -0.012510 -0.008500 -0.037174 ]
+                                                                inertiaMatrix [
+                                                                  9.000000e-05 1.370000e-04 7.700000e-05
+                                                                  0.000000e+00 6.000000e-06 0.000000e+00
+                                                                ]
+                                                              }
+                                                            }
+                                                          ]
+                                                          name "right_ankle_2"
+                                                          boundingObject Transform {
+                                                            translation -0.029100 0.016500 -0.033696
+                                                            rotation -0.000000 -0.000000 -1.000000 1.570796
+                                                            children [
+                                                              Box {
+                                                                 size 0.041000 0.078601 0.088208
+                                                              }
+                                                            ]
+                                                          }
+                                                          physics Physics {
+                                                            density -1
+                                                            mass 0.025976
+                                                            centerOfMass [ -0.040641 0.017336 -0.008852 ]
+                                                            inertiaMatrix [
+                                                              2.200000e-05 3.100000e-05 2.000000e-05
+                                                              0.000000e+00 -8.000000e-06 0.000000e+00
+                                                            ]
+                                                          }
+                                                        }
+                                                      ]
+                                                      name "JX_servo_v12_18"
+                                                      boundingObject Transform {
+                                                        translation -0.000180 0.035962 0.018128
+                                                        rotation 0.001958 -0.999983 -0.005571 3.141614
+                                                        children [
+                                                          Box {
+                                                             size 0.040008 0.072785 0.081838
+                                                          }
+                                                        ]
+                                                      }
+                                                      physics Physics {
+                                                        density -1
+                                                        mass 0.198535
+                                                        centerOfMass [ 0.000000 0.038910 0.017726 ]
+                                                        inertiaMatrix [
+                                                          1.370000e-04 9.000000e-05 7.700000e-05
+                                                          -0.000000e+00 0.000000e+00 -6.000000e-06
+                                                        ]
+                                                      }
+                                                    }
+                                                  }
+                                                ]
+                                                name "right_calve_1"
+                                                boundingObject Transform {
+                                                  translation -0.008534 0.009198 -0.050504
+                                                  rotation 0.000337 0.000533 -1.000000 3.141285
+                                                  children [
+                                                    Box {
+                                                       size 0.040056 0.089344 0.109056
+                                                    }
+                                                  ]
+                                                }
+                                                physics Physics {
+                                                  density -1
+                                                  mass 0.035688
+                                                  centerOfMass [ -0.008550 0.011777 -0.035312 ]
+                                                  inertiaMatrix [
+                                                    7.300000e-05 3.900000e-05 4.300000e-05
+                                                    0.000000e+00 0.000000e+00 2.000000e-06
+                                                  ]
+                                                }
+                                              }
+                                            ]
+                                            name "JX_servo_v12_17"
+                                            boundingObject Transform {
+                                              translation 0.000180 0.035962 -0.018128
+                                              rotation 0.999998 -0.001958 0.000011 3.130452
+                                              children [
+                                                Box {
+                                                   size 0.040008 0.072785 0.081838
+                                                }
+                                              ]
+                                            }
+                                            physics Physics {
+                                              density -1
+                                              mass 0.198535
+                                              centerOfMass [ 0.000000 0.038910 -0.017726 ]
+                                              inertiaMatrix [
+                                                1.370000e-04 9.000000e-05 7.700000e-05
+                                                0.000000e+00 0.000000e+00 6.000000e-06
+                                              ]
+                                            }
+                                          }
+                                        }
+                                      ]
+                                      name "right_thigh_1"
+                                      boundingObject Transform {
+                                        translation 0.000000 0.037486 -0.062055
+                                        rotation -0.000450 -0.000001 -1.000000 3.140819
+                                        children [
+                                          Box {
+                                             size 0.040316 0.088860 0.164193
+                                          }
+                                        ]
+                                      }
+                                      physics Physics {
+                                        density -1
+                                        mass 0.046987
+                                        centerOfMass [ 0.003552 0.037286 -0.067385 ]
+                                        inertiaMatrix [
+                                          1.440000e-04 8.900000e-05 6.900000e-05
+                                          0.000000e+00 3.000000e-06 -0.000000e+00
+                                        ]
+                                      }
+                                    }
+                                  }
+                                ]
+                                name "JX_servo_v12_16"
+                                boundingObject Transform {
+                                  translation -0.008320 0.013462 0.036772
+                                  rotation 0.999998 -0.001958 0.000011 3.130451
+                                  children [
+                                    Box {
+                                       size 0.040008 0.072785 0.081838
+                                    }
+                                  ]
+                                }
+                                physics Physics {
+                                  density -1
+                                  mass 0.198535
+                                  centerOfMass [ -0.008500 0.016410 0.037174 ]
+                                  inertiaMatrix [
+                                    1.370000e-04 9.000000e-05 7.700000e-05
+                                    0.000000e+00 0.000000e+00 6.000000e-06
+                                  ]
+                                }
+                              }
+                            ]
+                            name "right_ankle_1"
+                            boundingObject Transform {
+                              translation 0.035300 -0.008500 -0.040104
+                              rotation 0.707107 0.707107 0.000000 3.141593
+                              children [
+                                Box {
+                                   size 0.041000 0.078601 0.088208
+                                }
+                              ]
+                            }
+                            physics Physics {
+                              density -1
+                              mass 0.025976
+                              centerOfMass [ 0.023759 -0.009336 -0.064948 ]
+                              inertiaMatrix [
+                                2.200000e-05 3.100000e-05 2.000000e-05
+                                -0.000000e+00 8.000000e-06 0.000000e+00
+                              ]
+                            }
+                          }
+                        ]
+                        name "JX_servo_v12_15"
+                        boundingObject Transform {
+                          translation -0.035962 0.000180 -0.018128
+                          rotation 0.708485 0.705715 0.003947 3.133730
+                          children [
+                            Box {
+                               size 0.040008 0.072785 0.081838
+                            }
+                          ]
+                        }
+                        physics Physics {
+                          density -1
+                          mass 0.198535
+                          centerOfMass [ -0.038910 0.000000 -0.017726 ]
+                          inertiaMatrix [
+                            9.000000e-05 1.370000e-04 7.700000e-05
+                            -0.000000e+00 -6.000000e-06 0.000000e+00
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                  name "right_hip_side_1"
+                  boundingObject Transform {
+                    translation 0.001005 -0.000003 -0.029585
+                    rotation 0.577350 -0.577350 -0.577350 2.094395
+                    children [
+                      Box {
+                         size 0.040058 0.059198 0.062010
+                      }
+                    ]
+                  }
+                  physics Physics {
+                    density -1
+                    mass 0.019000
+                    centerOfMass [ -0.000660 -0.000000 -0.021142 ]
+                    inertiaMatrix [
+                      9.000000e-06 1.800000e-05 1.400000e-05
+                      -0.000000e+00 -0.000000e+00 -0.000000e+00
+                    ]
+                  }
+                }
+              }
+            ]
+            name "JX_servo_v12_14"
+            boundingObject Transform {
+              translation -0.000200 0.000053 0.009883
+              rotation 0.577350 0.577350 0.577350 2.094395
+              children [
+                Box {
+                   size 0.040547 0.073207 0.082789
+                }
+              ]
+            }
+            physics Physics {
+              density -1
+              mass 0.198535
+              centerOfMass [ 0.000274 0.000000 0.012510 ]
+              inertiaMatrix [
+                7.700000e-05 1.370000e-04 9.000000e-05
+                0.000000e+00 6.000000e-06 0.000000e+00
+              ]
+            }
+          }
+          Solid {
+            translation -0.021000 0.102500 -0.036500
+            rotation 0.000000 0.000000 1.000000 0.000000
+            children [
+              Transform {
+                translation 0.021000 -0.107500 0.036500
+                rotation 0.000000 0.000000 1.000000 0.000000
+                children [
+                  Shape {
+                    appearance DEF aluminum_satin PBRAppearance {
+                      baseColor 0.500000 0.500000 0.500000
+                      transparency 0.000000
+                      roughness 1.000000
+                      metalness 0
+                      emissiveColor 0.000000 0.000000 0.000000
+                    }
+                    geometry DEF t-servo-hub_1 Mesh {
+                      url "Bez3_meshes/25t-servo-hub_1.stl"
+                    }
+                  }
+                ]
+              }
+              HingeJoint {
+                jointParameters HingeJointParameters {
+                  axis 0.000000 -1.000000 0.000000
+                  anchor 0.000000 0.002794 0.000000
+                  dampingConstant 0.0
+                  staticFriction 0.0
+                }
+                device [
+                  RotationalMotor {
+                    name "left_arm_motor_0 [shoulder]"
+                    maxTorque 10000
+                  }
+                  PositionSensor {
+                    name "left_arm_motor_0_sensor"
+                  }
+                ]
+                endPoint Solid {
+                  translation 0.000000 0.002794 0.000000
+                  rotation 0.000000 0.000000 1.000000 0.000000
+                  children [
+                    Transform {
+                      translation 0.021000 -0.110294 0.036500
+                      rotation 0.000000 0.000000 1.000000 0.000000
+                      children [
+                        Shape {
+                          appearance DEF plastic_glossy_grey PBRAppearance {
+                            baseColor 0.500000 0.500000 0.500000
+                            transparency 0.000000
+                            roughness 1.000000
+                            metalness 0
+                            emissiveColor 0.000000 0.000000 0.000000
+                          }
+                          geometry DEF gobilda-servo_1 Mesh {
+                            url "Bez3_meshes/gobilda-servo_1.stl"
+                          }
+                        }
+                      ]
+                    }
+                    Solid {
+                      translation -0.007500 0.036900 0.007500
+                      rotation 0.000000 0.000000 1.000000 0.000000
+                      children [
+                        Transform {
+                          translation 0.028500 -0.147194 0.029000
+                          rotation 0.000000 0.000000 1.000000 0.000000
+                          children [
+                            Shape {
+                              appearance USE plastic_glossy_black
+                              geometry DEF left_bicep_1 Mesh {
+                                url "Bez3_meshes/left_bicep_1.stl"
+                              }
+                            }
+                          ]
+                        }
+                        Solid {
+                          translation 0.000000 0.000000 -0.070300
+                          rotation 0.000000 0.000000 1.000000 0.000000
+                          children [
+                            Transform {
+                              translation 0.028500 -0.147194 0.099300
+                              rotation 0.000000 0.000000 1.000000 0.000000
+                              children [
+                                Shape {
+                                  appearance USE plastic_glossy_grey
+                                  geometry DEF gobilda-servo_3 Mesh {
+                                    url "Bez3_meshes/gobilda-servo_3.stl"
+                                  }
+                                }
+                              ]
+                            }
+                            HingeJoint {
+                              jointParameters HingeJointParameters {
+                                axis -0.000000 -1.000000 -0.000000
+                                anchor 0.007500 -0.036900 -0.007500
+                                dampingConstant 0.0
+                                staticFriction 0.0
+                              }
+                              device [
+                                RotationalMotor {
+                                  name "left_arm_motor_1"
+                                  maxTorque 10000
+                                }
+                                PositionSensor {
+                                  name "left_arm_motor_1_sensor"
+                                }
+                              ]
+                              endPoint Solid {
+                                translation 0.007500 -0.036900 -0.007500
+                                rotation 0.000000 0.000000 1.000000 0.000000
+                                children [
+                                  Transform {
+                                    translation 0.021000 -0.110294 0.106800
+                                    rotation 0.000000 0.000000 1.000000 0.000000
+                                    children [
+                                      Shape {
+                                        appearance USE aluminum_satin
+                                        geometry DEF t-servo-hub_2 Mesh {
+                                          url "Bez3_meshes/25t-servo-hub_2.stl"
+                                        }
+                                      }
+                                    ]
+                                  }
+                                  Solid {
+                                    translation 0.000000 -0.002794 0.000000
+                                    rotation 0.000000 0.000000 1.000000 0.000000
+                                    children [
+                                      Transform {
+                                        translation 0.021000 -0.107500 0.106800
+                                        rotation 0.000000 0.000000 1.000000 0.000000
+                                        children [
+                                          Shape {
+                                            appearance USE plastic_glossy_black
+                                            geometry DEF elbow-attach_1 Mesh {
+                                              url "Bez3_meshes/elbow-attach_1.stl"
+                                            }
+                                          }
+                                        ]
+                                      }
+                                      Solid {
+                                        translation -0.027500 0.002000 0.010000
+                                        rotation 0.000000 0.000000 1.000000 0.000000
+                                        children [
+                                          Transform {
+                                            translation 0.048500 -0.109500 0.096800
+                                            rotation 0.000000 0.000000 1.000000 0.000000
+                                            children [
+                                              Shape {
+                                                appearance USE plastic_glossy_black
+                                                geometry DEF left_forearm_1 Mesh {
+                                                  url "Bez3_meshes/left_forearm_1.stl"
+                                                }
+                                              }
+                                            ]
+                                          }
+                                          Solid {
+                                            translation 0.000000 0.044674 0.000000
+                                            rotation 0.000000 0.000000 1.000000 0.000000
+                                            children [
+                                              Transform {
+                                                translation 0.048500 -0.154174 0.096800
+                                                rotation 0.000000 0.000000 1.000000 0.000000
+                                                children [
+                                                  Shape {
+                                                    appearance USE plastic_glossy_black
+                                                    geometry DEF elbow-bearing_1 Mesh {
+                                                      url "Bez3_meshes/elbow-bearing_1.stl"
+                                                    }
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                            name "elbow-bearing_1"
+                                            boundingObject Transform {
+                                              translation 0.020419 0.001650 -0.012500
+                                              rotation 0.582999 -0.574317 -0.574693 2.086497
+                                              children [
+                                                Box {
+                                                   size 0.009762 0.035006 0.049967
+                                                }
+                                              ]
+                                            }
+                                            physics Physics {
+                                              density -1
+                                              mass 0.004942
+                                              centerOfMass [ 0.017892 0.003496 -0.012651 ]
+                                              inertiaMatrix [
+                                                1.000000e-06 2.000000e-06 1.000000e-06
+                                                -0.000000e+00 0.000000e+00 0.000000e+00
+                                              ]
+                                            }
+                                          }
+                                        ]
+                                        name "left_forearm_1 [hand]"
+                                        boundingObject Transform {
+                                          translation 0.011120 0.022337 -0.111985
+                                          rotation 0.000000 1.000000 0.000000 3.133410
+                                          children [
+                                            Box {
+                                               size 0.027533 0.050674 0.194296
+                                            }
+                                          ]
+                                        }
+                                        physics Physics {
+                                          density -1
+                                          mass 0.027372
+                                          centerOfMass [ 0.002238 0.022337 -0.067926 ]
+                                          inertiaMatrix [
+                                            5.900000e-05 5.700000e-05 5.000000e-06
+                                            0.000000e+00 4.000000e-06 0.000000e+00
+                                          ]
+                                        }
+                                      }
+                                    ]
+                                    name "elbow-attach_1"
+                                    boundingObject Transform {
+                                      translation -0.007085 0.000427 -0.002500
+                                      rotation 0.574519 -0.578761 -0.578761 2.098648
+                                      children [
+                                        Box {
+                                           size 0.009115 0.035013 0.049931
+                                        }
+                                      ]
+                                    }
+                                    physics Physics {
+                                      density -1
+                                      mass 0.005142
+                                      centerOfMass [ -0.009234 -0.001515 -0.002548 ]
+                                      inertiaMatrix [
+                                        1.000000e-06 2.000000e-06 1.000000e-06
+                                        0.000000e+00 0.000000e+00 -0.000000e+00
+                                      ]
+                                    }
+                                  }
+                                ]
+                                name "25t-servo-hub_2"
+                                boundingObject Transform {
+                                  translation -0.000032 0.000381 -0.000054
+                                  rotation -0.266136 0.266577 -0.926341 1.646705
+                                  children [
+                                    Box {
+                                       size 0.006407 0.025663 0.025667
+                                    }
+                                  ]
+                                }
+                                physics Physics {
+                                  density -1
+                                  mass 0.005585
+                                  centerOfMass [ -0.000000 0.000342 0.000000 ]
+                                }
+                              }
+                            }
+                          ]
+                          name "gobilda-servo_3"
+                          boundingObject Transform {
+                            translation 0.007500 -0.017906 -0.017694
+                            rotation -0.000000 -0.999063 0.043271 3.141593
+                            children [
+                              Box {
+                                 size 0.020000 0.039983 0.054373
+                              }
+                            ]
+                          }
+                          physics Physics {
+                            density -1
+                            mass 0.060587
+                            centerOfMass [ 0.007500 -0.015782 -0.017269 ]
+                            inertiaMatrix [
+                              1.400000e-05 1.000000e-05 7.000000e-06
+                              0.000000e+00 -0.000000e+00 0.000000e+00
+                            ]
+                          }
+                        }
+                      ]
+                      name "left_bicep_1"
+                      boundingObject Transform {
+                        translation 0.007379 -0.013294 -0.052628
+                        rotation 0.992142 -0.124702 0.010199 0.020751
+                        children [
+                          Box {
+                             size 0.035710 0.042837 0.110696
+                          }
+                        ]
+                      }
+                      physics Physics {
+                        density -1
+                        mass 0.011456
+                        centerOfMass [ 0.007500 -0.003484 -0.061155 ]
+                        inertiaMatrix [
+                          9.000000e-06 8.000000e-06 3.000000e-06
+                          -0.000000e+00 -0.000000e+00 1.000000e-06
+                        ]
+                      }
+                    }
+                  ]
+                  name "gobilda-servo_1"
+                  boundingObject Transform {
+                    translation 0.000000 0.018994 -0.010194
+                    rotation -0.000000 -0.999063 0.043271 3.141593
+                    children [
+                      Box {
+                         size 0.020000 0.039983 0.054373
+                      }
+                    ]
+                  }
+                  physics Physics {
+                    density -1
+                    mass 0.060587
+                    centerOfMass [ 0.000000 0.021118 -0.009769 ]
+                    inertiaMatrix [
+                      1.400000e-05 1.000000e-05 7.000000e-06
+                      0.000000e+00 -0.000000e+00 0.000000e+00
+                    ]
+                  }
+                }
+              }
+            ]
+            name "25t-servo-hub_1"
+            boundingObject Transform {
+              translation -0.000032 0.003174 -0.000054
+              rotation -0.266136 0.266577 -0.926341 1.646705
+              children [
+                Box {
+                   size 0.006378 0.025252 0.025380
+                }
+              ]
+            }
+            physics Physics {
+              density -1
+              mass 0.005585
+              centerOfMass [ -0.000000 0.003136 0.000000 ]
+            }
+          }
+          Solid {
+            translation -0.021000 -0.112500 -0.036500
+            rotation 0.000000 0.000000 1.000000 0.000000
+            children [
+              Transform {
+                translation 0.021000 0.107500 0.036500
+                rotation 0.000000 0.000000 1.000000 0.000000
+                children [
+                  Shape {
+                    appearance USE aluminum_satin
+                    geometry DEF t-servo-hub_Mirror__1 Mesh {
+                      url "Bez3_meshes/25t-servo-hub_Mirror__1.stl"
+                    }
+                  }
+                ]
+              }
+              HingeJoint {
+                jointParameters HingeJointParameters {
+                  axis 0.000000 -1.000000 0.000000
+                  anchor 0.000000 -0.002794 0.000000
+                  dampingConstant 0.0
+                  staticFriction 0.0
+                }
+                device [
+                  RotationalMotor {
+                    name "right_arm_motor_0 [shoulder]"
+                    maxTorque 10000
+                  }
+                  PositionSensor {
+                    name "right_arm_motor_0_sensor"
+                  }
+                ]
+                endPoint Solid {
+                  translation 0.000000 -0.002794 0.000000
+                  rotation 0.000000 0.000000 1.000000 0.000000
+                  children [
+                    Transform {
+                      translation 0.021000 0.110294 0.036500
+                      rotation 0.000000 0.000000 1.000000 0.000000
+                      children [
+                        Shape {
+                          appearance USE plastic_glossy_grey
+                          geometry DEF gobilda-servo_Mirror__1 Mesh {
+                            url "Bez3_meshes/gobilda-servo_Mirror__1.stl"
+                          }
+                        }
+                      ]
+                    }
+                    Solid {
+                      translation -0.007500 -0.036900 0.007500
+                      rotation 0.000000 0.000000 1.000000 0.000000
+                      children [
+                        Transform {
+                          translation 0.028500 0.147194 0.029000
+                          rotation 0.000000 0.000000 1.000000 0.000000
+                          children [
+                            Shape {
+                              appearance USE plastic_glossy_black
+                              geometry DEF right_bicep_1 Mesh {
+                                url "Bez3_meshes/right_bicep_1.stl"
+                              }
+                            }
+                          ]
+                        }
+                        Solid {
+                          translation 0.000000 0.000000 -0.070300
+                          rotation 0.000000 0.000000 1.000000 0.000000
+                          children [
+                            Transform {
+                              translation 0.028500 0.147194 0.099300
+                              rotation 0.000000 0.000000 1.000000 0.000000
+                              children [
+                                Shape {
+                                  appearance USE plastic_glossy_grey
+                                  geometry DEF gobilda-servo_Mirror__2 Mesh {
+                                    url "Bez3_meshes/gobilda-servo_Mirror__2.stl"
+                                  }
+                                }
+                              ]
+                            }
+                            HingeJoint {
+                              jointParameters HingeJointParameters {
+                                axis -0.000000 -1.000000 0.000000
+                                anchor 0.007500 0.036900 -0.007500
+                                dampingConstant 0.0
+                                staticFriction 0.0
+                              }
+                              device [
+                                RotationalMotor {
+                                  name "right_arm_motor_1"
+                                  maxTorque 10000
+                                }
+                                PositionSensor {
+                                  name "right_arm_motor_1_sensor"
+                                }
+                              ]
+                              endPoint Solid {
+                                translation 0.007500 0.036900 -0.007500
+                                rotation 0.000000 0.000000 1.000000 0.000000
+                                children [
+                                  Transform {
+                                    translation 0.021000 0.110294 0.106800
+                                    rotation 0.000000 0.000000 1.000000 0.000000
+                                    children [
+                                      Shape {
+                                        appearance USE aluminum_satin
+                                        geometry DEF t-servo-hub_Mirror__2 Mesh {
+                                          url "Bez3_meshes/25t-servo-hub_Mirror__2.stl"
+                                        }
+                                      }
+                                    ]
+                                  }
+                                  Solid {
+                                    translation 0.000000 0.002794 0.000000
+                                    rotation 0.000000 0.000000 1.000000 0.000000
+                                    children [
+                                      Transform {
+                                        translation 0.021000 0.107500 0.106800
+                                        rotation 0.000000 0.000000 1.000000 0.000000
+                                        children [
+                                          Shape {
+                                            appearance USE plastic_glossy_black
+                                            geometry DEF elbow-attach_Mirror__1 Mesh {
+                                              url "Bez3_meshes/elbow-attach_Mirror__1.stl"
+                                            }
+                                          }
+                                        ]
+                                      }
+                                      Solid {
+                                        translation -0.027500 -0.002000 0.010000
+                                        rotation 0.000000 0.000000 1.000000 0.000000
+                                        children [
+                                          Transform {
+                                            translation 0.048500 0.109500 0.096800
+                                            rotation 0.000000 0.000000 1.000000 0.000000
+                                            children [
+                                              Shape {
+                                                appearance USE plastic_glossy_black
+                                                geometry DEF right_forearm_1 Mesh {
+                                                  url "Bez3_meshes/right_forearm_1.stl"
+                                                }
+                                              }
+                                            ]
+                                          }
+                                          Solid {
+                                            translation 0.000000 -0.044674 0.000000
+                                            rotation 0.000000 0.000000 1.000000 0.000000
+                                            children [
+                                              Transform {
+                                                translation 0.048500 0.154174 0.096800
+                                                rotation 0.000000 0.000000 1.000000 0.000000
+                                                children [
+                                                  Shape {
+                                                    appearance USE plastic_glossy_black
+                                                    geometry DEF elbow-bearing_Mirror__1 Mesh {
+                                                      url "Bez3_meshes/elbow-bearing_Mirror__1.stl"
+                                                    }
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                            name "elbow-bearing_Mirror__1"
+                                            boundingObject Transform {
+                                              translation 0.020400 -0.001573 -0.012500
+                                              rotation 0.574509 -0.578765 -0.578765 2.098662
+                                              children [
+                                                Box {
+                                                   size 0.009221 0.035000 0.049867
+                                                }
+                                              ]
+                                            }
+                                            physics Physics {
+                                              density -1
+                                              mass 0.004942
+                                              centerOfMass [ 0.017892 -0.003496 -0.012651 ]
+                                              inertiaMatrix [
+                                                1.000000e-06 2.000000e-06 1.000000e-06
+                                                0.000000e+00 0.000000e+00 -0.000000e+00
+                                              ]
+                                            }
+                                          }
+                                        ]
+                                        name "right_forearm_1 [hand]"
+                                        boundingObject Transform {
+                                          translation 0.011082 -0.022337 -0.111957
+                                          rotation 0.000000 1.000000 0.000000 3.134614
+                                          children [
+                                            Box {
+                                               size 0.027546 0.050674 0.194206
+                                            }
+                                          ]
+                                        }
+                                        physics Physics {
+                                          density -1
+                                          mass 0.027372
+                                          centerOfMass [ 0.002238 -0.022337 -0.067926 ]
+                                          inertiaMatrix [
+                                            5.900000e-05 5.700000e-05 5.000000e-06
+                                            -0.000000e+00 4.000000e-06 0.000000e+00
+                                          ]
+                                        }
+                                      }
+                                    ]
+                                    name "elbow-attach_Mirror__1"
+                                    boundingObject Transform {
+                                      translation -0.007154 -0.000351 -0.002500
+                                      rotation 0.582999 -0.574317 -0.574693 2.086497
+                                      children [
+                                        Box {
+                                           size 0.009759 0.035006 0.049820
+                                        }
+                                      ]
+                                    }
+                                    physics Physics {
+                                      density -1
+                                      mass 0.005142
+                                      centerOfMass [ -0.009234 0.001515 -0.002548 ]
+                                      inertiaMatrix [
+                                        1.000000e-06 2.000000e-06 1.000000e-06
+                                        -0.000000e+00 0.000000e+00 0.000000e+00
+                                      ]
+                                    }
+                                  }
+                                ]
+                                name "25t-servo-hub_Mirror__2"
+                                boundingObject Transform {
+                                  translation -0.000012 -0.000380 0.000042
+                                  rotation -0.117727 -0.116864 0.986146 1.584051
+                                  children [
+                                    Box {
+                                       size 0.006413 0.025205 0.025303
+                                    }
+                                  ]
+                                }
+                                physics Physics {
+                                  density -1
+                                  mass 0.005585
+                                  centerOfMass [ 0.000001 -0.000342 0.000001 ]
+                                }
+                              }
+                            }
+                          ]
+                          name "gobilda-servo_Mirror__2"
+                          boundingObject Transform {
+                            translation 0.007500 0.017728 -0.017710
+                            rotation -0.000000 -0.043271 0.999063 3.141593
+                            children [
+                              Box {
+                                 size 0.020000 0.040477 0.054373
+                              }
+                            ]
+                          }
+                          physics Physics {
+                            density -1
+                            mass 0.060587
+                            centerOfMass [ 0.007500 0.015782 -0.017269 ]
+                            inertiaMatrix [
+                              1.400000e-05 1.000000e-05 7.000000e-06
+                              -0.000000e+00 -0.000000e+00 -0.000000e+00
+                            ]
+                          }
+                        }
+                      ]
+                      name "right_bicep_1"
+                      boundingObject Transform {
+                        translation 0.007327 0.013252 -0.052619
+                        rotation 0.001630 -0.010181 -0.999947 3.136800
+                        children [
+                          Box {
+                             size 0.035047 0.042984 0.110710
+                          }
+                        ]
+                      }
+                      physics Physics {
+                        density -1
+                        mass 0.011456
+                        centerOfMass [ 0.007500 0.003484 -0.061155 ]
+                        inertiaMatrix [
+                          9.000000e-06 8.000000e-06 3.000000e-06
+                          0.000000e+00 -0.000000e+00 -1.000000e-06
+                        ]
+                      }
+                    }
+                  ]
+                  name "gobilda-servo_Mirror__1"
+                  boundingObject Transform {
+                    translation 0.000000 -0.019172 -0.010210
+                    rotation 0.000000 0.043271 -0.999063 3.141593
+                    children [
+                      Box {
+                         size 0.020000 0.040477 0.054373
+                      }
+                    ]
+                  }
+                  physics Physics {
+                    density -1
+                    mass 0.060587
+                    centerOfMass [ 0.000000 -0.021118 -0.009769 ]
+                    inertiaMatrix [
+                      1.400000e-05 1.000000e-05 7.000000e-06
+                      -0.000000e+00 -0.000000e+00 -0.000000e+00
+                    ]
+                  }
+                }
+              }
+            ]
+            name "25t-servo-hub_Mirror__1"
+            boundingObject Transform {
+              translation -0.000012 -0.003174 0.000042
+              rotation -0.117727 -0.116864 0.986146 1.584051
+              children [
+                Box {
+                   size 0.006413 0.025205 0.025303
+                }
+              ]
+            }
+            physics Physics {
+              density -1
+              mass 0.005585
+              centerOfMass [ 0.000001 -0.003136 0.000001 ]
+            }
+          }
+          Solid {
+            translation 0.000000 -0.005000 -0.000010
+            rotation 0.000000 0.000000 1.000000 0.000000
+            children [
+              Transform {
+                translation -0.000000 -0.000000 0.000010
+                rotation 0.000000 0.000000 1.000000 0.000000
+                children [
+                  Shape {
+                    appearance USE plastic_glossy_black
+                    geometry DEF custom_servo_support__lower_neck__v2_1 Mesh {
+                      url "Bez3_meshes/custom_servo_support__lower_neck__v2_1.stl"
+                    }
+                  }
+                ]
+              }
+              Solid {
+                translation -0.017150 -0.007500 0.006980
+                rotation 0.000000 0.000000 1.000000 0.000000
+                children [
+                  Transform {
+                    translation 0.017150 0.007500 -0.006970
+                    rotation 0.000000 0.000000 1.000000 0.000000
+                    children [
+                      Shape {
+                        appearance USE plastic_glossy_grey
+                        geometry DEF gobilda-servo_4 Mesh {
+                          url "Bez3_meshes/gobilda-servo_4.stl"
+                        }
+                      }
+                    ]
+                  }
+                  HingeJoint {
+                    jointParameters HingeJointParameters {
+                      axis 0.000000 -0.000000 1.000000
+                      anchor 0.007500 0.007500 0.036900
+                      dampingConstant 0.0
+                      staticFriction 0.0
+                    }
+                    device [
+                      RotationalMotor {
+                        name "head_motor_0"
+                        maxTorque 10000
+                      }
+                      PositionSensor {
+                        name "head_motor_0_sensor"
+                      }
+                    ]
+                    endPoint Solid {
+                      translation 0.007500 0.007500 0.036900
+                      rotation 0.000000 0.000000 1.000000 0.000000
+                      children [
+                        Transform {
+                          translation 0.009650 -0.000000 -0.043870
+                          rotation 0.000000 0.000000 1.000000 0.000000
+                          children [
+                            Shape {
+                              appearance USE aluminum_satin
+                              geometry DEF t-servo-hub_3 Mesh {
+                                url "Bez3_meshes/25t-servo-hub_3.stl"
+                              }
+                            }
+                          ]
+                        }
+                        Solid {
+                          translation 0.000000 0.000000 0.002794
+                          rotation 0.000000 0.000000 1.000000 0.000000
+                          children [
+                            Transform {
+                              translation 0.009650 -0.000000 -0.046664
+                              rotation 0.000000 0.000000 1.000000 0.000000
+                              children [
+                                Shape {
+                                  appearance USE plastic_glossy_black
+                                  geometry DEF neck_1 Mesh {
+                                    url "Bez3_meshes/neck_1.stl"
+                                  }
+                                }
+                              ]
+                            }
+                            Solid {
+                              translation 0.000000 -0.022187 0.033817
+                              rotation 0.000000 0.000000 1.000000 0.000000
+                              children [
+                                Transform {
+                                  translation 0.009650 0.022187 -0.080481
+                                  rotation 0.000000 0.000000 1.000000 0.000000
+                                  children [
+                                    Shape {
+                                      appearance USE aluminum_satin
+                                      geometry DEF t-servo-hub_4 Mesh {
+                                        url "Bez3_meshes/25t-servo-hub_4.stl"
+                                      }
+                                    }
+                                  ]
+                                }
+                                HingeJoint {
+                                  jointParameters HingeJointParameters {
+                                    axis -0.000000 1.000000 -0.000000
+                                    anchor 0.000000 0.002794 0.000000
+                                    dampingConstant 0.0
+                                    staticFriction 0.0
+                                  }
+                                  device [
+                                    RotationalMotor {
+                                      name "head_motor_1"
+                                      maxTorque 10000
+                                    }
+                                    PositionSensor {
+                                      name "head_motor_1_sensor"
+                                    }
+                                  ]
+                                  endPoint Solid {
+                                    translation 0.000000 0.002794 0.000000
+                                    rotation 0.000000 0.000000 1.000000 0.000000
+                                    children [
+                                      Transform {
+                                        translation 0.009650 0.019393 -0.080481
+                                        rotation 0.000000 0.000000 1.000000 0.000000
+                                        children [
+                                          Shape {
+                                            appearance USE plastic_glossy_grey
+                                            geometry DEF gobilda-servo_5 Mesh {
+                                              url "Bez3_meshes/gobilda-servo_5.stl"
+                                            }
+                                          }
+                                        ]
+                                      }
+                                      Solid {
+                                        translation -0.007500 0.036900 0.007500
+                                        rotation 0.000000 0.000000 1.000000 0.000000
+                                        children [
+                                          Transform {
+                                            translation 0.017150 -0.017507 -0.087981
+                                            rotation 0.000000 0.000000 1.000000 0.000000
+                                            children [
+                                              Shape {
+                                                appearance USE plastic_glossy_black
+                                                geometry DEF head_1 Mesh {
+                                                  url "Bez3_meshes/head_1.stl"
+                                                }
+                                              }
+                                            ]
+                                          }
+                                          Solid {
+                                            translation 0.024000 -0.014020 0.013500
+                                            rotation 0.000000 0.000000 1.000000 0.000000
+                                            children [
+                                              Transform {
+                                                translation -0.006850 -0.003487 -0.101481
+                                                rotation 0.000000 0.000000 1.000000 0.000000
+                                                children [
+                                                  Shape {
+                                                    appearance USE plastic_glossy_black
+                                                    geometry DEF camera_1 Mesh {
+                                                      url "Bez3_meshes/camera_1.stl"
+                                                    }
+                                                  }
+                                                ]
+                                              }
+                                              Solid {
+                                                translation 0.037200 0.000000 0.027000
+                                                rotation 0.000000 0.000000 1.000000 0.000000
+                                                children [
+                                                  Transform {
+                                                    translation -0.044050 -0.003487 -0.128481
+                                                    rotation 0.000000 0.000000 1.000000 0.000000
+                                                    children [
+                                                      Shape {
+                                                        appearance USE steel_satin
+                                                        geometry DEF camera-link_1 Mesh {
+                                                          url "Bez3_meshes/camera-link_1.stl"
+                                                        }
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                                name "camera-link_1"
+                                                boundingObject Transform {
+                                                  translation 0.000500 -0.000000 0.000000
+                                                  rotation 0.000000 1.000000 0.000000 3.141593
+                                                  children [
+                                                    Box {
+                                                       size 0.001000 0.005000 0.005000
+                                                    }
+                                                  ]
+                                                }
+                                                physics Physics {
+                                                  density -1
+                                                  mass 0.000196
+                                                  centerOfMass [ 0.000500 -0.000000 0.000000 ]
+                                                }
+                                              }
+                                            ]
+                                            name "camera_1"
+                                            boundingObject Transform {
+                                              translation 0.002708 0.000001 0.020750
+                                              rotation 0.577355 0.577341 -0.577355 2.094409
+                                              children [
+                                                Box {
+                                                   size 0.041500 0.070988 0.094000
+                                                }
+                                              ]
+                                            }
+                                            physics Physics {
+                                              density -1
+                                              mass 0.094257
+                                              centerOfMass [ 0.014184 -0.000011 0.019216 ]
+                                              inertiaMatrix [
+                                                5.200000e-05 4.300000e-05 6.900000e-05
+                                                0.000000e+00 -1.100000e-05 -0.000000e+00
+                                              ]
+                                            }
+                                          }
+                                        ]
+                                        name "head_1"
+                                        boundingObject Transform {
+                                          translation 0.017069 -0.008737 -0.003906
+                                          rotation 0.576461 -0.576461 -0.579125 2.091735
+                                          children [
+                                            Box {
+                                               size 0.033965 0.035093 0.060851
+                                            }
+                                          ]
+                                        }
+                                        physics Physics {
+                                          density -1
+                                          mass 0.007654
+                                          centerOfMass [ 0.017762 -0.005180 0.000055 ]
+                                          inertiaMatrix [
+                                            2.000000e-06 3.000000e-06 3.000000e-06
+                                            0.000000e+00 -0.000000e+00 0.000000e+00
+                                          ]
+                                        }
+                                      }
+                                      Solid {
+                                        translation 0.015000 0.001450 0.047400
+                                        rotation 0.0 0.0 -1.0 1.5708
+                                        children [
+                                          DEF CAMERA Camera {
+                                              rotation 1.0 0.0 0.0 1.5708
+                                              name "camera"
+                                              fieldOfView 1.39626
+                                              width 640
+                                              height 480
+                                              noise 0.007000
+                                              near 0.2
+                                              far 10
+
+                                          }
+                                        ]
+                                        name "camera"
+                                        physics Physics {
+                                          density -1
+                                          mass 0.010000
+                                          centerOfMass [ 0.000000 0.000000 0.000000 ]
+                                          inertiaMatrix [
+                                            1.000000e-09 1.000000e-09 1.000000e-09
+                                            0.000000e+00 0.000000e+00 0.000000e+00
+                                          ]
+                                        }
+                                      }
+                                    ]
+                                    name "gobilda-servo_5"
+                                    boundingObject Transform {
+                                      translation 0.010194 0.018994 0.000000
+                                      rotation 0.043231 0.998129 -0.043231 1.572669
+                                      children [
+                                        Box {
+                                           size 0.020000 0.039983 0.054373
+                                        }
+                                      ]
+                                    }
+                                    physics Physics {
+                                      density -1
+                                      mass 0.060587
+                                      centerOfMass [ 0.009769 0.021118 0.000000 ]
+                                      inertiaMatrix [
+                                        7.000000e-06 1.000000e-05 1.400000e-05
+                                        -0.000000e+00 0.000000e+00 0.000000e+00
+                                      ]
+                                    }
+                                  }
+                                }
+                              ]
+                              name "25t-servo-hub_4"
+                              boundingObject Transform {
+                                translation -0.000032 0.003174 -0.000054
+                                rotation -0.266137 0.266577 -0.926341 1.646705
+                                children [
+                                  Box {
+                                     size 0.006378 0.025252 0.025380
+                                  }
+                                ]
+                              }
+                              physics Physics {
+                                density -1
+                                mass 0.005585
+                                centerOfMass [ -0.000000 0.003136 0.000001 ]
+                              }
+                            }
+                          ]
+                          name "neck_1"
+                          boundingObject Transform {
+                            translation 0.000000 0.002000 0.024207
+                            rotation 1.000000 -0.000000 -0.000000 1.570796
+                            children [
+                              Box {
+                                 size 0.035000 0.048415 0.056374
+                              }
+                            ]
+                          }
+                          physics Physics {
+                            density -1
+                            mass 0.012940
+                            centerOfMass [ 0.000000 0.001560 0.014703 ]
+                            inertiaMatrix [
+                              9.000000e-06 4.000000e-06 8.000000e-06
+                              -0.000000e+00 -0.000000e+00 0.000000e+00
+                            ]
+                          }
+                        }
+                      ]
+                      name "25t-servo-hub_3"
+                      boundingObject Transform {
+                        translation -0.000033 -0.000053 -0.000386
+                        rotation -0.435505 0.787751 0.435642 1.807012
+                        children [
+                          Box {
+                             size 0.006370 0.025233 0.025358
+                          }
+                        ]
+                      }
+                      physics Physics {
+                        density -1
+                        mass 0.005585
+                        centerOfMass [ -0.000000 0.000000 -0.000342 ]
+                      }
+                    }
+                  }
+                ]
+                name "gobilda-servo_4"
+                boundingObject Transform {
+                  translation 0.017694 0.007500 0.017906
+                  rotation -0.559955 0.559955 -0.610656 2.045156
+                  children [
+                    Box {
+                       size 0.020000 0.039983 0.054373
+                    }
+                  ]
+                }
+                physics Physics {
+                  density -1
+                  mass 0.060587
+                  centerOfMass [ 0.017269 0.007500 0.015782 ]
+                  inertiaMatrix [
+                    7.000000e-06 1.400000e-05 1.000000e-05
+                    0.000000e+00 0.000000e+00 -0.000000e+00
+                  ]
+                }
+              }
+            ]
+            name "custom_servo_support__lower_neck__v2_1"
+            boundingObject Transform {
+              translation -0.000137 0.000089 0.003490
+              rotation -0.707714 0.001943 0.706497 3.137699
+              children [
+                Box {
+                   size 0.007050 0.040027 0.041146
+                }
+              ]
+            }
+            physics Physics {
+              density -1
+              mass 0.003136
+              centerOfMass [ -0.000182 0.000000 0.001967 ]
+            }
+          }
+          Solid {
+            translation 0.000000 -0.005000 -0.005000
+            rotation 0.000000 0.000000 1.000000 0.000000
+            children [
+              Transform {
+                translation -0.000000 -0.000000 0.005000
+                rotation 0.000000 0.000000 1.000000 0.000000
+                children [
+                  Accelerometer {
+                  name "imu accelerometer"
+                  lookupTable [
+                  -19.62 -32768 0.00203
+                  19.62 32767 0.00203
+                  ]
+                  resolution 1
+                }
+                Gyro {
+                  name "imu gyro"
+                  lookupTable [
+                    -8.7266 -32768 0.00698
+                      8.7266 32767 0.00698
+                  ]
+                  resolution 1
+                }
+                  Shape {
+                    appearance USE steel_satin
+                    geometry DEF imu-link_1 Mesh {
+                      url "Bez3_meshes/imu-link_1.stl"
+                    }
+                  }
+                ]
+              }
+            ]
+            name "imu-link_1"
+            boundingObject Transform {
+              translation 0.000000 0.000000 -0.049500
+              rotation 0.577350 -0.577350 0.577350 2.094395
+              children [
+                Box {
+                   size 0.001000 0.005000 0.005000
+                }
+              ]
+            }
+            physics Physics {
+              density -1
+              mass 0.000196
+              centerOfMass [ -0.000000 -0.000000 -0.049500 ]
+            }
+          }
+          Solid {
+            translation -0.012000 -0.004667 -0.005000
+            rotation 0.000000 0.000000 1.000000 0.000000
+            children [
+              Transform {
+                translation 0.012000 -0.000333 0.005000
+                rotation 0.000000 0.000000 1.000000 0.000000
+                children [
+                  Shape {
+                    appearance DEF plastic_matte_blue PBRAppearance {
+                      baseColor 0.500000 0.500000 0.500000
+                      transparency 0.000000
+                      roughness 1.000000
+                      metalness 0
+                      emissiveColor 0.000000 0.000000 0.000000
+                    }
+                    geometry DEF Component32_1 Mesh {
+                      url "Bez3_meshes/Component32_1.stl"
+                    }
+                  }
+                ]
+              }
+              Solid {
+                translation 0.000000 0.000000 -0.047000
+                rotation 0.000000 0.000000 1.000000 0.000000
+                name "TX2_board_v2_1"
+                physics Physics {
+                  density -1
+                  mass 0.262164
+                  centerOfMass [ 0.000773 -0.000034 -0.015295 ]
+                  inertiaMatrix [
+                    1.650000e-04 7.100000e-05 1.950000e-04
+                    -0.000000e+00 3.000000e-06 -0.000000e+00
+                  ]
+                }
+              }
+            ]
+            name "Component32_1"
+            boundingObject Transform {
+              translation -0.000000 0.000000 -0.023500
+              rotation 1.000000 -0.000000 -0.000000 1.570796
+              children [
+                Box {
+                   size 0.035000 0.047000 0.107000
+                }
+              ]
+            }
+            physics Physics {
+              density -1
+              mass 0.319995
+              centerOfMass [ -0.000000 0.000000 -0.023500 ]
+              inertiaMatrix [
+                3.640000e-04 9.200000e-05 3.380000e-04
+                -0.000000e+00 -0.000000e+00 0.000000e+00
+              ]
+            }
+          }
+        ]
+        name "torso_1"
+        boundingObject Transform {
+          translation -0.006931 -0.005000 -0.068500
+          rotation 0.000000 0.707107 0.707107 3.141593
+          children [
+            Box {
+               size 0.124139 0.137000 0.215000
+            }
+          ]
+        }
+        physics Physics {
+          density -1
+          mass 0.296807
+          centerOfMass [ -0.003658 -0.006168 -0.073387 ]
+          inertiaMatrix [
+            2.664000e-03 1.243000e-03 2.203000e-03
+            5.000000e-06 6.000000e-05 0.000000e+00
+          ]
+        }
+      }
+    ]
+    name IS name
+    boundingObject Transform {
+      translation 0.005000 0.005000 0.005000
+      rotation 0.000000 0.000000 1.000000 3.141593
+      children [
+        Box {
+           size 0.010000 0.010000 0.010000
+        }
+      ]
+    }
+    physics Physics {
+      density -1
+      mass 0.007850
+      centerOfMass [ 0.005000 0.005000 0.005000 ]
+    }
+  }
+}

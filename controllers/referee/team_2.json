@@ -1,60 +1,87 @@
 {
-  "name": "Agile Lynxes",
+  "name": "UTRA 2",
   "players": {
     "1": {
-      "proto": "RobocupRobot",
-      "halfTimeStartingPose": {
-        "translation": [-3.5, -3.06, 0.24],
+      "proto": "SimpleBez1",
+      "dockerTag": "latest",
+      "dockerCmd": "bash ./src/soccerbot/soccerbot/scripts/start_competition.sh robot1",
+        "halfTimeStartingPose": {
+        "translation": [-4, -3.15, 0.33],
         "rotation": [0, 0, 1, 1.57]
       },
       "reentryStartingPose": {
-        "translation": [-3.5, -3.11, 0.24],
+        "translation": [-4, -3.15, 0.33],
         "rotation": [0, 0, 1, 1.57]
       },
       "shootoutStartingPose": {
-        "translation": [2.6, 0, 0.24],
+        "translation": [2.6, 0, 0.33],
         "rotation": [0, 0, 1, 0]
       },
       "goalKeeperStartingPose": {
-        "translation": [-4.47, 0, 0.24],
+        "translation": [-4.5, 0, 0.33],
         "rotation": [0, 0, 1, 0]
       }
     },
     "2": {
-      "proto": "RobocupRobot",
+      "proto": "SimpleBez1",
+      "dockerTag": "latest",
+      "dockerCmd": "bash ./src/soccerbot/soccerbot/scripts/start_competition.sh robot2",
       "halfTimeStartingPose": {
-        "translation": [-3.5, 3.06, 0.24],
-        "rotation": [0, 0, 1, -1.57]
+        "translation": [-1, -3.15, 0.33],
+        "rotation": [0, 0, 1, 1.57]
       },
       "reentryStartingPose": {
-        "translation": [-3.5, 3.11, 0.24],
-        "rotation": [0, 0, 1, -1.57]
+        "translation": [-1, -3.15, 0.33],
+        "rotation": [0, 0, 1, 1.57]
       },
       "shootoutStartingPose": {
-        "translation": [2.6, 0, 0.24],
+        "translation": [2.6, 0, 0.33],
         "rotation": [0, 0, 1, 0]
       },
       "goalKeeperStartingPose": {
-        "translation": [-4.47, 0, 0.24],
+        "translation": [-4.5, 0, 0.33],
         "rotation": [0, 0, 1, 0]
       }
     },
     "3": {
-      "proto": "RobocupRobot",
+      "proto": "SimpleBez1",
+      "dockerTag": "latest",
+      "dockerCmd": "bash ./src/soccerbot/soccerbot/scripts/start_competition.sh robot3",
       "halfTimeStartingPose": {
-        "translation": [-0.75, -3.06, 0.24],
-        "rotation": [0, 0, 1, 1.57]
+        "translation": [-1, 3.15, 0.33],
+        "rotation": [0, 0, 1, -1.57]
       },
       "reentryStartingPose": {
-        "translation": [-0.75, -3.11, 0.24],
+        "translation": [-1, 3.15, 0.33],
         "rotation": [0, 0, 1, 1.57]
       },
       "shootoutStartingPose": {
-        "translation": [2.6, 0, 0.24],
+        "translation": [2.6, 0, 0.33],
         "rotation": [0, 0, 1, 0]
       },
       "goalKeeperStartingPose": {
-        "translation": [-4.47, 0, 0.24],
+        "translation": [-4.5, 0, 0.33],
+        "rotation": [0, 0, 1, 0]
+      }
+    },
+    "4": {
+      "proto": "SimpleBez1",
+      "dockerTag": "latest",
+      "dockerCmd": "bash ./src/soccerbot/soccerbot/scripts/start_competition.sh robot4",
+      "halfTimeStartingPose": {
+        "translation": [-4, 3.15, 0.33],
+        "rotation": [0, 0, 1, -1.57]
+      },
+      "reentryStartingPose": {
+        "translation": [-4, 3.15, 0.33],
+        "rotation": [0, 0, 1, 1.57]
+      },
+      "shootoutStartingPose": {
+        "translation": [2.6, 0, 0.33],
+        "rotation": [0, 0, 1, 0]
+      },
+      "goalKeeperStartingPose": {
+        "translation": [-4.5, 0, 0.33],
         "rotation": [0, 0, 1, 0]
       }
     }

@@ -16,6 +16,8 @@
 import copy
 import json
 import math
+import signal
+
 import numpy as np
 import os
 import random
@@ -27,6 +29,7 @@ import traceback
 import yaml
 
 from scipy.spatial import ConvexHull
+from scipy.spatial.transform import Rotation as R
 
 from types import SimpleNamespace
 
@@ -161,6 +164,17 @@ class Referee:
         if hasattr(self.game, "udp_bouncer_process") and self.udp_bouncer_process:
             self.logger.info("Terminating 'udp_bouncer' process")
             self.udp_bouncer_process.terminate()
+        if hasattr(self.game, 'record_simulation'):
+            if self.game.record_simulation.endswith(".html"):
+                self.logger.info("Stopping Animation recording")
+                self.supervisor.animationStopRecording()
+                self.logger.info("Stopped animation recording")
+            elif self.game.record_simulation.endswith(".mp4"):
+                self.logger.info("Starting encoding")
+                self.supervisor.movieStopRecording()
+                while not self.supervisor.movieIsReady():
+                    self.supervisor.step(self.time_step)
+                self.logger.info("Encoding finished")
         if hasattr(self.game, 'over') and self.game.over:
             self.logger.info("Game is over")
             if hasattr(self.game, 'press_a_key_to_terminate') and self.game.press_a_key_to_terminate:
@@ -177,16 +191,6 @@ class Referee:
                     self.supervisor.step(self.time_step)
                     waiting_steps -= 1
                 self.logger.info("Finished waiting")
-        if hasattr(self.game, 'record_simulation'):
-            if self.game.record_simulation.endswith(".html"):
-                self.logger.info("Stopping animation recording")
-                self.supervisor.animationStopRecording()
-            elif self.game.record_simulation.endswith(".mp4"):
-                self.logger.info("Starting encoding")
-                self.supervisor.movieStopRecording()
-                while not self.supervisor.movieIsReady():
-                    self.supervisor.step(self.time_step)
-                self.logger.info("Encoding finished")
         self.logger.info("Exiting webots properly")
 
         # Note: If self.supervisor.step is not called before the 'simulationQuit', information is not shown
@@ -2088,6 +2092,7 @@ class Referee:
         if hasattr(self.game, 'record_simulation'):
             try:
                 if self.game.record_simulation.endswith(".html"):
+                    self.logger.info("Start animation Recording")
                     self.supervisor.animationStartRecording(self.game.record_simulation)
                 elif self.game.record_simulation.endswith(".mp4"):
                     self.supervisor.movieStartRecording(self.game.record_simulation, width=1280, height=720, codec=0,
@@ -2100,18 +2105,50 @@ class Referee:
                 self.logger.error(f"Failed to start recording with exception: {traceback.format_exc()}")
                 self.clean_exit()
 
+    def sigint(self, *args):
+        self.logger.warning("Sigint signal called")
+        self.clean_exit()
+
     def main_loop(self):
         previous_real_time = time.time()
-        while self.supervisor.step(self.time_step) != -1 and not self.game.over:
+        i = 0
+        signal.signal(signal.SIGINT, self.sigint)
+        signal.signal(signal.SIGTERM, self.sigint)
+        while not self.game.over:
+            supervisor_step = self.supervisor.step(self.time_step)
+            if supervisor_step == -1:
+                self.game.over = True
+                break
+
             if hasattr(self.game, 'max_duration') and (time.time() - self.blackboard.start_real_time) > self.game.max_duration:
                 self.logger.info(f'Interrupting game automatically after {self.game.max_duration} seconds')
                 break
             self.print_status()
             self.game_controller_send(f'CLOCK:{self.sim_time.get_ms()}')
-            self.game_controller_receive()
-            if self.game.state is None:
-                self.sim_time.progress_ms(self.time_step)
+            i = i + 1
+            if i % 10 != 0: # Send Game Controller status
                 continue
+
+            if os.getenv("START_PLAY", "false") == "true" and i == 20:
+                print(f"Setting starting state: {os.getenv('STARTING_STATE')}")
+                self.game_controller_send("STATE:READY")
+                self.game_controller_send("STATE:SET")
+                self.game_controller_send("STATE:PLAY")
+                if os.getenv("ROBOT_X") is not None:
+                    p = [float(os.getenv("ROBOT_X")), float(os.getenv("ROBOT_Y")), float(os.getenv("ROBOT_Z"))]
+                    r = R.from_euler("ZYX", [os.getenv("ROBOT_THETA"), 0, 0], degrees=False)
+                    q = r.as_quat().tolist()
+                    qq = [q[3], q[0], q[1], q[2]]
+                    print("Resetting Robot Position")
+                    print(p)
+                    print(qq)
+                    self.reset_player("red", "1", None, custom_t=p, custom_r=qq)
+                if os.getenv("BALL_X") is not None:
+                    p = [float(os.getenv("BALL_X")), float(os.getenv("BALL_Y")), 0.0772]
+                    self.game_interruption_place_ball(p)
+
+
+            self.game_controller_receive()
             self.stabilize_robots()
             send_play_state_after_penalties = False
             previous_position = copy.deepcopy(self.game.ball_position)
