@@ -10,7 +10,8 @@ IMPORTABLE EXTERNPROTO "../protos/lighting/RoboCupTopLight.proto"
 
 IMPORTABLE EXTERNPROTO "../protos/robots/RoboCupRobot/RobocupRobot.proto"
 IMPORTABLE EXTERNPROTO "../protos/robots/WolfgangRobocup/WolfgangRobocup.proto"
-
+IMPORTABLE EXTERNPROTO "../protos/Utra/BezRobocup/BezRobocup.proto"
+IMPORTABLE EXTERNPROTO "../protos/Utra/Bez2Robocup/Bez2Robocup.proto"
 WorldInfo {
   info [
     "Description: official soccer simulation for the 2021 Robocup Virtual Humanoid League (kid size)"
