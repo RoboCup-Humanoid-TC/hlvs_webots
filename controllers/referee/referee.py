@@ -68,12 +68,13 @@ class Referee:
             config = yaml.safe_load(f)
         self.config = SimpleNamespace(**config)
         self.config.GOAL_HALF_WIDTH = self.config.GOAL_WIDTH / 2
+        self.UPDATE_GAME_STATUS_RATE = 10
         self.config.SIMULATED_TIME_INTERRUPTION_PHASE_0 = \
-            int(self.config.SIMULATED_TIME_INTERRUPTION_PHASE_0 * 1000 / self.time_step)
+            int(self.config.SIMULATED_TIME_INTERRUPTION_PHASE_0 * 1000 / self.time_step / self.UPDATE_GAME_STATUS_RATE)
         self.config.SIMULATED_TIME_BEFORE_PLAY_STATE = \
-            int(self.config.SIMULATED_TIME_BEFORE_PLAY_STATE * 1000 / self.time_step)
+            int(self.config.SIMULATED_TIME_BEFORE_PLAY_STATE * 1000 / self.time_step / self.UPDATE_GAME_STATUS_RATE)
         self.config.SIMULATED_TIME_SET_PENALTY_SHOOTOUT = \
-            int(self.config.SIMULATED_TIME_SET_PENALTY_SHOOTOUT * 1000 / self.time_step)
+            int(self.config.SIMULATED_TIME_SET_PENALTY_SHOOTOUT * 1000 / self.time_step / self.UPDATE_GAME_STATUS_RATE)
 
         self.game_controller_socket = None
 
@@ -2126,7 +2127,7 @@ class Referee:
             self.print_status()
             self.game_controller_send(f'CLOCK:{self.sim_time.get_ms()}')
             i = i + 1
-            if i % 10 != 0: # Send Game Controller status
+            if i % self.UPDATE_GAME_STATUS_RATE != 0: # Send Game Controller status
                 self.sim_time.progress_ms(self.time_step)
                 continue
 
