@@ -3,7 +3,7 @@
 # license url: http://www.apache.org/licenses/LICENSE-2.0
 # This is a proto file for Webots for the WolfgangRobocup
 
-EXTERNPROTO "Bez.proto"
+EXTERNPROTO "Soccerbot_meshes/Bez.proto"
 
 PROTO BezRobocup [
   field  SFVec3f     translation     0 0 0
