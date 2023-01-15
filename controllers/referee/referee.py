@@ -2127,6 +2127,7 @@ class Referee:
             self.game_controller_send(f'CLOCK:{self.sim_time.get_ms()}')
             i = i + 1
             if i % 10 != 0: # Send Game Controller status
+                self.sim_time.progress_ms(self.time_step)
                 continue
 
             if os.getenv("START_PLAY", "false") == "true" and i == 20:
@@ -2610,7 +2611,7 @@ class Referee:
                                 else:
                                     self.logger.info('Tossing a coin to determine the winner.')
                                     if bool(random.getrandbits(1)):
-                                        self.logger.info('The winer is the red team.')
+                                        self.logger.info('The winner is the red team.')
                                     else:
                                         self.logger.info('The winer is the blue team.')
 
