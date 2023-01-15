@@ -4,6 +4,7 @@ controllers/referee/meshes/*
 controllers/referee/recording.css
 controllers/referee/recording.html
 controllers/referee/recording.x3d
+controllers/referee/recording.json
 controllers/referee/textures/*
 .idea/*
 # Python compiled files
