@@ -5,7 +5,7 @@
       "proto": "SimpleBez1",
       "dockerTag": "latest",
       "dockerCmd": "bash ./src/soccerbot/soccerbot/scripts/start_competition.sh robot1",
-        "halfTimeStartingPose": {
+      "halfTimeStartingPose": {
         "translation": [-4, -3.15, 0.33],
         "rotation": [0, 0, 1, 1.57]
       },

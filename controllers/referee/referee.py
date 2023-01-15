@@ -186,7 +186,7 @@ class Referee:
                     if keyboard.getKey() != -1:
                         break
             else:
-                waiting_steps = self.config.END_OF_GAME_TIMEOUT * 1000 / self.time_step
+                waiting_steps = self.config.END_OF_GAME_TIMEOUT * 1000 / self.time_step / self.UPDATE_GAME_STATUS_RATE
                 self.logger.info(f"Waiting {waiting_steps} simulation steps before exiting")
                 while waiting_steps > 0:
                     self.supervisor.step(self.time_step)

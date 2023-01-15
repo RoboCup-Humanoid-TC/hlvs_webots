@@ -14,6 +14,7 @@
 
 
 import json
+import os
 import traceback
 from types import SimpleNamespace
 
@@ -32,6 +33,23 @@ class Team(SimpleNamespace):
                         raise RuntimeError(f"Missing field {field_name}")
                 if len(team['players']) == 0:
                     logger.warning(f"No players found for team {team['name']}")
+                if "2" in team["name"]:
+                    players_on_field = os.environ.get("TEAM_2_PLAYERS_ON_FIELD", "1,2,3,4")
+                else:
+                    players_on_field = os.environ.get("TEAM_1_PLAYERS_ON_FIELD", "1,2,3,4")
+                print(f"Team {team['name']} selecting players {players_on_field}")
+
+
+                players = players_on_field.replace(" ", "").split(",")
+                for i in range(5):
+                    if str(i) not in players and str(i) in team['players']:
+                        team['players'].pop(str(i))
+
+                robot_model = os.environ.get("ROBOT_MODEL", "bez1")
+                for i in range(5):
+                    if robot_model != "bez1" and str(i) in team['players']:
+                        team['players'][str(i)]['proto'] = robot_model.capitalize()
+
                 count = 1
                 for p_key, p in team['players'].items():
                     if int(p_key) != count:
