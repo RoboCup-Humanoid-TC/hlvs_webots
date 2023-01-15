@@ -2,7 +2,7 @@
   "name": "UTRA 1",
   "players": {
     "1": {
-      "proto": "BezRobocup",
+      "proto": "SimpleBez1",
       "dockerTag": "latest",
       "dockerCmd": "bash ./src/soccerbot/soccerbot/scripts/start_competition.sh robot1",
         "halfTimeStartingPose": {
