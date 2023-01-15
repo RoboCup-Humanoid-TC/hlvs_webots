@@ -235,11 +235,21 @@ PROTO Bez [
                       %{=text2}%
                     ]
       }
-      Soccerbot_torso_3Mesh {
-      }
-      Soccerbot_torso_4Mesh {
-      }
-      Soccerbot_torso_5Mesh {
+      Transform {
+        translation 0.012 0.0 -0.05
+        rotation 0.000000 1.000000 0.000000 0.000000
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0 0 0
+              roughness 1
+              metalness 0
+            }
+            geometry Box {
+              size 0.085000 0.145000 0.152000
+            }
+          }
+        ]
       }
 
 
@@ -272,23 +282,21 @@ PROTO Bez [
           translation -0.015700 0.072500 0.000000
           rotation 0.000000 -1.00000 0.000000 0.000000
           children [
-            Soccerbot_left_bicep_0Mesh {
-            }
-            Soccerbot_left_bicep_1Mesh {
-            }
-            Soccerbot_left_bicep_2Mesh {
-            }
-            Soccerbot_left_bicep_3Mesh {
-            }
-            Soccerbot_left_bicep_4Mesh {
-            }
-            Soccerbot_left_bicep_5Mesh {
-            }
-            Soccerbot_left_bicep_6Mesh {
-            }
-            Soccerbot_left_bicep_7Mesh {
-            }
-            Soccerbot_left_bicep_8Mesh {
+            Transform {
+              translation 0.00 0.025 -0.05
+              rotation 0.000000 1.000000 0.000000 0.000000
+              children [
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0 0 0
+                    roughness 1
+                    metalness 0
+                  }
+                  geometry Box {
+                    size 0.040000 0.047760 0.123000
+                  }
+                }
+              ]
             }
             HingeJointWithBacklash {
               jointParameters HingeJointParameters {
@@ -417,23 +425,21 @@ PROTO Bez [
           translation -0.015700 -0.072500 0.000000
           rotation 0.000000 1.000000 0.000000 0.000000
           children [
-            Soccerbot_right_bicep_0Mesh {
-            }
-            Soccerbot_right_bicep_1Mesh {
-            }
-            Soccerbot_right_bicep_2Mesh {
-            }
-            Soccerbot_right_bicep_3Mesh {
-            }
-            Soccerbot_right_bicep_4Mesh {
-            }
-            Soccerbot_right_bicep_5Mesh {
-            }
-            Soccerbot_right_bicep_6Mesh {
-            }
-            Soccerbot_right_bicep_7Mesh {
-            }
-            Soccerbot_right_bicep_8Mesh {
+            Transform {
+              translation 0.00 -0.025 -0.05
+              rotation 0.000000 1.000000 0.000000 0.000000
+              children [
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0 0 0
+                    roughness 1
+                    metalness 0
+                  }
+                  geometry Box {
+                    size 0.040000 0.047760 0.123000
+                  }
+                }
+              ]
             }
             HingeJointWithBacklash {
               jointParameters HingeJointParameters {
@@ -1807,21 +1813,21 @@ PROTO Bez [
                 translation 0.000000 0.000000 0.024000
                 rotation 0.000000 1.000000 0.000000 0.000000
                 children [
-                  Soccerbot_head_0Mesh {
-                  }
-                  Soccerbot_head_1Mesh {
-                  }
-                  Soccerbot_head_2Mesh {
-                  }
-                  Soccerbot_head_3Mesh {
-                  }
-                  Soccerbot_head_4Mesh {
-                  }
-                  Soccerbot_head_5Mesh {
-                  }
-                  Soccerbot_head_6Mesh {
-                  }
-                  Soccerbot_head_7Mesh {
+                  Transform {
+                    translation -0.01 0.0 0.025
+                    rotation 0.000000 1.000000 0.000000 0.000000
+                    children [
+                      Shape {
+                        appearance PBRAppearance {
+                          baseColor 0 0 0
+                          roughness 1
+                          metalness 0
+                        }
+                        geometry Box {
+                          size 0.071200 0.094000 0.077900
+                        }
+                      }
+                    ]
                   }
 
                   Solid {
