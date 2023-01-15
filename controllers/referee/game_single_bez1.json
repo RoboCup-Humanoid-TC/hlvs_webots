@@ -6,7 +6,7 @@
   "minimum_real_time_factor": 0,
   "side_left": "red",
   "press_a_key_to_terminate": false,
-  "use_bouncing_server": true,
+  "use_bouncing_server": false,
   "record_simulation": "recording.html",
   "red": {
     "id": 16,
