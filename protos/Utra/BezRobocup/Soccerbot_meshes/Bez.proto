@@ -4,163 +4,163 @@
 # This is a proto file for Webots for the Soccerbot
 # Extracted from: soccerbot.urdf
 
-EXTERNPROTO "Soccerbot_meshes/HingeJointWithBacklash.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_hip_front_6Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_calve_6Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_bicep_8Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_ankle_10Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_calve_5Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_hip_front_19Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_hip_front_18Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_hip_front_0Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_bicep_0Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_hip_front_13Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_torso_5Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_bicep_4Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_ankle_0Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_ankle_15Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_hip_side_0Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_bicep_2Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_hip_front_17Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_head_3Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_bicep_6Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_hip_front_16Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_ankle_7Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_calve_10Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_hip_front_17Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_bicep_4Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_ankle_18Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_ankle_14Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_ankle_22Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_calve_0Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_hip_front_21Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_hip_front_9Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_ankle_18Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_hip_front_6Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_calve_4Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_ankle_7Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_hip_front_3Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_head_7Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_calve_3Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_ankle_21Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_ankle_3Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_head_0Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_hip_front_4Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_forearm_0Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_ankle_2Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_hip_front_9Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_foot_0Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_calve_7Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_hip_front_14Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_bicep_1Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_bicep_1Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_ankle_15Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_hip_front_3Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_hip_front_20Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_calve_5Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_calve_6Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_bicep_0Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_ankle_8Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_ankle_12Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_torso_3Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_ankle_6Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_ankle_16Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_hip_front_19Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_hip_front_2Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_hip_front_16Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_ankle_11Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_calve_0Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_hip_front_1Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_bicep_8Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_ankle_2Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_neck_0Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_head_4Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_ankle_20Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_ankle_14Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_torso_2Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_bicep_6Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_ankle_21Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_ankle_9Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_hip_front_0Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_calve_1Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_ankle_1Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_hip_front_5Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_thigh_0Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_hip_front_15Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_calve_8Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_calve_4Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_hip_front_14Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_torso_1Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_ankle_17Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_calve_7Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_hip_front_13Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_calve_2Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_hip_side_0Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_calve_3Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_hip_front_8Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_ankle_13Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_calve_9Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_hip_front_8Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_thigh_1Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_hip_front_5Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_bicep_3Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_hip_front_22Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_bicep_3Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_hip_front_4Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_hip_front_1Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_hip_front_7Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_ankle_5Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_ankle_20Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_hip_front_12Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_ankle_19Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_hip_front_12Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_ankle_5Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_calve_2Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_ankle_11Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_ankle_4Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_ankle_17Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_hip_front_15Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_torso_4Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_ankle_13Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_bicep_5Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_hip_front_11Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_head_2Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_hip_front_22Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_head_5Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_ankle_22Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_ankle_9Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_ankle_12Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_thigh_0Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_hip_front_7Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_bicep_7Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_calve_9Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_ankle_8Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_head_6Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_torso_0Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_hip_front_20Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_ankle_19Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_calve_8Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_hip_front_11Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_bicep_5Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_bicep_2Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_ankle_0Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_hip_front_18Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_bicep_7Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_foot_0Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_calve_10Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_ankle_10Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_ankle_6Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_hip_front_2Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_hip_front_21Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_ankle_1Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_calve_1Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_hip_front_10Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_forearm_0Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_ankle_16Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_ankle_4Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_left_hip_front_10Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_head_1Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_right_ankle_3Mesh.proto"
+EXTERNPROTO "HingeJointWithBacklash.proto"
+EXTERNPROTO "Soccerbot_right_hip_front_6Mesh.proto"
+EXTERNPROTO "Soccerbot_right_calve_6Mesh.proto"
+EXTERNPROTO "Soccerbot_right_bicep_8Mesh.proto"
+EXTERNPROTO "Soccerbot_left_ankle_10Mesh.proto"
+EXTERNPROTO "Soccerbot_left_calve_5Mesh.proto"
+EXTERNPROTO "Soccerbot_left_hip_front_19Mesh.proto"
+EXTERNPROTO "Soccerbot_left_hip_front_18Mesh.proto"
+EXTERNPROTO "Soccerbot_right_hip_front_0Mesh.proto"
+EXTERNPROTO "Soccerbot_right_bicep_0Mesh.proto"
+EXTERNPROTO "Soccerbot_right_hip_front_13Mesh.proto"
+EXTERNPROTO "Soccerbot_torso_5Mesh.proto"
+EXTERNPROTO "Soccerbot_left_bicep_4Mesh.proto"
+EXTERNPROTO "Soccerbot_right_ankle_0Mesh.proto"
+EXTERNPROTO "Soccerbot_right_ankle_15Mesh.proto"
+EXTERNPROTO "Soccerbot_right_hip_side_0Mesh.proto"
+EXTERNPROTO "Soccerbot_right_bicep_2Mesh.proto"
+EXTERNPROTO "Soccerbot_left_hip_front_17Mesh.proto"
+EXTERNPROTO "Soccerbot_head_3Mesh.proto"
+EXTERNPROTO "Soccerbot_left_bicep_6Mesh.proto"
+EXTERNPROTO "Soccerbot_right_hip_front_16Mesh.proto"
+EXTERNPROTO "Soccerbot_left_ankle_7Mesh.proto"
+EXTERNPROTO "Soccerbot_left_calve_10Mesh.proto"
+EXTERNPROTO "Soccerbot_right_hip_front_17Mesh.proto"
+EXTERNPROTO "Soccerbot_right_bicep_4Mesh.proto"
+EXTERNPROTO "Soccerbot_right_ankle_18Mesh.proto"
+EXTERNPROTO "Soccerbot_left_ankle_14Mesh.proto"
+EXTERNPROTO "Soccerbot_left_ankle_22Mesh.proto"
+EXTERNPROTO "Soccerbot_left_calve_0Mesh.proto"
+EXTERNPROTO "Soccerbot_left_hip_front_21Mesh.proto"
+EXTERNPROTO "Soccerbot_right_hip_front_9Mesh.proto"
+EXTERNPROTO "Soccerbot_left_ankle_18Mesh.proto"
+EXTERNPROTO "Soccerbot_left_hip_front_6Mesh.proto"
+EXTERNPROTO "Soccerbot_left_calve_4Mesh.proto"
+EXTERNPROTO "Soccerbot_right_ankle_7Mesh.proto"
+EXTERNPROTO "Soccerbot_right_hip_front_3Mesh.proto"
+EXTERNPROTO "Soccerbot_head_7Mesh.proto"
+EXTERNPROTO "Soccerbot_left_calve_3Mesh.proto"
+EXTERNPROTO "Soccerbot_left_ankle_21Mesh.proto"
+EXTERNPROTO "Soccerbot_left_ankle_3Mesh.proto"
+EXTERNPROTO "Soccerbot_head_0Mesh.proto"
+EXTERNPROTO "Soccerbot_right_hip_front_4Mesh.proto"
+EXTERNPROTO "Soccerbot_right_forearm_0Mesh.proto"
+EXTERNPROTO "Soccerbot_left_ankle_2Mesh.proto"
+EXTERNPROTO "Soccerbot_left_hip_front_9Mesh.proto"
+EXTERNPROTO "Soccerbot_right_foot_0Mesh.proto"
+EXTERNPROTO "Soccerbot_right_calve_7Mesh.proto"
+EXTERNPROTO "Soccerbot_right_hip_front_14Mesh.proto"
+EXTERNPROTO "Soccerbot_right_bicep_1Mesh.proto"
+EXTERNPROTO "Soccerbot_left_bicep_1Mesh.proto"
+EXTERNPROTO "Soccerbot_left_ankle_15Mesh.proto"
+EXTERNPROTO "Soccerbot_left_hip_front_3Mesh.proto"
+EXTERNPROTO "Soccerbot_right_hip_front_20Mesh.proto"
+EXTERNPROTO "Soccerbot_right_calve_5Mesh.proto"
+EXTERNPROTO "Soccerbot_left_calve_6Mesh.proto"
+EXTERNPROTO "Soccerbot_left_bicep_0Mesh.proto"
+EXTERNPROTO "Soccerbot_right_ankle_8Mesh.proto"
+EXTERNPROTO "Soccerbot_right_ankle_12Mesh.proto"
+EXTERNPROTO "Soccerbot_torso_3Mesh.proto"
+EXTERNPROTO "Soccerbot_right_ankle_6Mesh.proto"
+EXTERNPROTO "Soccerbot_right_ankle_16Mesh.proto"
+EXTERNPROTO "Soccerbot_right_hip_front_19Mesh.proto"
+EXTERNPROTO "Soccerbot_left_hip_front_2Mesh.proto"
+EXTERNPROTO "Soccerbot_left_hip_front_16Mesh.proto"
+EXTERNPROTO "Soccerbot_right_ankle_11Mesh.proto"
+EXTERNPROTO "Soccerbot_right_calve_0Mesh.proto"
+EXTERNPROTO "Soccerbot_left_hip_front_1Mesh.proto"
+EXTERNPROTO "Soccerbot_left_bicep_8Mesh.proto"
+EXTERNPROTO "Soccerbot_right_ankle_2Mesh.proto"
+EXTERNPROTO "Soccerbot_neck_0Mesh.proto"
+EXTERNPROTO "Soccerbot_head_4Mesh.proto"
+EXTERNPROTO "Soccerbot_right_ankle_20Mesh.proto"
+EXTERNPROTO "Soccerbot_right_ankle_14Mesh.proto"
+EXTERNPROTO "Soccerbot_torso_2Mesh.proto"
+EXTERNPROTO "Soccerbot_right_bicep_6Mesh.proto"
+EXTERNPROTO "Soccerbot_right_ankle_21Mesh.proto"
+EXTERNPROTO "Soccerbot_left_ankle_9Mesh.proto"
+EXTERNPROTO "Soccerbot_left_hip_front_0Mesh.proto"
+EXTERNPROTO "Soccerbot_right_calve_1Mesh.proto"
+EXTERNPROTO "Soccerbot_right_ankle_1Mesh.proto"
+EXTERNPROTO "Soccerbot_left_hip_front_5Mesh.proto"
+EXTERNPROTO "Soccerbot_left_thigh_0Mesh.proto"
+EXTERNPROTO "Soccerbot_left_hip_front_15Mesh.proto"
+EXTERNPROTO "Soccerbot_left_calve_8Mesh.proto"
+EXTERNPROTO "Soccerbot_right_calve_4Mesh.proto"
+EXTERNPROTO "Soccerbot_left_hip_front_14Mesh.proto"
+EXTERNPROTO "Soccerbot_torso_1Mesh.proto"
+EXTERNPROTO "Soccerbot_right_ankle_17Mesh.proto"
+EXTERNPROTO "Soccerbot_left_calve_7Mesh.proto"
+EXTERNPROTO "Soccerbot_left_hip_front_13Mesh.proto"
+EXTERNPROTO "Soccerbot_left_calve_2Mesh.proto"
+EXTERNPROTO "Soccerbot_left_hip_side_0Mesh.proto"
+EXTERNPROTO "Soccerbot_right_calve_3Mesh.proto"
+EXTERNPROTO "Soccerbot_left_hip_front_8Mesh.proto"
+EXTERNPROTO "Soccerbot_right_ankle_13Mesh.proto"
+EXTERNPROTO "Soccerbot_right_calve_9Mesh.proto"
+EXTERNPROTO "Soccerbot_right_hip_front_8Mesh.proto"
+EXTERNPROTO "Soccerbot_right_thigh_1Mesh.proto"
+EXTERNPROTO "Soccerbot_right_hip_front_5Mesh.proto"
+EXTERNPROTO "Soccerbot_left_bicep_3Mesh.proto"
+EXTERNPROTO "Soccerbot_right_hip_front_22Mesh.proto"
+EXTERNPROTO "Soccerbot_right_bicep_3Mesh.proto"
+EXTERNPROTO "Soccerbot_left_hip_front_4Mesh.proto"
+EXTERNPROTO "Soccerbot_right_hip_front_1Mesh.proto"
+EXTERNPROTO "Soccerbot_right_hip_front_7Mesh.proto"
+EXTERNPROTO "Soccerbot_right_ankle_5Mesh.proto"
+EXTERNPROTO "Soccerbot_left_ankle_20Mesh.proto"
+EXTERNPROTO "Soccerbot_left_hip_front_12Mesh.proto"
+EXTERNPROTO "Soccerbot_left_ankle_19Mesh.proto"
+EXTERNPROTO "Soccerbot_right_hip_front_12Mesh.proto"
+EXTERNPROTO "Soccerbot_left_ankle_5Mesh.proto"
+EXTERNPROTO "Soccerbot_right_calve_2Mesh.proto"
+EXTERNPROTO "Soccerbot_left_ankle_11Mesh.proto"
+EXTERNPROTO "Soccerbot_right_ankle_4Mesh.proto"
+EXTERNPROTO "Soccerbot_left_ankle_17Mesh.proto"
+EXTERNPROTO "Soccerbot_right_hip_front_15Mesh.proto"
+EXTERNPROTO "Soccerbot_torso_4Mesh.proto"
+EXTERNPROTO "Soccerbot_left_ankle_13Mesh.proto"
+EXTERNPROTO "Soccerbot_right_bicep_5Mesh.proto"
+EXTERNPROTO "Soccerbot_left_hip_front_11Mesh.proto"
+EXTERNPROTO "Soccerbot_head_2Mesh.proto"
+EXTERNPROTO "Soccerbot_left_hip_front_22Mesh.proto"
+EXTERNPROTO "Soccerbot_head_5Mesh.proto"
+EXTERNPROTO "Soccerbot_right_ankle_22Mesh.proto"
+EXTERNPROTO "Soccerbot_right_ankle_9Mesh.proto"
+EXTERNPROTO "Soccerbot_left_ankle_12Mesh.proto"
+EXTERNPROTO "Soccerbot_right_thigh_0Mesh.proto"
+EXTERNPROTO "Soccerbot_left_hip_front_7Mesh.proto"
+EXTERNPROTO "Soccerbot_left_bicep_7Mesh.proto"
+EXTERNPROTO "Soccerbot_left_calve_9Mesh.proto"
+EXTERNPROTO "Soccerbot_left_ankle_8Mesh.proto"
+EXTERNPROTO "Soccerbot_head_6Mesh.proto"
+EXTERNPROTO "Soccerbot_torso_0Mesh.proto"
+EXTERNPROTO "Soccerbot_left_hip_front_20Mesh.proto"
+EXTERNPROTO "Soccerbot_right_ankle_19Mesh.proto"
+EXTERNPROTO "Soccerbot_right_calve_8Mesh.proto"
+EXTERNPROTO "Soccerbot_right_hip_front_11Mesh.proto"
+EXTERNPROTO "Soccerbot_left_bicep_5Mesh.proto"
+EXTERNPROTO "Soccerbot_left_bicep_2Mesh.proto"
+EXTERNPROTO "Soccerbot_left_ankle_0Mesh.proto"
+EXTERNPROTO "Soccerbot_right_hip_front_18Mesh.proto"
+EXTERNPROTO "Soccerbot_right_bicep_7Mesh.proto"
+EXTERNPROTO "Soccerbot_left_foot_0Mesh.proto"
+EXTERNPROTO "Soccerbot_right_calve_10Mesh.proto"
+EXTERNPROTO "Soccerbot_right_ankle_10Mesh.proto"
+EXTERNPROTO "Soccerbot_left_ankle_6Mesh.proto"
+EXTERNPROTO "Soccerbot_right_hip_front_2Mesh.proto"
+EXTERNPROTO "Soccerbot_right_hip_front_21Mesh.proto"
+EXTERNPROTO "Soccerbot_left_ankle_1Mesh.proto"
+EXTERNPROTO "Soccerbot_left_calve_1Mesh.proto"
+EXTERNPROTO "Soccerbot_right_hip_front_10Mesh.proto"
+EXTERNPROTO "Soccerbot_left_forearm_0Mesh.proto"
+EXTERNPROTO "Soccerbot_left_ankle_16Mesh.proto"
+EXTERNPROTO "Soccerbot_left_ankle_4Mesh.proto"
+EXTERNPROTO "Soccerbot_left_hip_front_10Mesh.proto"
+EXTERNPROTO "Soccerbot_head_1Mesh.proto"
+EXTERNPROTO "Soccerbot_right_ankle_3Mesh.proto"
 
 PROTO Bez [
   field  SFVec3f     translation     0 0 0
@@ -235,11 +235,21 @@ PROTO Bez [
                       %{=text2}%
                     ]
       }
-      Soccerbot_torso_3Mesh {
-      }
-      Soccerbot_torso_4Mesh {
-      }
-      Soccerbot_torso_5Mesh {
+      Transform {
+        translation 0.012 0.0 -0.05
+        rotation 0.000000 1.000000 0.000000 0.000000
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0 0 0
+              roughness 1
+              metalness 0
+            }
+            geometry Box {
+              size 0.085000 0.145000 0.152000
+            }
+          }
+        ]
       }
 
 
@@ -272,23 +282,21 @@ PROTO Bez [
           translation -0.015700 0.072500 0.000000
           rotation 0.000000 -1.00000 0.000000 0.000000
           children [
-            Soccerbot_left_bicep_0Mesh {
-            }
-            Soccerbot_left_bicep_1Mesh {
-            }
-            Soccerbot_left_bicep_2Mesh {
-            }
-            Soccerbot_left_bicep_3Mesh {
-            }
-            Soccerbot_left_bicep_4Mesh {
-            }
-            Soccerbot_left_bicep_5Mesh {
-            }
-            Soccerbot_left_bicep_6Mesh {
-            }
-            Soccerbot_left_bicep_7Mesh {
-            }
-            Soccerbot_left_bicep_8Mesh {
+            Transform {
+              translation 0.00 0.025 -0.05
+              rotation 0.000000 1.000000 0.000000 0.000000
+              children [
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0 0 0
+                    roughness 1
+                    metalness 0
+                  }
+                  geometry Box {
+                    size 0.040000 0.047760 0.123000
+                  }
+                }
+              ]
             }
             HingeJointWithBacklash {
               jointParameters HingeJointParameters {
@@ -417,23 +425,21 @@ PROTO Bez [
           translation -0.015700 -0.072500 0.000000
           rotation 0.000000 1.000000 0.000000 0.000000
           children [
-            Soccerbot_right_bicep_0Mesh {
-            }
-            Soccerbot_right_bicep_1Mesh {
-            }
-            Soccerbot_right_bicep_2Mesh {
-            }
-            Soccerbot_right_bicep_3Mesh {
-            }
-            Soccerbot_right_bicep_4Mesh {
-            }
-            Soccerbot_right_bicep_5Mesh {
-            }
-            Soccerbot_right_bicep_6Mesh {
-            }
-            Soccerbot_right_bicep_7Mesh {
-            }
-            Soccerbot_right_bicep_8Mesh {
+            Transform {
+              translation 0.00 -0.025 -0.05
+              rotation 0.000000 1.000000 0.000000 0.000000
+              children [
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0 0 0
+                    roughness 1
+                    metalness 0
+                  }
+                  geometry Box {
+                    size 0.040000 0.047760 0.123000
+                  }
+                }
+              ]
             }
             HingeJointWithBacklash {
               jointParameters HingeJointParameters {
@@ -1807,21 +1813,21 @@ PROTO Bez [
                 translation 0.000000 0.000000 0.024000
                 rotation 0.000000 1.000000 0.000000 0.000000
                 children [
-                  Soccerbot_head_0Mesh {
-                  }
-                  Soccerbot_head_1Mesh {
-                  }
-                  Soccerbot_head_2Mesh {
-                  }
-                  Soccerbot_head_3Mesh {
-                  }
-                  Soccerbot_head_4Mesh {
-                  }
-                  Soccerbot_head_5Mesh {
-                  }
-                  Soccerbot_head_6Mesh {
-                  }
-                  Soccerbot_head_7Mesh {
+                  Transform {
+                    translation -0.01 0.0 0.025
+                    rotation 0.000000 1.000000 0.000000 0.000000
+                    children [
+                      Shape {
+                        appearance PBRAppearance {
+                          baseColor 0 0 0
+                          roughness 1
+                          metalness 0
+                        }
+                        geometry Box {
+                          size 0.071200 0.094000 0.077900
+                        }
+                      }
+                    ]
                   }
 
                   Solid {

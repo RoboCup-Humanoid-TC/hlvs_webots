@@ -4,9 +4,9 @@
 # This is a proto file for Webots for the Soccerbot
 # Extracted from: soccerbot.urdf
 
-EXTERNPROTO "Soccerbot_meshes/HingeJointWithBacklash.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_torso_1Mesh.proto"
-EXTERNPROTO "Soccerbot_meshes/Soccerbot_torso_2Mesh.proto"
+EXTERNPROTO "HingeJointWithBacklash.proto"
+EXTERNPROTO "Soccerbot_torso_1Mesh.proto"
+EXTERNPROTO "Soccerbot_torso_2Mesh.proto"
 
 PROTO SimpleBez1 [
   field  SFVec3f     translation     0 0 0
