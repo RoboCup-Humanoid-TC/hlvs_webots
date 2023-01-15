@@ -1,5 +1,5 @@
 __pycache__/*
-controllers/player/build/*
+controllers/player/build
 controllers/model_verifier/results/*
 controllers/referee/meshes/*
 controllers/referee/recording.css
