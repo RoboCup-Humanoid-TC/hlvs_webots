@@ -1,4 +1,3 @@
-__pycache__/*
 controllers/player/build
 controllers/model_verifier/results/*
 controllers/referee/meshes/*
@@ -7,3 +6,6 @@ controllers/referee/recording.html
 controllers/referee/recording.x3d
 controllers/referee/textures/*
 .idea/*
+# Python compiled files
+__pycache__/
+*.pyc

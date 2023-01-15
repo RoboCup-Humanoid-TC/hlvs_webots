@@ -2149,6 +2149,9 @@ class Referee:
 
 
             self.game_controller_receive()
+            if self.game.state is None:
+                self.sim_time.progress_ms(self.time_step)
+                continue
             self.stabilize_robots()
             send_play_state_after_penalties = False
             previous_position = copy.deepcopy(self.game.ball_position)
