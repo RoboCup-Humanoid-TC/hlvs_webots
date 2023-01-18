@@ -29,6 +29,7 @@ import yaml
 from scipy.spatial import ConvexHull
 
 from types import SimpleNamespace
+from typing import Dict, List
 
 
 import numpy as np
@@ -134,15 +135,15 @@ class Referee:
         self.game_controller_udp_filter = os.environ['GAME_CONTROLLER_UDP_FILTER'] \
             if 'GAME_CONTROLLER_UDP_FILTER' in os.environ else None
 
+        if self.config.DATA_COLLECTION:
+            self.data_collector: dc.DataCollector = self.init_data_collector()
+        self.logger.info("REMOVE: After DataCollector init")
+
         self.setup()
         self.display.update()
 
         self.status_update_last_real_time = None
         self.status_update_last_sim_time = None
-
-        if self.config.DATA_COLLECTION:
-            self.data_collector: dc.DataCollector = self.init_data_collector()
-            self.collect_team_player_frame_nodes()
 
         try:
             self.main_loop()
@@ -1960,7 +1961,6 @@ class Referee:
         :return: a dictionary of nodes indexed by frame id
         :rtype: Dict[str, Node]
         """
-        robot = team.players[number]["robot"]
         frame_ids = [
             "base_link",
             "l_sole",
@@ -1971,6 +1971,7 @@ class Referee:
             "l_camera_frame",
             "r_camera_frame",
         ]
+        robot = team.players[number]["robot"]
         nodes = {}
         for frame_id in frame_ids:
             node = robot.getDefFromProto(frame_id)
@@ -1984,7 +1985,7 @@ class Referee:
         self.team_player_frame_nodes = {}
         for color, team in {"blue": self.blue_team, "red": self.red_team}.items():
             self.team_player_frame_nodes[color] = {}
-            for number in range(len(team.players)):
+            for number in team.players.keys():
                 self.team_player_frame_nodes[color][
                     number
                 ] = self.get_player_frame_nodes(team, number)
@@ -2172,6 +2173,9 @@ class Referee:
 
         self.list_solids()  # prepare lists of solids to monitor in each robot to compute the convex hulls
 
+        if self.config.DATA_COLLECTION:
+            self.collect_team_player_frame_nodes()
+
         self.game.reset_ball_touched()
 
         self.previous_seconds_remaining = 0
@@ -2265,6 +2269,7 @@ class Referee:
             except Exception:
                 self.logger.error(f"Failed to start recording with exception: {traceback.format_exc()}")
                 self.clean_exit()
+        self.logger.info("Setup complete.")
 
     def main_loop(self):
         previous_real_time = time.time()
