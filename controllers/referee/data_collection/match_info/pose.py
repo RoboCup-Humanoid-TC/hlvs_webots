@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Tuple
 
+import numpy as np
 import transforms3d
 from dataclasses_json import DataClassJsonMixin
 

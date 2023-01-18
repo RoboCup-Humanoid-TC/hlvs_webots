@@ -89,7 +89,6 @@ class Referee:
         self.blackboard.config = self.config
         self.blackboard.start_real_time = time.time()
         self.logger = logger
-        self.data_collector = DataCollector("dataframes/", self.supervisor)
 
         # determine configuration file name
         self.game_config_file = os.environ['WEBOTS_ROBOCUP_GAME'] if 'WEBOTS_ROBOCUP_GAME' in os.environ \
@@ -137,7 +136,6 @@ class Referee:
 
         if self.config.DATA_COLLECTION:
             self.data_collector: dc.DataCollector = self.init_data_collector()
-        self.logger.info("REMOVE: After DataCollector init")
 
         self.setup()
         self.display.update()
@@ -1974,10 +1972,10 @@ class Referee:
         robot = team.players[number]["robot"]
         nodes = {}
         for frame_id in frame_ids:
-            node = robot.getDefFromProto(frame_id)
+            node = robot.getFromProtoDef(frame_id)
             if node is None:
                 continue
-            poses[node]
+            nodes[frame_id] = node
         return nodes
 
     def collect_team_player_frame_nodes(self):
@@ -2010,7 +2008,7 @@ class Referee:
         """Sets the player poses in the data collection."""
         poses = self.get_team_player_poses()
 
-        def create_player(number, poses):
+        def create_player(number: int, poses: Dict[str, List[float]]) -> mi.Player:
             """Creates a player for the data collection.
 
             :param number: number of the player
@@ -2021,25 +2019,25 @@ class Referee:
             :rtype: Player
             """
             try:
-                camera_frame = mi.pose_from_affine(frames["camera_frame"])
+                camera_frame = mi.pose_from_affine(np.array(poses["camera_frame"]))
             except KeyError:
                 camera_frame = None
             try:
-                l_camera_frame = mi.pose_from_affine(frames["l_camera_frame"])
+                l_camera_frame = mi.pose_from_affine(np.array(poses["l_camera_frame"]))
             except KeyError:
                 l_camera_frame = None
             try:
-                r_camera_frame = mi.pose_from_affine(frames["r_camera_frame"])
+                r_camera_frame = mi.pose_from_affine(np.array(poses["r_camera_frame"]))
             except KeyError:
                 r_camera_frame = None
 
             return mi.Player(
                 id=number,
-                base_link=mi.pose_from_affine(frames["base_link"]),
-                l_sole=mi.pose_from_affine(frames["l_sole"]),
-                r_sole=mi.pose_from_affine(frames["r_sole"]),
-                l_gripper=mi.pose_from_affine(frames["l_gripper"]),
-                r_gripper=mi.pose_from_affine(frames["r_gripper"]),
+                base_link=mi.pose_from_affine(np.array(poses["base_link"])),
+                l_sole=mi.pose_from_affine(np.array(poses["l_sole"])),
+                r_sole=mi.pose_from_affine(np.array(poses["r_sole"])),
+                l_gripper=mi.pose_from_affine(np.array(poses["l_gripper"])),
+                r_gripper=mi.pose_from_affine(np.array(poses["r_gripper"])),
                 camera_frame=camera_frame,
                 l_camera_frame=l_camera_frame,
                 r_camera_frame=r_camera_frame,
@@ -2048,25 +2046,25 @@ class Referee:
         # Team1 is always blue
         blue_players = poses["blue"]
         team1 = mi.Team(
-            id=self.dc.match.get_static_match_info().teams.blue().id,
-            player1=create_player(1, blue_players[1]),
-            player2=create_player(2, blue_players[2]),
-            player3=create_player(3, blue_players[3]),
-            player4=create_player(4, blue_players[4]),
+            id=self.data_collector.match.get_static_match_info().teams.blue().id,
+            player1=create_player('1', blue_players['1']),
+            player2=create_player('2', blue_players['2']),
+            player3=create_player('3', blue_players['3']),
+            player4=create_player('4', blue_players['4']),
         )
 
         # Team2 is always red
         red_players = poses["red"]
         team2 = mi.Team(
-            id=self.dc.match.get_static_match_info().teams.red().id,
-            player1=create_player(1, red_players[1]),
-            player2=create_player(2, red_players[2]),
-            player3=create_player(3, red_players[3]),
-            player4=create_player(4, red_players[4]),
+            id=self.data_collector.match.get_static_match_info().teams.red().id,
+            player1=create_player('1', red_players['1']),
+            player2=create_player('2', red_players['2']),
+            player3=create_player('3', red_players['3']),
+            player4=create_player('4', red_players['4']),
         )
 
         teams = mi.Teams(team1=team1, team2=team2)
-        self.dc.current_step().teams = teams
+        self.data_collector.current_step().teams = teams
 
     def setup(self):
         # check game type
@@ -2288,7 +2286,7 @@ class Referee:
             send_play_state_after_penalties = False
             previous_position = copy.deepcopy(self.game.ball_position)
             self.game.ball_position = self.game.ball_translation.getSFVec3f()
-            self.data_collector.current_step.ball = mi.Ball(
+            self.data_collector.current_step().ball = mi.Ball(
                 "ball",
                 mi.Frame(
                     "ball_frame",

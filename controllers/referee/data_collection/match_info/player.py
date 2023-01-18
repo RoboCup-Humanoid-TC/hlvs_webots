@@ -91,10 +91,10 @@ class Player(MatchObject, DataClassJsonMixin):
     :type r_gripper: Frame
     :param camera_frame: Camera frame of the player
     :type camera_frame: Optional[Frame]
-    :param l_camera: Left camera frame of the player
-    :type l_camera: Optional[Frame]
-    :param r_camera: Right camera frame of the player
-    :type r_camera: Optional[Frame]
+    :param l_camera_frame: Left camera frame of the player
+    :type l_camera_frame: Optional[Frame]
+    :param r_camera_frame: Right camera frame of the player
+    :type r_camera_frame: Optional[Frame]
     :param state: Current state of the player, defaults to State.UNKNOWN_STATE
     :type state: State, optional
     :param role: Current role of the player, defaults to Role.ROLE_UNDEFINED
@@ -110,8 +110,8 @@ class Player(MatchObject, DataClassJsonMixin):
     r_gripper: Frame
 
     camera_frame: Optional[Frame] = None
-    l_camera: Optional[Frame] = None
-    r_camera: Optional[Frame] = None
+    l_camera_frame: Optional[Frame] = None
+    r_camera_frame: Optional[Frame] = None
 
     state: State = State.UNKNOWN_STATE
     role: Role = Role.ROLE_UNDEFINED
@@ -139,4 +139,4 @@ class Player(MatchObject, DataClassJsonMixin):
         :return: Left and right camera frames of the player
         :rtype: Tuple[Optional[Frame], Optional[Frame]]
         """
-        return (self.l_camera, self.r_camera)
+        return (self.l_camera_frame, self.r_camera_frame)
