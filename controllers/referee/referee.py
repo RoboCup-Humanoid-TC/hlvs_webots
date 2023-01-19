@@ -693,7 +693,6 @@ class Referee:
                 point = contact_points[i].point
                 member = player['node_names'].get(contact_points[i].node_id)
                 if member is None:
-                    print("cache miss")
                     node = self.supervisor.getFromId(contact_points[i].node_id)
                     if not node:
                         continue
