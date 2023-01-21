@@ -691,15 +691,19 @@ class Referee:
                 fallen = True
             for i in range(n):
                 point = contact_points[i].point
-                node = self.supervisor.getFromId(contact_points[i].node_id)
-                if not node:
-                    continue
-                name_field = node.getField('name')
-                member = 'unknown body part'
-                if name_field:
-                    name = name_field.getSFString()
-                    if name in player['tagged_solids']:
-                        member = player['tagged_solids'][name]
+                member = player['node_names'].get(contact_points[i].node_id)
+                if member is None:
+                    node = self.supervisor.getFromId(contact_points[i].node_id)
+                    if not node:
+                        continue
+                    name_field = node.getField('name')
+                    member = 'unknown body part'
+                    if name_field:
+                        name = name_field.getSFString()
+                        if name in player['tagged_solids']:
+                            member = player['tagged_solids'][name]
+                    player['node_names'][contact_points[i].node_id] = member
+
                 if point[2] > self.field.turf_depth:  # not a contact with the ground
                     if not early_game_interruption and point in self.ball.contact_points:  # ball contact
                         if member in ['arm', 'hand']:
