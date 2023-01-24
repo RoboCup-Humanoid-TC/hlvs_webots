@@ -5,7 +5,6 @@ from threading import Event, Thread
 from typing import Optional
 
 import pandas as pd
-from controller import Supervisor
 from data_collection import match_info as mi
 
 # from ..logger import Logger
@@ -16,7 +15,6 @@ class DataCollector:
         self,
         save_dir: os.PathLike,
         autosave_interval: int,
-        supervisor: Supervisor,
         match: mi.Match,
         logger=None,
     ) -> None:
@@ -25,15 +23,12 @@ class DataCollector:
         :type save_dir: os.PathLike
         :param autosave_interval: Interval in seconds to autosave match data. Set to -1 to disable autosave
         :type autosave_interval: int
-        :param supervisor: Webots supervisor controller to receive match data from
-        :type supervisor: Supervisor
         :param match: Match data
         :type match: mi.Match
         :param logger: Logger, defaults to None
         :type logger: Optional[Logger], optional
         """
         self.save_dir: os.PathLike = save_dir
-        self.sv: Supervisor = supervisor
         self.logger = logger
         self.match: mi.Match = match
 

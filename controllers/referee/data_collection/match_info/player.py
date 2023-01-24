@@ -45,6 +45,30 @@ class Action(IntEnum):
     ACTION_LOCALIZING = 7
 
 
+@dataclass
+class RobotInfo:  # Inferred from the GameState struct
+    @unique
+    class Penalty(IntEnum):
+        """Enum for the penalty of the robot."""
+
+        NONE = 0
+        PENALTY_HL_KID_BALL_MANIPULATION = 1
+        PENALTY_HL_KID_PHYSICAL_CONTACT = 2
+        PENALTY_HL_KID_ILLEGAL_ATTACK = 3
+        PENALTY_HL_KID_ILLEGAL_DEFENSE = 4
+        PENALTY_HL_KID_REQUEST_FOR_PICKUP = 5
+        PENALTY_HL_KID_REQUEST_FOR_SERVICE = 6
+        PENALTY_HL_KID_REQUEST_FOR_PICKUP_2_SERVICE = 7
+        MANUAL = 15
+
+    penalty: Penalty
+    secs_till_unpenalized: int
+    number_of_warnings: int
+    number_of_yellow_cards: int
+    number_of_red_cards: int
+    goalkeeper: bool
+
+
 @dataclass(frozen=True)
 class StaticPlayer(StaticMatchObject):
     """Static information about a player.
@@ -101,6 +125,8 @@ class Player(MatchObject, DataClassJsonMixin):
     :type role: Role, optional
     :param action: Current action of the player, defaults to Action.ACTION_UNDEFINED
     :type action: Action, optional
+    :param robot_info: Robot info of the player, defaults to None
+    :type robot_info: Optional[RobotInfo], optional
     """
 
     base_link: Frame
@@ -116,6 +142,8 @@ class Player(MatchObject, DataClassJsonMixin):
     state: State = State.UNKNOWN_STATE
     role: Role = Role.ROLE_UNDEFINED
     action: Action = Action.ACTION_UNDEFINED
+
+    robot_info: Optional[RobotInfo] = None
 
     def get_soles(self) -> Tuple[Frame, Frame]:
         """Returns the left and right sole frames of the player.

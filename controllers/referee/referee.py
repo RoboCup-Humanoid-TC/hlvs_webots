@@ -29,7 +29,7 @@ import yaml
 from scipy.spatial import ConvexHull
 
 from types import SimpleNamespace
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 
 import numpy as np
@@ -163,7 +163,7 @@ class Referee:
         kick_off_team = mi.TeamColor.RED  # TODO
 
         match_id = "TODO"  # TODO: Add match id
-        match_type = mi.MatchType.NORMAL  # TODO
+        match_type = mi.MatchType.ROUNDROBIN  # TODO
         league_sub_type = mi.LeagueSubType.KID  # TODO
         static_match_info: mi.StaticMatchInfo = mi.StaticMatchInfo(
             match_id,
@@ -181,7 +181,6 @@ class Referee:
         return dc.DataCollector(
             self.config.DATA_COLLECTION_DIR,
             self.config.DATA_COLLECTION_AUTOSAVE_INTERVAL,
-            self.supervisor,
             match,
             self.logger,
         )
@@ -2008,16 +2007,20 @@ class Referee:
         """Sets the player poses in the data collection."""
         poses = self.get_team_player_poses()
 
-        def create_player(number: int, poses: Dict[str, List[float]]) -> mi.Player:
+        def create_player(number: int|str, players: Dict[str, Dict[str, List[float]]]) -> Optional[mi.Player]:
             """Creates a player for the data collection.
 
             :param number: number of the player
-            :type number: int
-            :param poses: poses of the player
-            :type poses: Dict[str, List[float]]
-            :return: the player
-            :rtype: Player
+            :type number: int|str
+            :param players: Dict of players of poses
+            :type poses: Dict[str, Dict[str, List[float]]]
+            :return: Player object, if the player exists
+            :rtype: Optional[mi.Player]
             """
+            number = str(number)
+            if not hasattr(players, number):
+                return None
+            poses = players[number]
             try:
                 camera_frame = mi.pose_from_affine(np.array(poses["camera_frame"]))
             except KeyError:
@@ -2047,20 +2050,20 @@ class Referee:
         blue_players = poses["blue"]
         team1 = mi.Team(
             id=self.data_collector.match.get_static_match_info().teams.blue().id,
-            player1=create_player('1', blue_players['1']),
-            player2=create_player('2', blue_players['2']),
-            player3=create_player('3', blue_players['3']),
-            player4=create_player('4', blue_players['4']),
+            player1=create_player(1, blue_players),
+            player2=create_player(2, blue_players),
+            player3=create_player(3, blue_players),
+            player4=create_player(4, blue_players),
         )
 
         # Team2 is always red
         red_players = poses["red"]
         team2 = mi.Team(
             id=self.data_collector.match.get_static_match_info().teams.red().id,
-            player1=create_player('1', red_players['1']),
-            player2=create_player('2', red_players['2']),
-            player3=create_player('3', red_players['3']),
-            player4=create_player('4', red_players['4']),
+            player1=create_player(1, blue_players),
+            player2=create_player(2, blue_players),
+            player3=create_player(3, blue_players),
+            player4=create_player(4, blue_players),
         )
 
         teams = mi.Teams(team1=team1, team2=team2)
@@ -2628,9 +2631,6 @@ class Referee:
                 self.send_penalties()
                 if send_play_state_after_penalties:
                     self.game_controller_send('STATE:PLAY')
-
-            # Collect team player data
-            self.collect_team_player_data()
 
             self.sim_time.progress_ms(self.time_step)
 

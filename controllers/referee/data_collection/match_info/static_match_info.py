@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from enum import Enum, unique
+from enum import Enum, IntEnum, unique
 
 from dataclasses_json import DataClassJsonMixin
 
@@ -10,13 +10,13 @@ from .team import StaticTeams
 
 
 @unique
-class MatchType(str, Enum):  # Inherit from str to make it JSON serializable
+class MatchType(IntEnum):
     """Match type enum."""
 
-    NORMAL = "NORMAL"
-    KNOCKOUT = "KNOCKOUT"
-    PENALTY = "PENALTY"
-    DROPIN = "DROPIN"
+    UNKNOWN = -1
+    ROUNDROBIN = 0
+    PLAYOFF = 1
+    DROPIN = 2
 
 
 @unique

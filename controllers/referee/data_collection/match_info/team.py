@@ -9,7 +9,9 @@ from .player import Player
 
 @unique
 class TeamColor(IntEnum):
-    """Enum for team colors."""
+    """Enum for team colors.
+    Inferred from the GameState struct
+    """
 
     BLUE = 0
     RED = 1
@@ -135,6 +137,12 @@ class Team(DataClassJsonMixin):
     :type player3: Optional[Player], optional
     :param player4: Fourth player, defaults to None
     :type player4: Optional[Player], optional
+    :param score: Score, defaults to 0
+    :type score: int, optional
+    :param penalty_shots: Penalty shots, defaults to 0
+    :type penalty_shots: int, optional
+    :param single_shots: Single shots (bits represent penalty shot success), defaults to 0
+    :type single_shots: int, optional
     """
 
     id: str
@@ -143,6 +151,10 @@ class Team(DataClassJsonMixin):
     player2: Optional[Player] = None
     player3: Optional[Player] = None
     player4: Optional[Player] = None
+
+    score: int = 0
+    penalty_shots: int = 0
+    single_shots: int = 0  # TODO: What is this?
 
 
 @dataclass(frozen=True)
