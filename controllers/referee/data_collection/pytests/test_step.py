@@ -5,6 +5,18 @@ import data_collection.match_info as mi
 
 def _create_step(time: int) -> mi.Step:
     time_to_calculate_simulation: int = 30
+
+    game_controll_data = mi.GameControllData(
+        game_state=mi.GameControllData.GameState.STATE_INITIAL,
+        first_half=True,
+        kickoff_team=1,
+        secondary_state_info=mi.GameControllData.SecondaryGameState.STATE_NORMAL,
+        drop_in_team=True,
+        drop_in_time=0,
+        seconds_remaining=0,
+        secondary_seconds_remaining=0,
+    )
+
     ball: mi.Ball = mi.Ball(
         "ball_id",
         mi.Frame("BALL_SHAPE", mi.Pose(mi.Position(0, 0, 0), mi.Rotation(0, 0, 0, 1))),
@@ -42,19 +54,18 @@ def _create_step(time: int) -> mi.Step:
     teams: mi.Teams = mi.Teams(
         mi.Team("HSV", player1=player), mi.Team("St. Pauli", player2=player)
     )
-    # collision_matrix: ForcefulContactMatrix = ForcefulContactMatrix(
-    #     len(teams.team1.players), len(teams.team2.players), 1, 1, 1
-    # )
 
     step = mi.Step(
-        time, time_to_calculate_simulation, ball, teams
-    )  # , collision_matrix)
+        time,
+        time_to_calculate_simulation=time_to_calculate_simulation,
+        ball=ball,
+        teams=teams,
+    )
 
     assert step.time == time
     assert step.time_to_calculate_simulation == time_to_calculate_simulation
     assert step.ball == ball
     assert step.teams == teams
-    # assert step.collision_matrix == collision_matrix
 
     return step
 

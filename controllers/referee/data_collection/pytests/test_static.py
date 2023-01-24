@@ -3,7 +3,7 @@ import data_collection.match_info as mi
 
 # Create a test StaticMatchInfo object
 def _create_static_match_info(id: str = "test_id") -> mi.StaticMatchInfo:
-    match_type = mi.MatchType.NORMAL
+    match_type = mi.MatchType.ROUNDROBIN
     league_sub_type = mi.LeagueSubType.KID
     simulation = mi.Simulation(True, 0)
     field = mi.Field("test_location_id", "test_location_name", 6, 9, 1.0)

@@ -13,7 +13,7 @@ from .team import Teams
 class GameControllData:
     """Holds data of game controller communication.
     See here for more information: https://github.com/RoboCup-Humanoid-TC/GameController/wiki/GameControlData
-    
+
     :param game_state: Game state
     :type game_state: GameState
     :param first_half: True if first half, False if second half
@@ -31,6 +31,7 @@ class GameControllData:
     :param secondary_seconds_remaining: The number of seconds shown as secondary time (remaining ready, until free ball, etc)
     :type secondary_seconds_remaining: int
     """
+
     @unique
     class GameState(IntEnum):
         """Enum for game states.
@@ -42,7 +43,6 @@ class GameControllData:
         STATE_SET = 2  # Keep ready
         STATE_PLAYING = 3  # Start play
         STATE_FINISHED = 4  # Game over
-
 
     @unique
     class SecondaryGameState(IntEnum):
@@ -62,7 +62,6 @@ class GameControllData:
         STATE_THROWIN = 9
         STATE_DROPBALL = 128
         STATE_UNKNOWN = 255
-
 
     game_state: GameState
     first_half: bool
@@ -92,8 +91,8 @@ class Step(DataClassJsonMixin):
 
     time: int
 
-
     time_to_calculate_simulation: Optional[int] = None
+
     game_controll_data: Optional[GameControllData] = None
 
     ball: Optional[Ball] = None

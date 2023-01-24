@@ -164,7 +164,7 @@ def _autosave(
         now: float = time.time()
         if now >= next_autosave_time:
             next_autosave_time = now + autosave_interval
-            filename: str = f"referee_data_collection_autosave_{datetime.utcnow().strftime('%Y-%m-%dT%H-%M-%S')}"
+            filename: str = f"referee_data_collection_AUTOSAVE_{datetime.utcnow().strftime('%Y-%m-%dT%H-%M-%S')}"
             save(save_dir, match, filename, logger)
 
             # Remove previous autosave file

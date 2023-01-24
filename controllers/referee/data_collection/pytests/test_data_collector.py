@@ -2,7 +2,6 @@ import glob
 import os
 import time
 
-from controller import Supervisor
 from data_collection import match_info as mi
 from data_collection.data_collector import DataCollector
 from data_collection.pytests.test_static import _create_static_match_info
@@ -12,10 +11,9 @@ from data_collection.pytests.test_step import _create_step
 def _create_data_collector(tmp_path) -> DataCollector:
     save_dir = tmp_path
 
-    supervisor = Supervisor()
     match = mi.Match(_create_static_match_info())
 
-    data_collector = DataCollector(save_dir, 5, supervisor, match)
+    data_collector = DataCollector(save_dir, 5, match)
 
     assert data_collector.save_dir == save_dir
     assert data_collector.match == match
@@ -38,11 +36,11 @@ def test_create_data_collector(tmp_path):
         len(os.listdir(d.save_dir))
         == len(
             glob.glob(
-                os.path.join(d.save_dir, "referee_data_collection_autosave_*.json")
+                os.path.join(d.save_dir, "referee_data_collection_AUTOSAVE_*.json")
             )
         )
         == 1
-    ), "Only a static match info file should be saved (referee_data_collection_autosave_*.json)"
+    ), "Only a static match info file should be saved (referee_data_collection_AUTOSAVE_*.json)"
 
     # Add a few steps to the match
     for i in range(5):
@@ -54,7 +52,7 @@ def test_create_data_collector(tmp_path):
     assert (
         len(os.listdir(d.save_dir))
         == len(
-            glob.glob(os.path.join(d.save_dir, "referee_data_collection_autosave_*"))
+            glob.glob(os.path.join(d.save_dir, "referee_data_collection_AUTOSAVE_*"))
         )
         == 3
     ), "A static match info .json file and two dynamic match info (.feather and .pkl) file should be saved"
@@ -67,7 +65,7 @@ def test_create_data_collector(tmp_path):
         len(os.listdir(d.save_dir)) == 6
     ), "Six files (.json, .feather and .pkl) should be saved, tree for each autosave and one for the final save"
     assert (
-        len(glob.glob(os.path.join(d.save_dir, "referee_data_collection_complete_*")))
+        len(glob.glob(os.path.join(d.save_dir, "referee_data_collection_COMPLETE_*")))
         == 3
     ), "Three files should be saved for the final save (referee_data_collection_complete_* [.json, .feather and .pkl])"
 
