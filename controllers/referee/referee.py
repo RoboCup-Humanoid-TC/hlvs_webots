@@ -2003,24 +2003,50 @@ class Referee:
                     poses[team][number][frame_id] = node.getPose()
         return poses
 
-    def data_collection_set_player_poses(self):
-        """Sets the player poses in the data collection."""
-        poses = self.get_team_player_poses()
+    def data_collection_set_team_data(self):
+        """Sets the team data for the data collection."""
 
-        def create_player(number: int|str, players: Dict[str, Dict[str, List[float]]]) -> Optional[mi.Player]:
+        def create_player(player_number: int, game_info_team, players: Dict[str, Dict[str, List[float]]]) -> Optional[mi.Player]:
             """Creates a player for the data collection.
 
-            :param number: number of the player
-            :type number: int|str
+            :param player_number: Number of the player
+            :type player_number: int
+            :param game_info_team: Team info from the game info
+            :type game_info_team: 
             :param players: Dict of players of poses
             :type poses: Dict[str, Dict[str, List[float]]]
             :return: Player object, if the player exists
             :rtype: Optional[mi.Player]
             """
-            number = str(number)
-            if not hasattr(players, number):
+            # Check if player exists
+            if not player_number in players:
                 return None
-            poses = players[number]
+
+            # Get GameInfoPlayer from game info
+            game_info_player = None
+            for player in game_info_team.players:
+                if player.number == player_number:
+                    game_info_player = player
+                    break
+            if game_info_player is None:
+                return None
+
+            # Get RobotInfo from game state info
+            if self.game.state is not None:
+                robot_info = mi.RobotInfo(
+                    penalty = game_info_player.penalty,
+                    secs_till_unpenalized = game_info_player,
+                    number_of_warnings = game_info_player.number_of_warnings,
+                    number_of_yellow_cards = game_info_player.number_of_yellow_cards,
+                    number_of_red_cards = game_info_player.number_of_red_cards,
+                    goalkeeper = game_info_player.goalkeeper,
+                )
+                self.game.state.teams[0].score
+            else:
+                robot_info = None
+
+            # Get poses
+            poses = players[player_number]
             try:
                 camera_frame = mi.pose_from_affine(np.array(poses["camera_frame"]))
             except KeyError:
@@ -2044,27 +2070,47 @@ class Referee:
                 camera_frame=camera_frame,
                 l_camera_frame=l_camera_frame,
                 r_camera_frame=r_camera_frame,
+                robot_info=robot_info
             )
 
-        # Team1 is always blue
-        blue_players = poses["blue"]
-        team1 = mi.Team(
-            id=self.data_collector.match.get_static_match_info().teams.blue().id,
-            player1=create_player(1, blue_players),
-            player2=create_player(2, blue_players),
-            player3=create_player(3, blue_players),
-            player4=create_player(4, blue_players),
-        )
+        def create_team(game_info_team, players) -> mi.Team:
+            """Create a team for the data collection.
 
+            :param game_info_team: Team info from the game info
+            :type game_info_team:
+            :param players: Dict of players of poses
+            :type poses: Dict[str, Dict[str, List[float]]]
+            """
+            return mi.Team(
+                id=game_info_team.team_number,
+                player1=create_player(1, game_info_team, players),
+                player2=create_player(2, game_info_team, players),
+                player3=create_player(3, game_info_team, players),
+                player4=create_player(4, game_info_team, players),
+                score=game_info_team.score,
+                penalty_shots=game_info_team.penalty_shot,
+                single_shots=game_info_team.single_shots
+            )
+
+        # Get teams
+        game_info_team_blue = game_info_team_red = None
+        for team in self.game.state.teams:
+            if team.team_color == "BLUE":
+                game_info_team_blue = team
+            elif team.team_color == "RED":
+                game_info_team_red = team
+        if game_info_team_blue is None or game_info_team_red is None:
+            return
+
+        # Get poses
+        poses = self.get_team_player_poses()
+        players_blue = poses["blue"]
+        players_red = poses["red"]
+
+        # Team1 is always blue
+        team1 = create_team(game_info_team_blue, players_blue)
         # Team2 is always red
-        red_players = poses["red"]
-        team2 = mi.Team(
-            id=self.data_collector.match.get_static_match_info().teams.red().id,
-            player1=create_player(1, blue_players),
-            player2=create_player(2, blue_players),
-            player3=create_player(3, blue_players),
-            player4=create_player(4, blue_players),
-        )
+        team2 = create_team(game_info_team_red, players_red)
 
         teams = mi.Teams(team1=team1, team2=team2)
         self.data_collector.current_step().teams = teams
@@ -2284,11 +2330,11 @@ class Referee:
             if self.game.state is None:
                 self.sim_time.progress_ms(self.time_step)
                 continue
-            self.data_collector.create_new_step(self.sim_time.get_ms())
             self.stabilize_robots()
             send_play_state_after_penalties = False
             previous_position = copy.deepcopy(self.game.ball_position)
             self.game.ball_position = self.game.ball_translation.getSFVec3f()
+            self.data_collector.create_new_step(self.sim_time.get_ms())
             self.data_collector.current_step().ball = mi.Ball(
                 "ball",
                 mi.Frame(
@@ -2298,7 +2344,8 @@ class Referee:
                     ),
                 ),
             )  # TODO: use ball node and get pose from it
-            self.data_collection_set_player_poses()
+            if self.game.state is not None:
+                self.data_collection_set_team_data()
             if self.game.ball_position != previous_position:
                 self.game.ball_last_move = self.sim_time.get_ms()
             self.update_contacts()  # check for collisions with the ground and ball
