@@ -17,6 +17,7 @@ class MatchType(IntEnum):
     ROUNDROBIN = 0
     PLAYOFF = 1
     DROPIN = 2
+    PENALTY = 10  # Penalty shootout as in referee
 
 
 @unique

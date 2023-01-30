@@ -134,11 +134,12 @@ class Referee:
         self.game_controller_udp_filter = os.environ['GAME_CONTROLLER_UDP_FILTER'] \
             if 'GAME_CONTROLLER_UDP_FILTER' in os.environ else None
 
-        if self.config.DATA_COLLECTION:
-            self.data_collector: dc.DataCollector = self.init_data_collector()
-
         self.setup()
         self.display.update()
+
+        if self.config.DATA_COLLECTION:
+            self.data_collector: dc.DataCollector = self.init_data_collector()
+            self.gather_data_collection_frame_nodes()
 
         self.status_update_last_real_time = None
         self.status_update_last_sim_time = None
@@ -152,19 +153,40 @@ class Referee:
 
     def init_data_collector(self) -> dc.DataCollector:
         """Initializes the data collector."""
+        match_id = os.environ.get("HLVS_GAME_TAG", "UNKNOWN_HLVS_GAME_TAG").strip()
+
+        # Match type
+        match_type = mi.MatchType.UNKNOWN
+        if self.game.type == 'NORMAL': match_type = mi.MatchType.ROUNDROBIN
+        if self.game.type == 'KNOCKOUT': match_type = mi.MatchType.PLAYOFF
+        if self.game.type == 'PENALTY': match_type = mi.MatchType.PENALTY
+
+        league_sub_type = mi.LeagueSubType.ADULT
+        if self.game.field_size == "kid": league_sub_type = mi.LeagueSubType.KID
+
         simulation: mi.Simulation = mi.Simulation(True, self.time_step)
 
-        field = mi.Field("test_location_id", "test_location_name", 6, 9, 1.0)  # TODO
-        ball = mi.StaticBall("test_ball_id", 0.5, "test_ball_texture", 0.14)  # TODO
+        field = mi.Field(
+            location_id = self.background,
+            location_name = self.background,
+            size_x = self.field.size_x * 2,  # Sizes are of half field
+            size_y = self.field.size_y * 2,  # Sizes are of half field
+            luminosity = self.luminosity,
+        )
+
+        ball = mi.StaticBall(
+            id = "BALL",
+            mass = 0.5,  # TODO
+            texture = self.ball_texture,
+            diameter = self.game.ball_radius * 2,
+        )
+
         teams = mi.StaticTeams(  # TODO
             mi.StaticTeam("test_team_1", "test_team_1_name", mi.TeamColor.RED),  # TODO
             mi.StaticTeam("test_team_2", "test_team_2_name", mi.TeamColor.BLUE),  # TODO
         )  # TODO
         kick_off_team = mi.TeamColor.RED  # TODO
 
-        match_id = "TODO"  # TODO: Add match id
-        match_type = mi.MatchType.ROUNDROBIN  # TODO
-        league_sub_type = mi.LeagueSubType.KID  # TODO
         static_match_info: mi.StaticMatchInfo = mi.StaticMatchInfo(
             match_id,
             match_type,
@@ -1977,15 +1999,35 @@ class Referee:
             nodes[frame_id] = node
         return nodes
 
-    def collect_team_player_frame_nodes(self):
-        """Collects the nodes of the team player's frames."""
-        self.team_player_frame_nodes = {}
+    def gather_data_collection_frame_nodes(self):
+        """Collects the nodes of the ball's and team player's frames."""
+        self.data_collection_frame_nodes = {
+            "ball": {},
+            "teams": {},
+        }
+
+        # Ball
+        self.data_collection_frame_nodes["ball"] = {"BALL_SHAPE": self.ball.getFromProtoDef("BALL_SHAPE")}
+
+        # Teams
         for color, team in {"blue": self.blue_team, "red": self.red_team}.items():
-            self.team_player_frame_nodes[color] = {}
+            self.data_collection_frame_nodes["teams"][color] = {}
             for number in team.players.keys():
-                self.team_player_frame_nodes[color][
+                self.data_collection_frame_nodes["teams"][color][
                     number
                 ] = self.get_player_frame_nodes(team, number)
+
+    def data_collection_set_ball_data(self):
+        """Sets the ball data for the data collection."""
+        affine_pose = self.data_collection_frame_nodes["ball"]["BALL_SHAPE"].getPose()
+
+        self.data_collector.current_step().ball = mi.Ball(
+            "BALL",
+            mi.Frame(
+                "BALL_SHAPE",
+                mi.pose_from_affine(np.array(affine_pose)),
+            ),
+        )
 
     def get_team_player_poses(self) -> Dict[str, Dict[int, Dict[str, List[float]]]]:
         """Returns the pose of the team players.
@@ -1995,7 +2037,7 @@ class Referee:
         :rtype: Dict[str, Dict[int, Dict[str, List[float]]]]
         """
         poses = {}
-        for team, players in self.team_player_frame_nodes.items():
+        for team, players in self.data_collection_frame_nodes["teams"].items():
             poses[team] = {}
             for number, nodes in players.items():
                 poses[team][number] = {}
@@ -2209,21 +2251,21 @@ class Referee:
         children = self.supervisor.getRoot().getField('children')
         if (hasattr(self.game, "texture_seed")):
             random.seed(self.game.texture_seed)
-        bg = random.choice(['stadium_dry', 'shanghai_riverside', 'ulmer_muenster', 'sunset_jhbcentral',
+        self.background = random.choice(['stadium_dry', 'shanghai_riverside', 'ulmer_muenster', 'sunset_jhbcentral',
                             'sepulchral_chapel_rotunda', 'paul_lobe_haus', 'kiara_1_dawn'])
-        luminosity = random.random() * 0.5 + 0.75  # random value between 0.75 and 1.25
-        ball_texture = random.choice(['telstar', 'teamgeist', 'europass', 'jabulani', 'tango'])
+        self.luminosity = random.random() * 0.5 + 0.75  # random value between 0.75 and 1.25
+        self.ball_texture = random.choice(['telstar', 'teamgeist', 'europass', 'jabulani', 'tango'])
         random.seed()
-        children.importMFNodeFromString(-1, f'RoboCupBackground {{ texture "{bg}" luminosity {luminosity}}}')
-        children.importMFNodeFromString(-1, f'RoboCupMainLight {{ texture "{bg}" luminosity {luminosity}}}')
-        children.importMFNodeFromString(-1, f'RoboCupOffLight {{ texture "{bg}" luminosity {luminosity}}}')
-        children.importMFNodeFromString(-1, f'RoboCupTopLight {{ texture "{bg}" luminosity {luminosity}}}')
+        children.importMFNodeFromString(-1, f'RoboCupBackground {{ texture "{self.background}" luminosity {self.luminosity}}}')
+        children.importMFNodeFromString(-1, f'RoboCupMainLight {{ texture "{self.background}" luminosity {self.luminosity}}}')
+        children.importMFNodeFromString(-1, f'RoboCupOffLight {{ texture "{self.background}" luminosity {self.luminosity}}}')
+        children.importMFNodeFromString(-1, f'RoboCupTopLight {{ texture "{self.background}" luminosity {self.luminosity}}}')
         children.importMFNodeFromString(-1, f'RobocupSoccerField {{ size "{self.game.field_size}" }}')
         ball_size = 1 if self.game.field_size == 'kid' else 5
 
         # the ball is initially very far away from the field
         children.importMFNodeFromString(-1, f'DEF BALL RobocupTexturedSoccerBall'
-                                            f'{{ translation 100 100 0.5 size {ball_size} texture "{ball_texture}" }}')
+                                            f'{{ translation 100 100 0.5 size {ball_size} texture "{self.ball_texture}" }}')
         self.ball = self.blackboard.supervisor.getFromDef('BALL')
         self.game.ball_translation = self.blackboard.supervisor.getFromDef('BALL').getField('translation')
 
@@ -2239,9 +2281,6 @@ class Referee:
         self.blue_team.goalkeeper_holding_time_window = np.zeros(goalkeeper_ball_holding_time_window_size, dtype=bool)
 
         self.list_solids()  # prepare lists of solids to monitor in each robot to compute the convex hulls
-
-        if self.config.DATA_COLLECTION:
-            self.collect_team_player_frame_nodes()
 
         self.game.reset_ball_touched()
 
@@ -2354,19 +2393,16 @@ class Referee:
             send_play_state_after_penalties = False
             previous_position = copy.deepcopy(self.game.ball_position)
             self.game.ball_position = self.game.ball_translation.getSFVec3f()
-            self.data_collector.create_new_step(self.sim_time.get_ms())
-            self.data_collector.current_step().ball = mi.Ball(
-                "ball",
-                mi.Frame(
-                    "ball_frame",
-                    mi.Pose(
-                        mi.Position(*self.game.ball_position), mi.Rotation(0, 0, 0, 1)
-                    ),
-                ),
-            )  # TODO: use ball node and get pose from it
-            if self.game.state is not None:
-                self.data_collection_set_game_control_data()
-                self.data_collection_set_team_data()
+
+            # Collect data of step
+            if self.config.DATA_COLLECTION:
+                self.data_collector.create_new_step(self.sim_time.get_ms())
+                self.data_collection_set_ball_data()
+
+                if self.game.state is not None:
+                    self.data_collection_set_game_control_data()
+                    self.data_collection_set_team_data()
+
             if self.game.ball_position != previous_position:
                 self.game.ball_last_move = self.sim_time.get_ms()
             self.update_contacts()  # check for collisions with the ground and ball

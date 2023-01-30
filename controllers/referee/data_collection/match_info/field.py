@@ -11,9 +11,11 @@ class Field:
     :param location_name: Name of the location
     :type location_name: str
     :param size_x: Size of the field in x direction
-    :type size_x: int
+    :type size_x: float
     :param size_y: Size of the field in y direction
-    :type size_y: int
+    :type size_y: float
+    :param luminosity: Luminosity of the field, defaults to None
+    :type luminosity: Optional[float], optional
     :param friction: Friction of the field, defaults to None
     :type friction: Optional[float], optional
     :param natural_light: Whether the field has natural light, defaults to None
@@ -24,8 +26,9 @@ class Field:
 
     location_id: str
     location_name: str
-    size_x: int
-    size_y: int
+    size_x: float
+    size_y: float
+    luminosity: Optional[float] = None
     friction: Optional[float] = None
     natural_light: Optional[bool] = None
     weather: Optional[str] = None
