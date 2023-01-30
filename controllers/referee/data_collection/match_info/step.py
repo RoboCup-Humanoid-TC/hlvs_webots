@@ -10,8 +10,8 @@ from .team import Teams
 
 
 @dataclass
-class GameControllData:
-    """Holds data of game controller communication.
+class GameControlData:
+    """Holds data of game controler communication.
     See here for more information: https://github.com/RoboCup-Humanoid-TC/GameController/wiki/GameControlData
 
     :param game_state: Game state
@@ -20,8 +20,12 @@ class GameControllData:
     :type first_half: bool
     :param kickoff_team: The team number of the next team to kick off or DROPBALL
     :type kickoff_team: int
-    :param secondary_state_info: Secondary game state
-    :type secondary_state_info: SecondaryGameState
+    :param secondary_state: Secondary game state
+    :type secondary_state: SecondaryGameState
+    :param secondary_state_info_team: The team number of the team performing the secondary state (e.g. direct free kick)
+    :type secondary_state_info_team: int
+    :param secondary_state_info_sub_state: The sub state of the secondary state (0 for ready, 1 for freeze/ball repositioning by referee)
+    :type secondary_state_info_sub_state: int
     :param drop_in_team: The team number of the team that caused last drop in
     :type drop_in_team: int
     :param drop_in_time: The number of seconds passed since the last drop in. -1 before first drop in
@@ -66,7 +70,9 @@ class GameControllData:
     game_state: GameState
     first_half: bool
     kickoff_team: int
-    secondary_state_info: SecondaryGameState
+    secondary_state: SecondaryGameState
+    secondary_state_info_team: int
+    secondary_state_info_sub_state: int
     drop_in_team: bool  # TODO: GameState says this is bool, but docs say int
     drop_in_time: int
     seconds_remaining: int
@@ -81,8 +87,8 @@ class Step(DataClassJsonMixin):
     :type time: int
     :param time_to_calculate_simulation: Time to calculate simulation in milliseconds, defaults to None
     :type time_to_calculate_simulation: Optional[int], optional
-    :param game_controll_data: Game controller data, defaults to None
-    :type game_controll_data: Optional[GameControllData], optional
+    :param game_control_data: Game controler data, defaults to None
+    :type game_control_data: Optional[GameControlData], optional
     :param ball: Ball data, defaults to None
     :type ball: Optional[Ball], optional
     :param teams: Team data, defaults to None
@@ -93,7 +99,7 @@ class Step(DataClassJsonMixin):
 
     time_to_calculate_simulation: Optional[int] = None
 
-    game_controll_data: Optional[GameControllData] = None
+    game_control_data: Optional[GameControlData] = None
 
     ball: Optional[Ball] = None
     teams: Optional[Teams] = None

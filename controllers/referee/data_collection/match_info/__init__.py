@@ -9,5 +9,5 @@ from .simulation import Simulation
 from .static_match_info import LeagueSubType, MatchType, StaticMatchInfo
 from .team import StaticTeam, StaticTeams, Team, TeamColor, Teams
 
-from .step import GameControllData, Step
+from .step import GameControlData, Step
 from .match import Match
