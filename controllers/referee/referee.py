@@ -2115,6 +2115,26 @@ class Referee:
         teams = mi.Teams(team1=team1, team2=team2)
         self.data_collector.current_step().teams = teams
 
+    def data_collection_set_game_control_data(self) -> None:
+        """Sets the game control data for the data collection."""
+        gamestate = self.game.state
+        if gamestate is None:
+            return
+        
+        # Set new game control data object
+        self.data_collector.current_step().game_control_data = mi.GameControlData(
+            game_state = mi.GameControlData.GameState(int(gamestate.game_state)),
+            first_half = gamestate.first_half,
+            kickoff_team = gamestate.kickoff_team,
+            secondary_state = mi.GameControlData.SecondaryGameState(int(gamestate.secondary_state)),
+            secondary_state_info_team = gamestate.secondary_state_info[0],
+            secondary_state_info_sub_state = gamestate.secondary_state_info[1],
+            drop_in_team = gamestate.drop_in_team,
+            drop_in_time = gamestate.drop_in_time,
+            seconds_remaining = gamestate.seconds_remaining,
+            secondary_seconds_remaining = gamestate.secondary_seconds_remaining,
+        )
+
     def setup(self):
         # check game type
         if self.game.type not in ['NORMAL', 'KNOCKOUT', 'PENALTY']:
@@ -2345,6 +2365,7 @@ class Referee:
                 ),
             )  # TODO: use ball node and get pose from it
             if self.game.state is not None:
+                self.data_collection_set_game_control_data()
                 self.data_collection_set_team_data()
             if self.game.ball_position != previous_position:
                 self.game.ball_last_move = self.sim_time.get_ms()
