@@ -4,7 +4,7 @@ from typing import Optional, Tuple
 
 from dataclasses_json import DataClassJsonMixin
 
-from .player import Player
+from .player import Player, StaticPlayer
 
 
 @unique
@@ -35,11 +35,24 @@ class StaticTeam:
     :type name: str
     :param color: Team color
     :type color: TeamColor
+    :param player1: First player
+    :type player1: StaticPlayer
+    :param player2: Second player
+    :type player2: StaticPlayer
+    :param player3: Third player
+    :type player3: StaticPlayer
+    :param player4: Fourth player
+    :type player4: StaticPlayer
     """
 
     id: str
     name: str
     color: TeamColor
+
+    player1: StaticPlayer
+    player2: StaticPlayer
+    player3: StaticPlayer
+    player4: StaticPlayer
 
 
 @dataclass(frozen=True)

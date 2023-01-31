@@ -161,6 +161,9 @@ class Referee:
         if self.game.type == 'KNOCKOUT': match_type = mi.MatchType.PLAYOFF
         if self.game.type == 'PENALTY': match_type = mi.MatchType.PENALTY
 
+        # League type
+        # Alternatively, this could be read from the game config file (self.game.class),
+        # but it seems like this is not used elsewhere in this referee.
         league_sub_type = mi.LeagueSubType.ADULT
         if self.game.field_size == "kid": league_sub_type = mi.LeagueSubType.KID
 
@@ -181,11 +184,51 @@ class Referee:
             diameter = self.game.ball_radius * 2,
         )
 
-        teams = mi.StaticTeams(  # TODO
-            mi.StaticTeam("test_team_1", "test_team_1_name", mi.TeamColor.RED),  # TODO
-            mi.StaticTeam("test_team_2", "test_team_2_name", mi.TeamColor.BLUE),  # TODO
-        )  # TODO
-        kick_off_team = mi.TeamColor.RED  # TODO
+        def create_static_players(players) -> List[mi.StaticPlayer]:
+            """Creates a list of static players from list of players (from team.json).
+            
+            :param players: List of players (from team.json)
+            :return: List of static players
+            :rtype: List[mi.StaticPlayer]
+            """
+            static_players = []
+
+            for player_id in sorted(players.keys()):  # Sort by player ID to consistently match to player1-4
+                static_players.append(mi.StaticPlayer(
+                    id = str(player_id),
+                    mass = -1.0,  # TODO
+                    DOF = -1,  # TODO (number of DOF)
+                    plattform = players[player_id].proto,
+                    # TODO: Cameras
+                ))
+            return static_players
+
+        team1_players = create_static_players(self.blue_team.players)
+        team2_players = create_static_players(self.red_team.players)
+
+        # Team 1 is always blue
+        teams = mi.StaticTeams(
+            team1 = mi.StaticTeam(
+                id = str(self.blue_team.id),
+                name = self.blue_team.name,
+                color = mi.TeamColor.BLUE,
+                player1 = team1_players[0],
+                player2 = team1_players[1],
+                player3 = team1_players[2],
+                player4 = team1_players[3],
+            ),
+
+            # Team 2 is always red
+            team2 = mi.StaticTeam(
+                id = str(self.red_team.id),
+                name = self.red_team.name,
+                color = mi.TeamColor.RED,
+                player1 = team2_players[0],
+                player2 = team2_players[1],
+                player3 = team2_players[2],
+                player4 = team2_players[3],
+            ),
+        )
 
         static_match_info: mi.StaticMatchInfo = mi.StaticMatchInfo(
             match_id,
@@ -195,7 +238,7 @@ class Referee:
             field,
             ball,
             teams,
-            kick_off_team,
+            self.game.kickoff,
         )
 
         match = mi.Match(static_match_info)
@@ -1972,35 +2015,36 @@ class Referee:
         self.game.reset_ball_touched()
         self.logger.info(f'Ball respawned at {target_location[0]} {target_location[1]} {target_location[2]}.')
 
-    def get_player_frame_nodes(self, team, number) -> Dict[str, Node]:
-        """Returns the nodes of frames from a player.
-
-        :param team: team of the player
-        :param number: number of the player
-        :return: a dictionary of nodes indexed by frame id
-        :rtype: Dict[str, Node]
-        """
-        frame_ids = [
-            "base_link",
-            "l_sole",
-            "r_sole",
-            "l_gripper",
-            "r_gripper",
-            "camera_frame",
-            "l_camera_frame",
-            "r_camera_frame",
-        ]
-        robot = team.players[number]["robot"]
-        nodes = {}
-        for frame_id in frame_ids:
-            node = robot.getFromProtoDef(frame_id)
-            if node is None:
-                continue
-            nodes[frame_id] = node
-        return nodes
-
     def gather_data_collection_frame_nodes(self):
         """Collects the nodes of the ball's and team player's frames."""
+
+        def get_player_frame_nodes(self, team, number) -> Dict[str, Node]:
+            """Returns the nodes of frames from a player.
+
+            :param team: team of the player
+            :param number: number of the player
+            :return: a dictionary of nodes indexed by frame id
+            :rtype: Dict[str, Node]
+            """
+            frame_ids = [
+                "base_link",
+                "l_sole",
+                "r_sole",
+                "l_gripper",
+                "r_gripper",
+                "camera_frame",
+                "l_camera_frame",
+                "r_camera_frame",
+            ]
+            robot = team.players[number]["robot"]
+            nodes = {}
+            for frame_id in frame_ids:
+                node = robot.getFromProtoDef(frame_id)
+                if node is None:
+                    continue
+                nodes[frame_id] = node
+            return nodes
+
         self.data_collection_frame_nodes = {
             "ball": {},
             "teams": {},
@@ -2028,22 +2072,6 @@ class Referee:
                 mi.pose_from_affine(np.array(affine_pose)),
             ),
         )
-
-    def get_team_player_poses(self) -> Dict[str, Dict[int, Dict[str, List[float]]]]:
-        """Returns the pose of the team players.
-
-        :return: Dictionary of poses (List of 16 floats to be interpreted as 4x4 matrix),
-            indexed by team color, player number and frame id
-        :rtype: Dict[str, Dict[int, Dict[str, List[float]]]]
-        """
-        poses = {}
-        for team, players in self.data_collection_frame_nodes["teams"].items():
-            poses[team] = {}
-            for number, nodes in players.items():
-                poses[team][number] = {}
-                for frame_id, node in nodes.items():
-                    poses[team][number][frame_id] = node.getPose()
-        return poses
 
     def data_collection_set_team_data(self):
         """Sets the team data for the data collection."""
@@ -2134,6 +2162,22 @@ class Referee:
                 single_shots=game_info_team.single_shots
             )
 
+        def get_team_player_poses(self) -> Dict[str, Dict[int, Dict[str, List[float]]]]:
+            """Returns the pose of the team players.
+
+            :return: Dictionary of poses (List of 16 floats to be interpreted as 4x4 matrix),
+                indexed by team color, player number and frame id
+            :rtype: Dict[str, Dict[int, Dict[str, List[float]]]]
+            """
+            poses = {}
+            for team, players in self.data_collection_frame_nodes["teams"].items():
+                poses[team] = {}
+                for number, nodes in players.items():
+                    poses[team][number] = {}
+                    for frame_id, node in nodes.items():
+                        poses[team][number][frame_id] = node.getPose()
+            return poses
+
         # Get teams
         game_info_team_blue = game_info_team_red = None
         for team in self.game.state.teams:
@@ -2145,7 +2189,7 @@ class Referee:
             return
 
         # Get poses
-        poses = self.get_team_player_poses()
+        poses = get_team_player_poses()
         players_blue = poses["blue"]
         players_red = poses["red"]
 
