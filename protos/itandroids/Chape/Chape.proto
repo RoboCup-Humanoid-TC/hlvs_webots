@@ -99,6 +99,9 @@ PROTO Chape [
           -27.925 0 0 27.925 1024 0
         ]
       }
+      DEF base_link Solid {
+        translation 0.0 0.0 -0.12
+      }
       HingeJointWithBacklash {
         gearMass IS gearMass
         backlash IS backlash
@@ -170,6 +173,11 @@ PROTO Chape [
                     fieldOfView 1.012300
                     width 640
                     height 480
+                    children [
+                      DEF camera_frame Solid {
+                        rotation -0.5773503 0.5773503 -0.5773503 2.0943951
+                      }
+                    ]
                   }
                 ]
                 name "head"
@@ -325,6 +333,9 @@ PROTO Chape [
                       translation 0.016000 0.060000 0.000000
                       rotation 1.000000 0.000000 0.000000 0.000000
                       children [
+                        DEF l_gripper Solid {
+                          translation -0.013 0.21 0.023
+                        }
                         Transform {
                           translation 0.000000 0.000000 0.000000
                           rotation 1.000000 0.000000 0.000000 1.570800
@@ -509,6 +520,9 @@ PROTO Chape [
                       translation 0.016000 -0.060000 0.000000
                       rotation 1.000000 0.000000 0.000000 0.000000
                       children [
+                        DEF r_gripper Solid {
+                          translation -0.013 -0.21 0.023
+                        }
                         Transform {
                           translation 0.000000 -0.000000 0.000000
                           rotation -1.000000 0.000000 0.000000 1.570800
@@ -780,6 +794,9 @@ PROTO Chape [
                                         translation 0.000000 0.000000 0.000000
                                         rotation 1.000000 0.000000 0.000000 0.000000
                                         children [
+                                          DEF l_sole Solid {
+                                            translation 0.0 0.01 -0.058
+                                          }
                                           Transform {
                                             translation 0.002750 0.000000 0.000000
                                             rotation 0.000000 1.000000 0.000000 0.000000
@@ -1188,6 +1205,9 @@ PROTO Chape [
                                         translation 0.000000 -0.000000 0.000000
                                         rotation 1.000000 0.000000 0.000000 0.000000
                                         children [
+                                          DEF r_sole Solid {
+                                            translation 0.0 -0.01 -0.058
+                                          }
                                           Transform {
                                             translation 0.002750 -0.000000 0.000000
                                             rotation 0.000000 1.000000 0.000000 0.000000
