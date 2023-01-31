@@ -153,6 +153,45 @@ class Referee:
 
     def init_data_collector(self) -> dc.DataCollector:
         """Initializes the data collector."""
+
+        def compute_mass(robot):
+            """Returns mass of robot
+            Derived from the model verifier
+            """
+
+            def get_physics_nodes(node):
+                """Return a list of tuples (mass, joint_and_tf, mass_name)"""
+                physics_nodes = []
+                if node[0] == "SFNode":
+                    if node[1].get("physics") is not None:
+                        physics = node[1]["physics"][1]
+                        if physics != {}:  # empty dict if null
+                                physics_nodes.append(physics["mass"][1])
+                    for mass_name in ['gearMass', 'gearMass2']:
+                        mass_node = node[1].get(mass_name)
+                        if mass_node is not None:
+                            physics_nodes.append(mass_node[1])
+                    node_type = node[1].get("__type")
+
+                    for k, v in node[1].items():
+                        physics_nodes.extend(get_physics_nodes(v))
+                elif node[0] == "MFNode":
+                    for child_node in node[1]:
+                        physics_nodes.extend(get_physics_nodes(("SFNode", child_node)))
+                return physics_nodes
+
+            physics_nodes = get_physics_nodes(("SFNode", robot))
+            mass = 0
+
+            for physics_node in physics_nodes:
+                single_mass = physics_node[0]
+                if single_mass == -1:
+                    continue
+                mass += single_mass
+
+            return mass
+
+
         match_id = os.environ.get("HLVS_GAME_TAG", "UNKNOWN_HLVS_GAME_TAG").strip()
 
         # Match type
@@ -197,9 +236,9 @@ class Referee:
                 static_players.append(mi.StaticPlayer(
                     id = str(player_id),
                     mass = -1.0,  # TODO
-                    DOF = -1,  # TODO (number of DOF)
+                    DOF = -1,  # TODO now done manually
                     plattform = players[player_id].proto,
-                    # TODO: Cameras
+                    # TODO: Cameras now done manually
                 ))
             return static_players
 

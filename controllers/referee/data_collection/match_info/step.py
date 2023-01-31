@@ -97,6 +97,7 @@ class Step(DataClassJsonMixin):
 
     time: int
 
+    # TODO Realtime
     time_to_calculate_simulation: Optional[int] = None
 
     game_control_data: Optional[GameControlData] = None
