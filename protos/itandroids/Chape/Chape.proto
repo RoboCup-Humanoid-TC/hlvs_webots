@@ -1459,13 +1459,6 @@ PROTO Chape [
   }
         ]
         name "number_01"
-        boundingObject Transform {
-          translation 0.792157 0.819608 0.933333
-          rotation 0.000000 1.000000 0.000000 0.000000
-          children [
-           
-          ]
-        }
         physics Physics {
           density -1
           mass 0.000556
