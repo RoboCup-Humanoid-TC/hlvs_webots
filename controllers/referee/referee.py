@@ -49,7 +49,6 @@ from display import Display
 from game import Game
 from team import Team
 from sim_time import SimTime
-from blackboard import blackboard
 from data_collection.data_collector import DataCollector
 
 
@@ -159,7 +158,7 @@ class Referee:
             Derived from the model verifier
             """
 
-            def get_physics_nodes(node):
+            def get_mass(node):
                 """Return a list of tuples (mass, joint_and_tf, mass_name)"""
                 physics_nodes = []
                 if node[0] == "SFNode":
@@ -174,13 +173,13 @@ class Referee:
                     node_type = node[1].get("__type")
 
                     for k, v in node[1].items():
-                        physics_nodes.extend(get_physics_nodes(v))
+                        physics_nodes.extend(get_mass(v))
                 elif node[0] == "MFNode":
                     for child_node in node[1]:
-                        physics_nodes.extend(get_physics_nodes(("SFNode", child_node)))
+                        physics_nodes.extend(get_mass(("SFNode", child_node)))
                 return physics_nodes
 
-            physics_nodes = get_physics_nodes(("SFNode", robot))
+            physics_nodes = get_mass(("SFNode", robot))
             mass = 0
 
             for physics_node in physics_nodes:
@@ -223,23 +222,26 @@ class Referee:
             diameter = self.game.ball_radius * 2,
         )
 
-        def create_static_players(players) -> List[mi.StaticPlayer]:
-            """Creates a list of static players from list of players (from team.json).
+        def create_static_players(players) -> Dict[int, Optional[mi.StaticPlayer]]:
+            """Creates a dict of static players from list of players (from team.json).
+            Keys are int indexes derived from sorted player IDs.
+            This is to ensure that the order of players is consistent across runs.
+            Example: Sorted player IDs are 2, 5, 6, 9. Keys will be 0, 1, 2, 3.
             
             :param players: List of players (from team.json)
-            :return: List of static players
-            :rtype: List[mi.StaticPlayer]
+            :return: Dict of static players
+            :rtype: Dict[int, Optional[mi.StaticPlayer]]
             """
-            static_players = []
+            static_players = {}
 
-            for player_id in sorted(players.keys()):  # Sort by player ID to consistently match to player1-4
-                static_players.append(mi.StaticPlayer(
+            for idx, player_id in enumerate(sorted(players.keys())):  # Sort by player ID to consistently match to player1-4
+                static_players[idx] = mi.StaticPlayer(
                     id = str(player_id),
                     mass = -1.0,  # TODO
                     DOF = -1,  # TODO now done manually
-                    plattform = players[player_id].proto,
+                    platform = players[player_id]['proto'],
                     # TODO: Cameras now done manually
-                ))
+                )
             return static_players
 
         team1_players = create_static_players(self.blue_team.players)
@@ -248,24 +250,24 @@ class Referee:
         # Team 1 is always blue
         teams = mi.StaticTeams(
             team1 = mi.StaticTeam(
-                id = str(self.blue_team.id),
+                id = str(self.game.blue.id),
                 name = self.blue_team.name,
                 color = mi.TeamColor.BLUE,
-                player1 = team1_players[0],
-                player2 = team1_players[1],
-                player3 = team1_players[2],
-                player4 = team1_players[3],
+                player1 = team1_players.get(0, None),
+                player2 = team1_players.get(1, None),
+                player3 = team1_players.get(2, None),
+                player4 = team1_players.get(3, None),
             ),
 
             # Team 2 is always red
             team2 = mi.StaticTeam(
-                id = str(self.red_team.id),
+                id = str(self.game.red.id),
                 name = self.red_team.name,
                 color = mi.TeamColor.RED,
-                player1 = team2_players[0],
-                player2 = team2_players[1],
-                player3 = team2_players[2],
-                player4 = team2_players[3],
+                player1 = team2_players.get(0, None),
+                player2 = team2_players.get(1, None),
+                player3 = team2_players.get(2, None),
+                player4 = team2_players.get(3, None),
             ),
         )
 
@@ -2057,7 +2059,7 @@ class Referee:
     def gather_data_collection_frame_nodes(self):
         """Collects the nodes of the ball's and team player's frames."""
 
-        def get_player_frame_nodes(self, team, number) -> Dict[str, Node]:
+        def get_player_frame_nodes(team, number) -> Dict[str, Node]:
             """Returns the nodes of frames from a player.
 
             :param team: team of the player
@@ -2096,9 +2098,7 @@ class Referee:
         for color, team in {"blue": self.blue_team, "red": self.red_team}.items():
             self.data_collection_frame_nodes["teams"][color] = {}
             for number in team.players.keys():
-                self.data_collection_frame_nodes["teams"][color][
-                    number
-                ] = self.get_player_frame_nodes(team, number)
+                self.data_collection_frame_nodes["teams"][color][number] = get_player_frame_nodes(team, number)
 
     def data_collection_set_ball_data(self):
         """Sets the ball data for the data collection."""
@@ -2201,7 +2201,7 @@ class Referee:
                 single_shots=game_info_team.single_shots
             )
 
-        def get_team_player_poses(self) -> Dict[str, Dict[int, Dict[str, List[float]]]]:
+        def get_team_player_poses() -> Dict[str, Dict[int, Dict[str, List[float]]]]:
             """Returns the pose of the team players.
 
             :return: Dictionary of poses (List of 16 floats to be interpreted as 4x4 matrix),
