@@ -13,13 +13,14 @@ transforms3d = "^0.4.1"
 scipy = "^1.9.3"
 pyyaml = "^6.0"
 pandas = "^1.5.2"
-pytest = "^7.2.0"
 dataclasses-json = "^0.5.7"
 pyarrow = "^10.0.1"
 
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.15.9"
+pytest = "^7.2.0"
+lark = "^1.1.5"
 
 [build-system]
 requires = ["poetry-core"]

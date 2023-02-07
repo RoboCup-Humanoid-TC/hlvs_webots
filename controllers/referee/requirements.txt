@@ -1,5 +1,8 @@
 construct
+dataclasses-json
 numpy
-transforms3d
-scipy
+pandas
+pyarrow
 pyyaml
+scipy
+transforms3d
