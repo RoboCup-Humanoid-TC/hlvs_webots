@@ -2059,7 +2059,7 @@ class Referee:
         }
 
         # Ball
-        self.data_collection_frame_nodes["ball"] = {"BALL_SHAPE": self.ball.getFromProtoDef("BALL_SHAPE")}
+        self.data_collection_frame_nodes["ball"] = {"BALL": self.ball}
 
         # Teams
         for color, team in {"blue": self.blue_team, "red": self.red_team}.items():
@@ -2069,12 +2069,13 @@ class Referee:
 
     def data_collection_set_ball_data(self):
         """Sets the ball data for the data collection."""
-        affine_pose = self.data_collection_frame_nodes["ball"]["BALL_SHAPE"].getPose()
+        frame_id = "BALL"
+        affine_pose = self.data_collection_frame_nodes["ball"][frame_id].getPose()
 
         self.data_collector.current_step().ball = mi.Ball(
-            "BALL",
+            frame_id,
             mi.Frame(
-                "BALL_SHAPE",
+                frame_id,
                 mi.pose_from_affine(np.array(affine_pose)),
             ),
         )
