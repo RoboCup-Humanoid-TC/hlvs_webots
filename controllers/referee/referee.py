@@ -2430,7 +2430,8 @@ class Referee:
     def main_loop(self):
         previous_real_time = time.time()
         while self.supervisor.step(self.time_step) != -1 and not self.game.over:
-            if hasattr(self.game, 'max_duration') and (time.time() - self.blackboard.start_real_time) > self.game.max_duration:
+            step_start_time = time.time()  # Also gets used for data collection
+            if hasattr(self.game, 'max_duration') and (step_start_time - self.blackboard.start_real_time) > self.game.max_duration:
                 self.logger.info(f'Interrupting game automatically after {self.game.max_duration} seconds')
                 break
             self.print_status()
@@ -2447,7 +2448,7 @@ class Referee:
             # Collect data of step
             if self.config.DATA_COLLECTION:
                 try:
-                    self.data_collector.create_new_step(self.sim_time.get_ms())
+                    self.data_collector.create_new_step(self.sim_time.get_sec())
                     self.data_collection_set_ball_data()
 
                     if self.game.state is not None:
@@ -2807,7 +2808,16 @@ class Referee:
                 wait_time = min_step_time - step_time_until_now
                 if wait_time > 0:  # wait only if the step was completed faster than the minimum required time
                     time.sleep(wait_time)  # wait for the remaining time
-            previous_real_time = time.time()  # update the previous real time
+
+            step_end_time = time.time()
+            if self.config.DATA_COLLECTION:
+                try:
+                    delta = step_end_time - step_start_time
+                    self.data_collector.current_step().delta_real_time = delta
+                except Exception:
+                    self.logger.error(f"Failure during step time calculation: {traceback.format_exc()}")
+
+            previous_real_time = time.time()  # update the previous real time for the next step
 
         # for some reason, the simulation was terminated before the end of the match (may happen during tests)
         if not self.game.over:

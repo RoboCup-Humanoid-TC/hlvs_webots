@@ -4,7 +4,7 @@ import data_collection.match_info as mi
 
 
 def _create_step(time: int) -> mi.Step:
-    time_to_calculate_simulation: int = 30
+    delta_real_time: float = 0.1
 
     game_controll_data = mi.GameControllData(
         game_state=mi.GameControllData.GameState.STATE_INITIAL,
@@ -57,13 +57,13 @@ def _create_step(time: int) -> mi.Step:
 
     step = mi.Step(
         time,
-        time_to_calculate_simulation=time_to_calculate_simulation,
+        delta_real_time=delta_real_time,
         ball=ball,
         teams=teams,
     )
 
     assert step.time == time
-    assert step.time_to_calculate_simulation == time_to_calculate_simulation
+    assert step.delta_real_time == delta_real_time
     assert step.ball == ball
     assert step.teams == teams
 
