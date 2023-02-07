@@ -137,8 +137,13 @@ class Referee:
         self.display.update()
 
         if self.config.DATA_COLLECTION:
-            self.data_collector: dc.DataCollector = self.init_data_collector()
-            self.gather_data_collection_frame_nodes()
+            try:
+                self.gather_data_collection_frame_nodes()
+                self.data_collector: dc.DataCollector = self.init_data_collector()
+            except Exception:
+                self.config.DATA_COLLECTION = False  # disable data collection
+                self.logger.error(f"Unexpected exception while initializing data collector: {traceback.format_exc()}")
+
 
         self.status_update_last_real_time = None
         self.status_update_last_sim_time = None
@@ -2479,12 +2484,16 @@ class Referee:
 
             # Collect data of step
             if self.config.DATA_COLLECTION:
-                self.data_collector.create_new_step(self.sim_time.get_ms())
-                self.data_collection_set_ball_data()
+                try:
+                    self.data_collector.create_new_step(self.sim_time.get_ms())
+                    self.data_collection_set_ball_data()
 
-                if self.game.state is not None:
-                    self.data_collection_set_game_control_data()
-                    self.data_collection_set_team_data()
+                    if self.game.state is not None:
+                        self.data_collection_set_game_control_data()
+                        self.data_collection_set_team_data()
+                except Exception:
+                    self.config.DATA_COLLECTION = False  # Disable data collection
+                    self.logger.error(f"Failed to collect data: {traceback.format_exc()}")
 
             if self.game.ball_position != previous_position:
                 self.game.ball_last_move = self.sim_time.get_ms()
