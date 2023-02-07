@@ -158,43 +158,27 @@ class Referee:
     def init_data_collector(self) -> dc.DataCollector:
         """Initializes the data collector."""
 
-        def compute_mass(robot):
-            """Returns mass of robot
-            Derived from the model verifier
+        def create_static_players(players) -> Dict[int, Optional[mi.StaticPlayer]]:
+            """Creates a dict of static players from list of players (from team.json).
+            Keys are int indexes derived from sorted player IDs.
+            This is to ensure that the order of players is consistent across runs.
+            Example: Sorted player IDs are 2, 5, 6, 9. Keys will be 0, 1, 2, 3.
+            
+            :param players: List of players (from team.json)
+            :return: Dict of static players
+            :rtype: Dict[int, Optional[mi.StaticPlayer]]
             """
+            static_players = {}
 
-            def get_mass(node):
-                """Return a list of tuples (mass, joint_and_tf, mass_name)"""
-                physics_nodes = []
-                if node[0] == "SFNode":
-                    if node[1].get("physics") is not None:
-                        physics = node[1]["physics"][1]
-                        if physics != {}:  # empty dict if null
-                                physics_nodes.append(physics["mass"][1])
-                    for mass_name in ['gearMass', 'gearMass2']:
-                        mass_node = node[1].get(mass_name)
-                        if mass_node is not None:
-                            physics_nodes.append(mass_node[1])
-                    node_type = node[1].get("__type")
-
-                    for k, v in node[1].items():
-                        physics_nodes.extend(get_mass(v))
-                elif node[0] == "MFNode":
-                    for child_node in node[1]:
-                        physics_nodes.extend(get_mass(("SFNode", child_node)))
-                return physics_nodes
-
-            physics_nodes = get_mass(("SFNode", robot))
-            mass = 0
-
-            for physics_node in physics_nodes:
-                single_mass = physics_node[0]
-                if single_mass == -1:
-                    continue
-                mass += single_mass
-
-            return mass
-
+            for idx, player_id in enumerate(sorted(players.keys())):  # Sort by player ID to consistently match to player1-4
+                static_players[idx] = mi.StaticPlayer(
+                    id = str(player_id),
+                    mass = -1.0,  # TODO Add mass manually (currently not possible with supervisor)
+                    DOF = -1,  # TODO Add DOF manually
+                    platform = players[player_id]['proto'],
+                    # TODO: Add Cameras manually
+                )
+            return static_players
 
         match_id = os.environ.get("HLVS_GAME_TAG", "UNKNOWN_HLVS_GAME_TAG").strip()
 
@@ -222,32 +206,10 @@ class Referee:
 
         ball = mi.StaticBall(
             id = "BALL",
-            mass = 0.5,  # TODO
+            mass = -1.0,  # TODO Add mass manually (currently not possible with supervisor)
             texture = self.ball_texture,
             diameter = self.game.ball_radius * 2,
         )
-
-        def create_static_players(players) -> Dict[int, Optional[mi.StaticPlayer]]:
-            """Creates a dict of static players from list of players (from team.json).
-            Keys are int indexes derived from sorted player IDs.
-            This is to ensure that the order of players is consistent across runs.
-            Example: Sorted player IDs are 2, 5, 6, 9. Keys will be 0, 1, 2, 3.
-            
-            :param players: List of players (from team.json)
-            :return: Dict of static players
-            :rtype: Dict[int, Optional[mi.StaticPlayer]]
-            """
-            static_players = {}
-
-            for idx, player_id in enumerate(sorted(players.keys())):  # Sort by player ID to consistently match to player1-4
-                static_players[idx] = mi.StaticPlayer(
-                    id = str(player_id),
-                    mass = -1.0,  # TODO
-                    DOF = -1,  # TODO now done manually
-                    platform = players[player_id]['proto'],
-                    # TODO: Cameras now done manually
-                )
-            return static_players
 
         team1_players = create_static_players(self.blue_team.players)
         team2_players = create_static_players(self.red_team.players)
