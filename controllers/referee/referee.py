@@ -281,6 +281,9 @@ class Referee:
         if hasattr(self.game, "udp_bouncer_process") and self.udp_bouncer_process:
             self.logger.info("Terminating 'udp_bouncer' process")
             self.udp_bouncer_process.terminate()
+        if self.config.DATA_COLLECTION:
+            self.logger.info("Stopping 'data collection'")
+            self.data_collector.finalize()
         if hasattr(self.game, 'over') and self.game.over:
             self.logger.info("Game is over")
             if hasattr(self.game, 'press_a_key_to_terminate') and self.game.press_a_key_to_terminate:
