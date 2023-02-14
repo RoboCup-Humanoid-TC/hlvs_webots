@@ -2436,9 +2436,14 @@ class Referee:
         self.logger.info("Setup complete.")
 
     def main_loop(self):
+        def should_run_data_collection(current_step_count: int) -> bool:
+            return self.config.DATA_COLLECTION and self.config.DATA_COLLECTION_STEP_INTERVAL > 0 and current_step_count % self.config.DATA_COLLECTION_STEP_INTERVAL == 0
+
         previous_real_time = time.time()
+        step_count: int = 0
         while self.supervisor.step(self.time_step) != -1 and not self.game.over:
             step_start_time = time.time()  # Also gets used for data collection
+            step_count += 1
             if hasattr(self.game, 'max_duration') and (step_start_time - self.blackboard.start_real_time) > self.game.max_duration:
                 self.logger.info(f'Interrupting game automatically after {self.game.max_duration} seconds')
                 break
@@ -2454,7 +2459,7 @@ class Referee:
             self.game.ball_position = self.game.ball_translation.getSFVec3f()
 
             # Collect data of step
-            if self.config.DATA_COLLECTION:
+            if should_run_data_collection(step_count):
                 try:
                     self.data_collector.create_new_step(self.sim_time.get_sec())
                     self.data_collection_set_ball_data()
@@ -2818,7 +2823,8 @@ class Referee:
                     time.sleep(wait_time)  # wait for the remaining time
 
             step_end_time = time.time()
-            if self.config.DATA_COLLECTION:
+
+            if should_run_data_collection(step_count):
                 try:
                     delta = step_end_time - step_start_time
                     self.data_collector.current_step().delta_real_time = delta
