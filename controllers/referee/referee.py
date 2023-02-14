@@ -140,6 +140,7 @@ class Referee:
             try:
                 self.gather_data_collection_frame_nodes()
                 self.data_collector: dc.DataCollector = self.init_data_collector()
+                self.logger.info("Data collection setup complete.")
             except Exception:
                 self.config.DATA_COLLECTION = False  # disable data collection
                 self.logger.error(f"Unexpected exception while initializing data collector: {traceback.format_exc()}")
@@ -2053,6 +2054,7 @@ class Referee:
                 node = robot.getFromProtoDef(frame_id)
                 if node is None:
                     continue
+                #node.enablePoseTracking(self.time_step)
                 nodes[frame_id] = node
             return nodes
 
@@ -2062,7 +2064,9 @@ class Referee:
         }
 
         # Ball
-        self.data_collection_frame_nodes["ball"] = {"BALL": self.ball}
+        node = self.ball
+        #node.enablePoseTracking(self.time_step)
+        self.data_collection_frame_nodes["ball"] = {"BALL": node}
 
         # Teams
         for color, team in {"blue": self.blue_team, "red": self.red_team}.items():
