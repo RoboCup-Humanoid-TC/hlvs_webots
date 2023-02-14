@@ -1,0 +1,3 @@
+*.wbproj
+controllers/model_verifier/results/*
+*.pyc
