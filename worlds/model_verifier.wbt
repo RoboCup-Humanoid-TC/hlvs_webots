@@ -3,6 +3,7 @@
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackground.proto"
 
+IMPORTABLE EXTERNPROTO "../protos/itandroids/Chape/ChapeRobocup.proto"
 
 WorldInfo {
   gravity 0
