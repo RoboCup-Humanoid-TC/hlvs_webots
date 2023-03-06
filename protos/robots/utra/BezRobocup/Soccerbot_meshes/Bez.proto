@@ -4,7 +4,7 @@
 # This is a proto file for Webots for the Soccerbot
 # Extracted from: soccerbot.urdf
 
-EXTERNPROTO "HingeJointWithBacklash.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/joints/protos/HingeJointWithBacklash.proto"
 EXTERNPROTO "Soccerbot_right_hip_front_6Mesh.proto"
 EXTERNPROTO "Soccerbot_right_calve_6Mesh.proto"
 EXTERNPROTO "Soccerbot_right_bicep_8Mesh.proto"
