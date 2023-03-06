@@ -40,8 +40,8 @@ fi
 
 export ROBOT_PATH=$(realpath $1)
 export ROBOT_NAME=$(basename $1 | sed s/.proto// )
-ROBOCUP_PATH=${WEBOTS_HOME}/projects/samples/contests/robocup
-MV_PATH=${ROBOCUP_PATH}/controllers/model_verifier
+MV_PATH=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+ROBOCUP_PATH=$(realpath "${MV_PATH}/../..")
 RESULTS_FOLDER=results/$ROBOT_NAME
 MARKDOWN_SRC=${MV_PATH}/report.md
 SUBMISSION_SRC=${MV_PATH}/robot_properties.json
