@@ -54,6 +54,9 @@ PROTO Bez2 [
     selfCollision IS selfCollision
 
     children [
+      DEF base_link Solid {
+        translation 0.0 0.0 -0.11
+      }
           %{
             print (fields.name.value)
             if fields.name.value ~= '' then
@@ -190,6 +193,9 @@ HingeJointWithBacklash {
                     rotation 0.000000 1.000000 0.000000 0.000000
                     name "left_hand [hand]"
                     children [
+                      DEF l_gripper Solid {
+                        translation 0.0 0.0 0.0
+                      }
                       Shape {
                         appearance PBRAppearance {
                           baseColor 0 0 0
@@ -336,6 +342,9 @@ HingeJointWithBacklash {
                     rotation 0.000000 1.000000 0.000000 0.000000
                     name "right_hand [hand]"
                     children [
+                      DEF r_gripper Solid {
+                        translation 0.0 0.0 0.0
+                      }
                       Shape {
                         appearance PBRAppearance {
                           baseColor 0 0 0
@@ -613,6 +622,9 @@ HingeJointWithBacklash {
                                       endPoint Solid {
                                         translation -0.084300 0.023300 0.000000
                                         children [
+                                          DEF l_sole Solid {
+                                            translation 0.0475 0.015 -0.035
+                                          }
                                           Transform {
                                             translation 0.069680 -0.036000 0.376050
                                             children [
@@ -1092,6 +1104,9 @@ HingeJointWithBacklash {
                                       endPoint Solid {
                                         translation -0.084300 -0.023300 0.000000
                                         children [
+                                          DEF r_sole Solid {
+                                            translation 0.0475 -0.015 -0.035
+                                          }
                                           Transform {
                                             translation 0.068180 0.035100 0.376050
                                             children [
@@ -1457,7 +1472,11 @@ HingeJointWithBacklash {
                             noise 0.007000
                             near 0.2
                             far 10
-
+                            children [
+                              DEF camera_frame Solid {
+                                rotation -0.5773503 0.5773503 -0.5773503 2.0943951
+                              }
+                            ]
                         }
                       ]
                       name "camera"
