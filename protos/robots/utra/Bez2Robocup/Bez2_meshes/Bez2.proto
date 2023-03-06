@@ -4,7 +4,7 @@
 # This is a proto file for Webots for the Bez2
 # Extracted from: /home/manx52/catkin_ws/src/soccerbot/bez2_description/urdf/bez2_simple.urdf
 
-EXTERNPROTO "HingeJointWithBacklash.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/joints/protos/HingeJointWithBacklash.proto"
 EXTERNPROTO "JerseyFront.proto"
 EXTERNPROTO "JerseyBack.proto"
 
