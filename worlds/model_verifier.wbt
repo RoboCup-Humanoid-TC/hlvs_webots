@@ -3,14 +3,17 @@
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackground.proto"
 
-IMPORTABLE EXTERNPROTO "../protos/itandroids/Chape/ChapeRobocup.proto"
+IMPORTABLE EXTERNPROTO "../protos/robots/itandroids/Chape/ChapeRobocup.proto"
+IMPORTABLE EXTERNPROTO "../protos/robots/utra/BezRobocup/BezRobocup.proto"
+IMPORTABLE EXTERNPROTO "../protos/robots/utra/Bez2Robocup/Bez2Robocup.proto"
+
 
 WorldInfo {
   gravity 0
 }
 Viewpoint {
-  orientation 0.9 0.2 0.4 1.4
-  position 0.6 -0.6 0.2
+  orientation 0.0 1.0 0.0 0.2
+  position -4.0 0.0 0.6
 }
 Robot {
   controller "model_verifier"
