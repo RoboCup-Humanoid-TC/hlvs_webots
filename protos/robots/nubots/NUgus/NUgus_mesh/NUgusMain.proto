@@ -4,7 +4,7 @@
 # This is a proto file for Webots for the NUgus
 # Extracted from: NUgus.urdf
 
-EXTERNPROTO "HingeJointWithBacklash.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/joints/protos/HingeJointWithBacklash.proto"
 EXTERNPROTO "NUgus_right_lower_legMesh.proto"
 EXTERNPROTO "NUgus_torsoMesh.proto"
 EXTERNPROTO "NUgus_left_hip_yawMesh.proto"
