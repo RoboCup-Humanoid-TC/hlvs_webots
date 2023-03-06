@@ -891,7 +891,7 @@ PROTO Bez [
                                           }
                                           TouchSensor {
                                             translation 0.03975 0.025 -0.0221
-                                            rotation 1.000000 0.000000 0.000000 1.57
+                                            rotation 1.000000 0.000000 0.000000 0.0
                                             name "left_leg_foot_sensor_1"
                                             type "bumper"
                                             resolution -1
@@ -926,7 +926,7 @@ PROTO Bez [
 					                                }
                                           TouchSensor {
                                             translation 0.03975 -0.033 -0.0221
-                                            rotation 1.000000 0.000000 0.000000 1.57
+                                            rotation 1.000000 0.000000 0.000000 0.0
                                             name "left_leg_foot_sensor_2"
                                             type "bumper"
                                             resolution -1
@@ -961,7 +961,7 @@ PROTO Bez [
                                           }
                                           TouchSensor {
                                             translation -0.03375 -0.033 -0.0221
-                                            rotation 1.000000 0.000000 0.000000 1.57
+                                            rotation 1.000000 0.000000 0.000000 0.0
                                             name "left_leg_foot_sensor_3"
                                             type "bumper"
                                             resolution -1
@@ -996,7 +996,7 @@ PROTO Bez [
                                           }
                                           TouchSensor {
                                             translation -0.03375 0.025 -0.0221
-                                            rotation 1.000000 0.000000 0.000000 1.57
+                                            rotation 1.000000 0.000000 0.000000 0.0
                                             name "left_leg_foot_sensor_4"
                                             type "bumper"
                                             resolution -1
@@ -1505,7 +1505,7 @@ PROTO Bez [
                                           }
                                           TouchSensor {
                                             translation 0.03975 0.033 -0.0221
-                                            rotation 1.000000 0.000000 0.000000 1.57
+                                            rotation 1.000000 0.000000 0.000000 0.0
                                             name "right_leg_foot_sensor_1"
                                             type "bumper"
                                             resolution -1
@@ -1540,7 +1540,7 @@ PROTO Bez [
 					                                }
                                           TouchSensor {
                                             translation 0.03975 -0.025 -0.0221
-                                            rotation 1.000000 0.000000 0.000000 1.57
+                                            rotation 1.000000 0.000000 0.000000 0.0
                                             name "right_leg_foot_sensor_2"
                                             type "bumper"
                                             resolution -1
@@ -1575,7 +1575,7 @@ PROTO Bez [
                                           }
                                           TouchSensor {
                                             translation -0.03375 -0.025 -0.0221
-                                            rotation 1.000000 0.000000 0.000000 1.57
+                                            rotation 1.000000 0.000000 0.000000 0.0
                                             name "right_leg_foot_sensor_3"
                                             type "bumper"
                                             resolution -1
@@ -1610,7 +1610,7 @@ PROTO Bez [
                                           }
                                           TouchSensor {
                                             translation -0.03375 0.033 -0.0221
-                                            rotation 1.000000 0.000000 0.000000 1.57
+                                            rotation 1.000000 0.000000 0.000000 0.0
                                             name "right_leg_foot_sensor_4"
                                             type "bumper"
                                             resolution -1
