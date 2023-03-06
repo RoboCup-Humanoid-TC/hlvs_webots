@@ -1,7 +1,6 @@
 #VRML_SIM R2022b utf8
 
 IMPORTABLE EXTERNPROTO "../protos/RoboCupBackground.proto"
-#IMPORTABLE EXTERNPROTO "../protos/RobocupGoal.proto"
 IMPORTABLE EXTERNPROTO "../protos/RobocupSoccerField.proto"
 IMPORTABLE EXTERNPROTO "../protos/RobocupTexturedSoccerBall.proto"
 IMPORTABLE EXTERNPROTO "../protos/lighting/RoboCupMainLight.proto"
@@ -9,7 +8,8 @@ IMPORTABLE EXTERNPROTO "../protos/lighting/RoboCupOffLight.proto"
 IMPORTABLE EXTERNPROTO "../protos/lighting/RoboCupTopLight.proto"
 
 IMPORTABLE EXTERNPROTO "../protos/robots/RoboCupRobot/RobocupRobot.proto"
-IMPORTABLE EXTERNPROTO "../protos/robots/WolfgangRobocup/WolfgangRobocup.proto"
+IMPORTABLE EXTERNPROTO "../protos/Utra/BezRobocup/BezRobocup.proto"
+IMPORTABLE EXTERNPROTO "../protos/Utra/Bez2Robocup/Bez2Robocup.proto"
 
 WorldInfo {
   info [
