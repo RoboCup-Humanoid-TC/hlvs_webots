@@ -9,6 +9,7 @@ IMPORTABLE EXTERNPROTO "../protos/lighting/RoboCupTopLight.proto"
 
 IMPORTABLE EXTERNPROTO "../protos/robots/RoboCupRobot/RobocupRobot.proto"
 IMPORTABLE EXTERNPROTO "../protos/robots/itandroids/Chape/ChapeRobocup.proto"
+IMPORTABLE EXTERNPROTO "../protos/robots/nubots/NUgus/NUgus.proto"
 IMPORTABLE EXTERNPROTO "../protos/robots/utra/BezRobocup/BezRobocup.proto"
 # IMPORTABLE EXTERNPROTO "../protos/robots/utra/Bez2Robocup/Bez2Robocup.proto"
 

@@ -4,6 +4,7 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackground.proto"
 
 IMPORTABLE EXTERNPROTO "../protos/robots/itandroids/Chape/ChapeRobocup.proto"
+IMPORTABLE EXTERNPROTO "../protos/robots/nubots/NUgus/NUgus.proto"
 IMPORTABLE EXTERNPROTO "../protos/robots/utra/BezRobocup/BezRobocup.proto"
 IMPORTABLE EXTERNPROTO "../protos/robots/utra/Bez2Robocup/Bez2Robocup.proto"
 
