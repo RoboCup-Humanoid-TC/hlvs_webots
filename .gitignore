@@ -1,0 +1,25 @@
+
+# hlvs controller files
+controllers/player/build
+controllers/model_verifier/results/*
+controllers/referee/meshes/*
+controllers/referee/recording.css
+controllers/referee/recording.html
+controllers/referee/recording.x3d
+controllers/referee/recording.json
+controllers/referee/textures/*
+controllers/model_verifier/results/*
+controllers/model_verifier/model_verifier.log
+controllers/model_verifier/report.md
+
+
+# Python compiled files
+*.pyc
+__pycache__/
+
+# webots specific stuff
+*.cache
+*.wbproj
+
+# IDEs
+.idea/*
