@@ -761,9 +761,6 @@ PROTO NUgusMain [
                                                   roughness 1.000000
                                                   metalness 0
                                                   emissiveColor 0.000000 0.000000 0.000000
-                                                  baseColorMap ImageTexture {
-                                                    url IS robotTexture
-                                                  }
                                                 }
                                               }
                                             ]
