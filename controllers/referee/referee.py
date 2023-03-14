@@ -2457,7 +2457,7 @@ class Referee:
             if self.game.maximum_real_time_factor <= 1.0:
 
                 # Time elapsed since the beginning of the step
-                step_time_until_now = previous_real_time - time.time()
+                step_time_until_now = time.time() - previous_real_time
 
                 # Minimum required time for the completed step
                 # Example: time_step = 8ms, max_real_time_factor = 0.1 -> min_step_time = 80ms
