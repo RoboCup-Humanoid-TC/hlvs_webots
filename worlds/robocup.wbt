@@ -16,10 +16,10 @@ IMPORTABLE EXTERNPROTO "../protos/robots/utra/BezRobocup/BezRobocup.proto"
 
 WorldInfo {
   info [
-    "Description: official soccer simulation for the 2021 Robocup Virtual Humanoid League (kid size)"
+    "Description: Official soccer simulation for the 2022/2023 RoboCup Humanoid League Virtual Season (kid size)"
     "Version 0.3"
   ]
-  title "Robocup V-HL Kid"
+  title "RoboCup HLVS Kid"
   basicTimeStep 8
   physicsDisableTime 0.1
   physicsDisableLinearThreshold 0.1
