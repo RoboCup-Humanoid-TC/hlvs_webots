@@ -42,7 +42,3 @@ STATUS_PRINT_PERIOD: 20                  # Real time between two status updates 
 DISABLE_ACTUATORS_MIN_DURATION: 1.0      # The minimal simulated time [s] until enabling actuators again after a reset
 FONT_SIZE: 0.096                         # Font size for the display
 FONT: 'Lucida Console'                   # Font typeface for the display
-DATA_COLLECTION: true                    # Wether to start data collection of this game
-DATA_COLLECTION_DIR: './data'            # Where to store data collection files # TODO
-DATA_COLLECTION_STEP_INTERVAL: 8         # Run the data collection every nth step
-DATA_COLLECTION_AUTOSAVE_INTERVAL: 600   # in seconds. Automatically saves collected data during the game. Set to -1 to disable auto save
