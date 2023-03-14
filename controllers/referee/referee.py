@@ -1910,7 +1910,7 @@ class Referee:
             self.clean_exit()
 
         # speed up non-real time tests
-        if self.game.maximum_real_time_factor > 1.0:
+        if self.game.maximum_real_time_factor <= 0.0:
             self.logger.info('Simulation will run as fast as possible, real time waiting times will be minimal.')
             self.config.REAL_TIME_BEFORE_FIRST_READY_STATE = 5
             self.config.HALF_TIME_BREAK_REAL_TIME_DURATION = 2
@@ -1946,7 +1946,7 @@ class Referee:
                     with open(path, 'w') as file:
                         file.write((red_line + blue_line) if self.game.red.id < self.game.blue.id else (blue_line + red_line))
                     command_line = [os.path.join(JAVA_HOME, 'bin', 'java'), '-jar', 'GameControllerSimulator.jar']
-                    if self.game.maximum_real_time_factor > 1.0:
+                    if self.game.maximum_real_time_factor <= 0.0 or self.game.maximum_real_time_factor > 1.0:
                         command_line.append('--fast')
                     command_line.append('--minimized')
                     command_line.append('--config')
@@ -2454,7 +2454,8 @@ class Referee:
             self.sim_time.progress_ms(self.time_step)
 
             # Slow down the simulation to guarantee minimum amount of real time between each step
-            if self.game.maximum_real_time_factor <= 1.0:
+            # Maximum real time factor of <= 0.0 means that the simulation will run as fast as possible
+            if self.game.maximum_real_time_factor > 0.0:
 
                 # Time elapsed since the beginning of the step
                 step_time_until_now = time.time() - previous_real_time
