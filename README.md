@@ -21,9 +21,14 @@ You will also need to get familiar with Webots by reading the [Webots User Guide
 
 3. Install Python dependencies:
 
-   ```
-   pip3 install -r controllers/referee/requirements.txt
-   ```
+   - Main dependencies:
+     ```
+     pip3 install -r controllers/referee/requirements/common.txt
+     ```
+  - Optional development dependencies:
+      ```
+      pip3 install -r controllers/referee/requirements/dev.txt
+      ```
 
 4. Build the controllers:
 
