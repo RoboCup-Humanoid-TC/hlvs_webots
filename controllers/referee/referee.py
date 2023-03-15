@@ -64,6 +64,7 @@ GAME_INTERRUPTIONS = {
 
 class Referee:
     def __init__(self):
+
         # start the webots supervisor
         self.supervisor = Supervisor()
         self.time_step = int(self.supervisor.getBasicTimeStep())
@@ -80,6 +81,8 @@ class Referee:
             int(self.config.SIMULATED_TIME_SET_PENALTY_SHOOTOUT * 1000 / self.time_step)
 
         self.game_controller_socket = None
+
+        self.first_step_done = False
 
         self.blackboard = blackboard
         self.blackboard.supervisor = self.supervisor
@@ -2757,7 +2760,13 @@ class Referee:
                         self.game_controller_send('STATE:SET')
                 elif self.game.ready_real_time is not None:
                     # initial kick-off (1st, 2nd half, extended periods, penalty shootouts)
-                    if self.game.ready_real_time <= time.time():
+                    if self.first_step_done and self.game.ready_real_time <= time.time():
+                        # The first step done check is necessary in case the ready real time has
+                        # already passed before the first step is done.
+                        # This can happen if setting up the game (and spawning robots) takes a lot of time.
+                        # If we send the ready state before the first step is done, the game controller
+                        # will skip the ready state and go directly to the set state.
+                        # This messes up the referee and it is stuck listening for the game controller... :(
                         self.logger.info('Real-time to wait elapsed, moving to READY')
                         self.game.ready_real_time = None
                         self.check_start_position()
@@ -2832,6 +2841,7 @@ class Referee:
                 except Exception:
                     self.logger.error(f"Failure during step time calculation: {traceback.format_exc()}")
 
+            self.first_step_done = True
             previous_real_time = time.time()  # update the previous real time for the next step
 
         # for some reason, the simulation was terminated before the end of the match (may happen during tests)
