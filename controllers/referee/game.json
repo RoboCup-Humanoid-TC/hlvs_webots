@@ -3,7 +3,7 @@
   "kickoff": "red",
   "class": "KID",
   "host": "127.0.0.1",
-  "minimum_real_time_factor": 0,
+  "maximum_real_time_factor": 1.0,
   "side_left": "blue",
   "press_a_key_to_terminate": true,
   "use_bouncing_server": true,

@@ -1904,21 +1904,19 @@ class Referee:
         self.logger.info(f'Ball respawned at {target_location[0]} {target_location[1]} {target_location[2]}.')
 
     def setup(self):
-        # speed up non-real time tests
-        if self.game.minimum_real_time_factor == 0:
-            self.config.REAL_TIME_BEFORE_FIRST_READY_STATE = 5
-            self.config.HALF_TIME_BREAK_REAL_TIME_DURATION = 2
-
         # check game type
         if self.game.type not in ['NORMAL', 'KNOCKOUT', 'PENALTY']:
             self.logger.error(f'Unsupported game type: {self.game.type}.')
             self.clean_exit()
 
-        if self.game.minimum_real_time_factor == 0:
+        # speed up non-real time tests
+        if self.game.maximum_real_time_factor <= 0.0:
             self.logger.info('Simulation will run as fast as possible, real time waiting times will be minimal.')
+            self.config.REAL_TIME_BEFORE_FIRST_READY_STATE = 5
+            self.config.HALF_TIME_BREAK_REAL_TIME_DURATION = 2
         else:
             self.logger.info(
-                f'Simulation will guarantee a maximum {1 / self.game.minimum_real_time_factor:.2f}x speed for each time step.')
+                f'Simulation will guarantee a maximum {self.game.maximum_real_time_factor:.2f} real-time factor for each time step.')
 
         # check team name length (should be at most 12 characters long, trim them if too long)
         if len(self.red_team.name) > 12:
@@ -1948,7 +1946,7 @@ class Referee:
                     with open(path, 'w') as file:
                         file.write((red_line + blue_line) if self.game.red.id < self.game.blue.id else (blue_line + red_line))
                     command_line = [os.path.join(JAVA_HOME, 'bin', 'java'), '-jar', 'GameControllerSimulator.jar']
-                    if self.game.minimum_real_time_factor < 1:
+                    if self.game.maximum_real_time_factor <= 0.0 or self.game.maximum_real_time_factor > 1.0:
                         command_line.append('--fast')
                     command_line.append('--minimized')
                     command_line.append('--config')
@@ -2455,13 +2453,22 @@ class Referee:
 
             self.sim_time.progress_ms(self.time_step)
 
-            if self.game.minimum_real_time_factor != 0:
-                # slow down the simulation to guarantee a miminum amount of real time between each step
-                t = time.time()
-                delta_time = previous_real_time - t + self.game.minimum_real_time_factor * self.time_step / 1000
-                if delta_time > 0:
-                    time.sleep(delta_time)
-                previous_real_time = time.time()
+            # Slow down the simulation to guarantee minimum amount of real time between each step
+            # Maximum real time factor of <= 0.0 means that the simulation will run as fast as possible
+            if self.game.maximum_real_time_factor > 0.0:
+
+                # Time elapsed since the beginning of the step
+                step_time_until_now = time.time() - previous_real_time
+
+                # Minimum required time for the completed step
+                # Example: time_step = 8ms, max_real_time_factor = 0.1 -> min_step_time = 80ms
+                min_step_time = (self.time_step / 1000) * (1 / self.game.maximum_real_time_factor)
+
+                # Time to wait before the next step
+                wait_time = min_step_time - step_time_until_now
+                if wait_time > 0:  # wait only if the step was completed faster than the minimum required time
+                    time.sleep(wait_time)  # wait for the remaining time
+            previous_real_time = time.time()  # update the previous real time
 
         # for some reason, the simulation was terminated before the end of the match (may happen during tests)
         if not self.game.over:
