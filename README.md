@@ -157,7 +157,7 @@ This configuration is used by the referee (and by the udp_bouncer if it is used)
 - `kickoff`: Color of the team that has kickoff at the start of the game [`red`, `blue`]
 - `side_left`: Color of the team that starts on the left field side [`red`, `blue`]
 - `host`: IP of the machine the referee is running on [LAN IP, or `127.0.0.1` for local]
-- `minimum_real_time_factor`: Minimum real time factor the simulation should run at TODO: Update after fix merge
+- `maximum_real_time_factor`: Referee guarantees that the simulation is not running faster. Values <= 0.0 mean, the simulation can run as fast as possible [float]
 - `data_collection`: Configuration for data collection
     - `enabled`: Whether to enable the data collection [`true` or `false`]
     - `directory`: Path to directory where to store data collection files
