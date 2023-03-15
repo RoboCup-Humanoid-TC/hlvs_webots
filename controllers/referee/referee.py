@@ -136,13 +136,13 @@ class Referee:
         self.setup()
         self.display.update()
 
-        if self.game.data_collection.enabled:
+        if self.game.data_collection["enabled"]:
             try:
                 self.gather_data_collection_frame_nodes()
                 self.data_collector: dc.DataCollector = self.init_data_collector()
                 self.logger.info("Data collection setup complete.")
             except Exception:
-                self.game.data_collection.enabled = False  # disable data collection
+                self.game.data_collection["enabled"] = False  # disable data collection
                 self.logger.error(f"Unexpected exception while initializing data collector: {traceback.format_exc()}")
 
 
@@ -253,8 +253,8 @@ class Referee:
         match = mi.Match(static_match_info)
 
         return dc.DataCollector(
-            self.game.data_collection.directory,
-            self.game.data_collection.autosave_interval,
+            self.game.data_collection["directory"],
+            self.game.data_collection["autosave_interval"],
             match,
             self.logger,
         )
@@ -282,7 +282,7 @@ class Referee:
         if hasattr(self.game, "udp_bouncer_process") and self.udp_bouncer_process:
             self.logger.info("Terminating 'udp_bouncer' process")
             self.udp_bouncer_process.terminate()
-        if self.game.data_collection.enabled:
+        if self.game.data_collection["enabled"]:
             self.logger.info("Stopping 'data collection'")
             self.data_collector.finalize()
         if hasattr(self.game, 'over') and self.game.over:
@@ -2439,7 +2439,7 @@ class Referee:
 
     def main_loop(self):
         def should_run_data_collection(current_step_count: int) -> bool:
-            return self.game.data_collection.enabled and self.game.data_collection.step_interval > 0 and current_step_count % self.game.data_collection.step_interval == 0
+            return self.game.data_collection["enabled"] and self.game.data_collection["step_interval"] > 0 and current_step_count % self.game.data_collection["step_interval"] == 0
 
         previous_real_time = time.time()
         step_count: int = 0
@@ -2470,7 +2470,7 @@ class Referee:
                         self.data_collection_set_game_control_data()
                         self.data_collection_set_team_data()
                 except Exception:
-                    self.game.data_collection.enabled = False  # Disable data collection
+                    self.game.data_collection["enabled"] = False  # Disable data collection
                     self.logger.error(f"Failed to collect data: {traceback.format_exc()}")
 
             if self.game.ball_position != previous_position:
