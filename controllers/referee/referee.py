@@ -2418,7 +2418,7 @@ class Referee:
         if hasattr(self.game, 'record_simulation'):
             try:
                 # Create the directory if it does not exist
-                os.makedirs(os.path.dirname(self.game.record_simulation), exist_ok=True)
+                os.makedirs(os.path.dirname(os.path.abspath(self.game.record_simulation)), exist_ok=True)
                 if self.game.record_simulation.endswith(".html"):
                     self.supervisor.animationStartRecording(self.game.record_simulation)
                 elif self.game.record_simulation.endswith(".mp4"):
