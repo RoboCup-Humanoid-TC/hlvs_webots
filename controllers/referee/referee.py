@@ -2092,11 +2092,11 @@ class Referee:
     def data_collection_set_team_data(self):
         """Sets the team data for the data collection."""
 
-        def create_player(player_number: int, game_info_team, players: Dict[str, Dict[str, List[float]]]) -> Optional[mi.Player]:
+        def create_player(player_number: str, game_info_team, players: Dict[str, Dict[str, List[float]]]) -> Optional[mi.Player]:
             """Creates a player for the data collection.
 
             :param player_number: Number of the player
-            :type player_number: int
+            :type player_number: str
             :param game_info_team: Team info from the game info
             :type game_info_team: 
             :param players: Dict of players of poses
@@ -2109,19 +2109,13 @@ class Referee:
                 return None
 
             # Get GameInfoPlayer from game info
-            game_info_player = None
-            for player in game_info_team.players:
-                if player.number == player_number:
-                    game_info_player = player
-                    break
-            if game_info_player is None:
-                return None
+            game_info_player = game_info_team.players[int(player_number)]
 
             # Get RobotInfo from game state info
             if self.game.state is not None:
                 robot_info = mi.RobotInfo(
                     penalty = game_info_player.penalty,
-                    secs_till_unpenalized = game_info_player,
+                    secs_till_unpenalized = game_info_player.secs_till_unpenalized,
                     number_of_warnings = game_info_player.number_of_warnings,
                     number_of_yellow_cards = game_info_player.number_of_yellow_cards,
                     number_of_red_cards = game_info_player.number_of_red_cards,
@@ -2147,7 +2141,7 @@ class Referee:
                 r_camera_frame = None
 
             return mi.Player(
-                id=number,
+                id=player_number,
                 base_link=mi.pose_from_affine(np.array(poses["base_link"])),
                 l_sole=mi.pose_from_affine(np.array(poses["l_sole"])),
                 r_sole=mi.pose_from_affine(np.array(poses["r_sole"])),
@@ -2169,10 +2163,10 @@ class Referee:
             """
             return mi.Team(
                 id=game_info_team.team_number,
-                player1=create_player(1, game_info_team, players),
-                player2=create_player(2, game_info_team, players),
-                player3=create_player(3, game_info_team, players),
-                player4=create_player(4, game_info_team, players),
+                player1=create_player("1", game_info_team, players),
+                player2=create_player("2", game_info_team, players),
+                player3=create_player("3", game_info_team, players),
+                player4=create_player("4", game_info_team, players),
                 score=game_info_team.score,
                 penalty_shots=game_info_team.penalty_shot,
                 single_shots=game_info_team.single_shots
