@@ -3,6 +3,8 @@
   "players": {
     "1": {
       "proto": "ChapeRobocup",
+      "dockerTag": "latest",
+      "dockerCmd": "bash ./main.sh",
       "halfTimeStartingPose": {
         "translation": [-3.5, -3.06, 0.42],
         "rotation": [0, 0, 1, 1.57]
@@ -22,6 +24,8 @@
     },
     "2": {
       "proto": "ChapeRobocup",
+      "dockerTag": "latest",
+      "dockerCmd": "bash ./main.sh",
       "halfTimeStartingPose": {
         "translation": [-3.5, 3.06, 0.42],
         "rotation": [0, 0, 1, -1.57]
@@ -41,6 +45,8 @@
     },
     "3": {
       "proto": "ChapeRobocup",
+      "dockerTag": "latest",
+      "dockerCmd": "bash ./main.sh",
       "halfTimeStartingPose": {
         "translation": [-0.75, -3.06, 0.42],
         "rotation": [0, 0, 1, 1.57]
@@ -60,6 +66,8 @@
     },
     "4": {
       "proto": "ChapeRobocup",
+      "dockerTag": "latest",
+      "dockerCmd": "bash ./main.sh",
       "halfTimeStartingPose": {
         "translation": [-0.75, 3.06, 0.42],
         "rotation": [0, 0, 1, -1.57]
