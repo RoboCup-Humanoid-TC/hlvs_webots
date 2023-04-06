@@ -11,7 +11,7 @@ from .team import Teams
 
 @dataclass
 class GameControlData:
-    """Holds data of game controler communication.
+    """Holds data of game controller communication.
     See here for more information: https://github.com/RoboCup-Humanoid-TC/GameController/wiki/GameControlData
 
     :param game_state: Game state

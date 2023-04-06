@@ -44,14 +44,11 @@ class Action(IntEnum):
     ACTION_SEARCHING = 6
     ACTION_LOCALIZING = 7
 
-
-@dataclass
-class RobotInfo:  # Inferred from the GameState struct
-    @unique
-    class Penalty(IntEnum):
-        """Enum for the penalty of the robot.
-        Inferred from: https://github.com/RoboCup-Humanoid-TC/GameController/blob/master/src/data/values/Penalties.java
-        """
+@unique
+class Penalty(IntEnum):
+    """Enum for the penalty of the robot.
+    Inferred from: https://github.com/RoboCup-Humanoid-TC/GameController/blob/master/src/data/values/Penalties.java
+    """
 
     UNKNOWN = 255
     NONE = 0
@@ -61,6 +58,10 @@ class RobotInfo:  # Inferred from the GameState struct
     HL_PHYSICAL_CONTACT = 31
     HL_PICKUP_OR_INCAPABLE = 34
     HL_SERVICE = 35
+
+
+@dataclass
+class RobotInfo:  # Inferred from the GameState struct
 
     penalty: Penalty
     secs_till_unpenalized: int

@@ -6,11 +6,13 @@ import data_collection.match_info as mi
 def _create_step(time: int) -> mi.Step:
     delta_real_time: float = 0.1
 
-    game_controll_data = mi.GameControllData(
-        game_state=mi.GameControllData.GameState.STATE_INITIAL,
+    game_control_data = mi.GameControlData(
+        game_state=mi.GameControlData.GameState.STATE_INITIAL,
         first_half=True,
         kickoff_team=1,
-        secondary_state_info=mi.GameControllData.SecondaryGameState.STATE_NORMAL,
+        secondary_state=mi.GameControlData.SecondaryGameState.STATE_UNKNOWN,
+        secondary_state_info_team=1,
+        secondary_state_info_sub_state=1,
         drop_in_team=True,
         drop_in_time=0,
         seconds_remaining=0,
@@ -23,9 +25,6 @@ def _create_step(time: int) -> mi.Step:
     )
     player: mi.Player = mi.Player(
         "player_1",
-        mi.State.UNKNOWN_STATE,
-        mi.Role.ROLE_UNDEFINED,
-        mi.Action.ACTION_UNDEFINED,
         mi.Frame(
             "base_link",
             mi.Pose(mi.Position(0, 0, 0), mi.Rotation(0, 0, 0, 1)),
@@ -46,10 +45,21 @@ def _create_step(time: int) -> mi.Step:
             "r_gripper",
             mi.Pose(mi.Position(0, 0, 0), mi.Rotation(0, 0, 0, 1)),
         ),
-        mi.Frame(
+        camera_frame=mi.Frame(
             "camera",
             mi.Pose(mi.Position(0, 0, 0), mi.Rotation(0, 0, 0, 1)),
         ),
+        state=mi.State.UNKNOWN_STATE,
+        role=mi.Role.ROLE_UNDEFINED,
+        action=mi.Action.ACTION_UNDEFINED,
+        robot_info=mi.RobotInfo(
+            mi.Penalty.UNKNOWN,
+            secs_till_unpenalized=42,
+            number_of_warnings=42,
+            number_of_yellow_cards=42,
+            number_of_red_cards=42,
+            goalkeeper=False
+        )
     )
     teams: mi.Teams = mi.Teams(
         mi.Team("HSV", player1=player), mi.Team("St. Pauli", player2=player)
