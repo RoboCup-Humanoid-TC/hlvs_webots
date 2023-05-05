@@ -197,7 +197,7 @@ class Referee:
         league_sub_type = mi.LeagueSubType.ADULT
         if self.game.field_size == "kid": league_sub_type = mi.LeagueSubType.KID
 
-        simulation: mi.Simulation = mi.Simulation(True, self.time_step)
+        simulation: mi.Simulation = mi.Simulation(True, self.time_step, self.game.data_collection["step_interval"])
 
         field = mi.Field(
             location_id = self.background,
@@ -313,7 +313,7 @@ class Referee:
                 while not self.supervisor.movieIsReady():
                     self.supervisor.step(self.time_step)
                 self.logger.info("Encoding finished")
-        self.logger.info("Exiting webots properly")
+        self.logger.info("Exiting Webots properly")
 
         # Note: If self.supervisor.step is not called before the 'simulationQuit', information is not shown
         self.supervisor.step(self.time_step)

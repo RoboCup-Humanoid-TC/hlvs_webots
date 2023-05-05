@@ -5,7 +5,7 @@ import data_collection.match_info as mi
 def _create_static_match_info(id: str = "test_id") -> mi.StaticMatchInfo:
     match_type = mi.MatchType.ROUNDROBIN
     league_sub_type = mi.LeagueSubType.KID
-    simulation = mi.Simulation(True, 0)
+    simulation = mi.Simulation(True, 0, 8)
     field = mi.Field("test_location_id", "test_location_name", 6.0, 9.0, 1.0)
     ball = mi.StaticBall("test_ball_id", 0.5, "test_ball_texture", 0.14)
     teams = mi.StaticTeams(
