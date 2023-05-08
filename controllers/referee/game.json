@@ -7,6 +7,12 @@
   "side_left": "blue",
   "press_a_key_to_terminate": true,
   "use_bouncing_server": true,
+  "data_collection": {
+    "enabled": true,
+    "directory": "./data",
+    "step_interval": 8,
+    "autosave_interval": 600
+  },
   "red": {
     "id": 8,
     "config": "team_1.json",

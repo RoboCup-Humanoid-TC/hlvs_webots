@@ -25,7 +25,7 @@ class Team(SimpleNamespace):
     @classmethod
     def from_json(cls, json_path):
         try:
-            with open(json_path) as json_file:
+            with open(json_path, 'r') as json_file:
                 team = json.load(json_file)
                 for field_name in ["name", "players"]:
                     if field_name not in team:

@@ -29,19 +29,26 @@ import yaml
 from scipy.spatial import ConvexHull
 
 from types import SimpleNamespace
+from typing import Dict, List, Optional
 
-from controller import Supervisor, Node
 
-from gamestate import GameState
+import numpy as np
+import yaml
+
+import data_collection as dc
+import data_collection.match_info as mi
+from blackboard import blackboard
+from controller import Node, Supervisor
+from display import Display
 from field import Field
 from forceful_contact_matrix import ForcefulContactMatrix
 from logger import logger
+from gamestate import GameState
 from geometry import distance2, rotate_along_z, aabb_circle_collision, polygon_circle_collision, update_aabb
 from display import Display
 from game import Game
 from team import Team
 from sim_time import SimTime
-from blackboard import blackboard
 
 
 # game interruptions requiring a free kick procedure
@@ -57,6 +64,7 @@ GAME_INTERRUPTIONS = {
 
 class Referee:
     def __init__(self):
+
         # start the webots supervisor
         self.supervisor = Supervisor()
         self.time_step = int(self.supervisor.getBasicTimeStep())
@@ -73,6 +81,8 @@ class Referee:
             int(self.config.SIMULATED_TIME_SET_PENALTY_SHOOTOUT * 1000 / self.time_step)
 
         self.game_controller_socket = None
+
+        self.first_step_done = False
 
         self.blackboard = blackboard
         self.blackboard.supervisor = self.supervisor
@@ -128,6 +138,16 @@ class Referee:
         self.setup()
         self.display.update()
 
+        if self.game.data_collection["enabled"]:
+            try:
+                self.gather_data_collection_frame_nodes()
+                self.data_collector: dc.DataCollector = self.init_data_collector()
+                self.logger.info("Data collection setup complete.")
+            except Exception:
+                self.game.data_collection["enabled"] = False  # disable data collection
+                self.logger.error(f"Unexpected exception while initializing data collector: {traceback.format_exc()}")
+
+
         self.status_update_last_real_time = None
         self.status_update_last_sim_time = None
 
@@ -137,6 +157,109 @@ class Referee:
             self.logger.error(f"Unexpected exception in main referee loop: {traceback.format_exc()}")
 
         self.clean_exit()
+
+    def init_data_collector(self) -> dc.DataCollector:
+        """Initializes the data collector."""
+
+        def create_static_players(players) -> Dict[int, Optional[mi.StaticPlayer]]:
+            """Creates a dict of static players from list of players (from team.json).
+            Keys are int indexes derived from sorted player IDs.
+            This is to ensure that the order of players is consistent across runs.
+            Example: Sorted player IDs are 2, 5, 6, 9. Keys will be 0, 1, 2, 3.
+            
+            :param players: List of players (from team.json)
+            :return: Dict of static players
+            :rtype: Dict[int, Optional[mi.StaticPlayer]]
+            """
+            static_players = {}
+
+            for idx, player_id in enumerate(sorted(players.keys())):  # Sort by player ID to consistently match to player1-4
+                static_players[idx] = mi.StaticPlayer(
+                    id = str(player_id),
+                    mass = -1.0,  # TODO Add mass manually (currently not possible with supervisor)
+                    DOF = -1,  # TODO Add DOF manually
+                    platform = players[player_id]['proto'],
+                    # TODO: Add Cameras manually
+                )
+            return static_players
+
+        match_id = os.environ.get("HLVS_GAME_TAG", "UNKNOWN_HLVS_GAME_TAG").strip()
+
+        # Match type
+        match_type = mi.MatchType.UNKNOWN
+        if self.game.type == 'NORMAL': match_type = mi.MatchType.ROUNDROBIN
+        if self.game.type == 'KNOCKOUT': match_type = mi.MatchType.PLAYOFF
+        if self.game.type == 'PENALTY': match_type = mi.MatchType.PENALTY
+
+        # League type
+        # Alternatively, this could be read from the game config file (self.game.class),
+        # but it seems like this is not used elsewhere in this referee.
+        league_sub_type = mi.LeagueSubType.ADULT
+        if self.game.field_size == "kid": league_sub_type = mi.LeagueSubType.KID
+
+        simulation: mi.Simulation = mi.Simulation(True, self.time_step, self.game.data_collection["step_interval"])
+
+        field = mi.Field(
+            location_id = self.background,
+            location_name = self.background,
+            size_x = self.field.size_x * 2,  # Sizes are of half field
+            size_y = self.field.size_y * 2,  # Sizes are of half field
+            luminosity = self.luminosity,
+        )
+
+        ball = mi.StaticBall(
+            id = "BALL",
+            mass = -1.0,  # TODO Add mass manually (currently not possible with supervisor)
+            texture = self.ball_texture,
+            diameter = self.game.ball_radius * 2,
+        )
+
+        team1_players = create_static_players(self.blue_team.players)
+        team2_players = create_static_players(self.red_team.players)
+
+        # Team 1 is always blue
+        teams = mi.StaticTeams(
+            team1 = mi.StaticTeam(
+                id = str(self.game.blue.id),
+                name = self.blue_team.name,
+                color = mi.TeamColor.BLUE,
+                player1 = team1_players.get(0, None),
+                player2 = team1_players.get(1, None),
+                player3 = team1_players.get(2, None),
+                player4 = team1_players.get(3, None),
+            ),
+
+            # Team 2 is always red
+            team2 = mi.StaticTeam(
+                id = str(self.game.red.id),
+                name = self.red_team.name,
+                color = mi.TeamColor.RED,
+                player1 = team2_players.get(0, None),
+                player2 = team2_players.get(1, None),
+                player3 = team2_players.get(2, None),
+                player4 = team2_players.get(3, None),
+            ),
+        )
+
+        static_match_info: mi.StaticMatchInfo = mi.StaticMatchInfo(
+            match_id,
+            match_type,
+            league_sub_type,
+            simulation,
+            field,
+            ball,
+            teams,
+            self.game.kickoff,
+        )
+
+        match = mi.Match(static_match_info)
+
+        return dc.DataCollector(
+            self.game.data_collection["directory"],
+            self.game.data_collection["autosave_interval"],
+            match,
+            self.logger,
+        )
 
     def announce_final_score(self):
         """ Prints score of the match to the console and saves it to the log. """
@@ -161,6 +284,9 @@ class Referee:
         if hasattr(self.game, "udp_bouncer_process") and self.udp_bouncer_process:
             self.logger.info("Terminating 'udp_bouncer' process")
             self.udp_bouncer_process.terminate()
+        if hasattr(self, "data_collector") and self.game.data_collection["enabled"]:
+            self.logger.info("Stopping 'data collection'")
+            self.data_collector.finalize()
         if hasattr(self.game, 'over') and self.game.over:
             self.logger.info("Game is over")
             if hasattr(self.game, 'press_a_key_to_terminate') and self.game.press_a_key_to_terminate:
@@ -187,7 +313,7 @@ class Referee:
                 while not self.supervisor.movieIsReady():
                     self.supervisor.step(self.time_step)
                 self.logger.info("Encoding finished")
-        self.logger.info("Exiting webots properly")
+        self.logger.info("Exiting Webots properly")
 
         # Note: If self.supervisor.step is not called before the 'simulationQuit', information is not shown
         self.supervisor.step(self.time_step)
@@ -254,10 +380,10 @@ class Referee:
             port = self.game.red.ports[n] if color == 'red' else self.game.blue.ports[n]
             if red_on_right:  # symmetry with respect to the central line of the field
                 self.flip_poses(player)
-            defname = color.upper() + '_PLAYER_' + number
+            def_name = color.upper() + '_PLAYER_' + number
             halfTimeStartingTranslation = player['halfTimeStartingPose']['translation']
             halfTimeStartingRotation = player['halfTimeStartingPose']['rotation']
-            string = f'DEF {defname} {model}{{name "{color} player {number}" ' + \
+            string = f'DEF {def_name} {model}{{name "{color} player {number}" ' + \
                      f'translation {halfTimeStartingTranslation[0]} ' + \
                      f'{halfTimeStartingTranslation[1]} {halfTimeStartingTranslation[2]} ' + \
                      f'rotation {halfTimeStartingRotation[0]} ' + \
@@ -268,9 +394,9 @@ class Referee:
                 string += f', "{h}"'
             string += '] }'
             children.importMFNodeFromString(-1, string)
-            player['robot'] = self.supervisor.getFromDef(defname)
+            player['robot'] = self.supervisor.getFromDef(def_name)
             player['position'] = player['robot'].getCenterOfMass()
-            self.logger.info(f'Spawned {defname} {model} on port {port} at halfTimeStartingPose: translation (' +
+            self.logger.info(f'Spawned {def_name} {model} on port {port} at halfTimeStartingPose: translation (' +
                              f'{halfTimeStartingTranslation[0]} {halfTimeStartingTranslation[1]} ' +
                              f'{halfTimeStartingTranslation[2]}), rotation ({halfTimeStartingRotation[0]} ' +
                              f'{halfTimeStartingRotation[1]} {halfTimeStartingRotation[2]} {halfTimeStartingRotation[3]}).')
@@ -576,14 +702,14 @@ class Referee:
         goalkeeper_number = None
         for number, player in team.players.items():
             d = distance2(player['position'], self.game.ball_position)
-            if d <= self.field.ball_vincity:
+            if d <= self.field.ball_vicinity:
                 if self.is_goalkeeper(team, number):
                     goalkeeper_number = number
                 players_close_to_the_ball.append(player)
                 numbers.append(number)
 
         goalkeeper_hold_ball = False
-        if goalkeeper_number is not None:  # goalkeeper is in vincity of ball
+        if goalkeeper_number is not None:  # goalkeeper is in vicinity of ball
             goalkeeper = team.players[goalkeeper_number]
             points = np.empty([4, 2])
             aabb = None
@@ -677,7 +803,7 @@ class Referee:
             # if less then 3 contact points, the contacts do not include contacts with the ground,
             # so don't update the following value based on ground collisions
             if n >= 3:
-                player['outside_circle'] = True        # true if fully outside the center cicle
+                player['outside_circle'] = True        # true if fully outside the center circle
                 player['outside_field'] = True         # true if fully outside the field
                 player['inside_field'] = True          # true if fully inside the field
                 player['on_outer_line'] = False        # true if robot is partially on the line surrounding the field
@@ -921,8 +1047,8 @@ class Referee:
         if foul_far_from_ball or not self.game.in_play or self.game.penalty_shootout:
             self.send_penalty(player, 'PHYSICAL_CONTACT', 'forceful contact foul')
         else:
-            offence_location = team.players[number]['position']
-            self.interruption('FREEKICK', freekick_team_id, offence_location)
+            offense_location = team.players[number]['position']
+            self.interruption('FREEKICK', freekick_team_id, offense_location)
 
     def goalkeeper_inside_own_goal_area(self, team, number):
         if self.is_goalkeeper(team, number):
@@ -971,7 +1097,7 @@ class Referee:
             red_number = opponent_number
             blue_number = number
         if self.forceful_contact_matrix.long_collision(red_number, blue_number):
-            if d1 < self.config.FOUL_VINCITY_DISTANCE and d1 - d2 > self.config.FOUL_DISTANCE_THRESHOLD:
+            if d1 < self.config.FOUL_VICINITY_DISTANCE and d1 - d2 > self.config.FOUL_DISTANCE_THRESHOLD:
                 collision_time = self.forceful_contact_matrix.get_collision_time(red_number, blue_number)
                 debug_messages.append(f"Pushing time: {collision_time} > {self.config.FOUL_PUSHING_TIME} "
                                       f"over the last {self.config.FOUL_PUSHING_PERIOD}")
@@ -989,8 +1115,8 @@ class Referee:
                               f"speed: {math.sqrt(v1_squared):.2f}")
         debug_messages.append(f"{p2_str:6s}: velocity: {self.readable_number_list(v2[:3])}, "
                               f"speed: {math.sqrt(v2_squared):.2f}")
-        if d1 < self.config.FOUL_VINCITY_DISTANCE:
-            debug_messages.append(f"{p1_str} is close to the ball ({d1:.2f} < {self.config.FOUL_VINCITY_DISTANCE})")
+        if d1 < self.config.FOUL_VICINITY_DISTANCE:
+            debug_messages.append(f"{p1_str} is close to the ball ({d1:.2f} < {self.config.FOUL_VICINITY_DISTANCE})")
             if self.moves_to_ball(p2, v2, v2_squared):
                 if not self.moves_to_ball(p1, v1, v1_squared):
                     self.logger.info(debug_messages)
@@ -1319,7 +1445,7 @@ class Referee:
                 continue
             if not player['outside_circle']:
                 color = team.color
-                self.send_penalty(player, 'INCAPABLE', 'entered circle during oppenent\'s kick-off',
+                self.send_penalty(player, 'INCAPABLE', 'entered circle during opponent\'s kick-off',
                                   f'{color.capitalize()} player {number} entering circle during opponent\'s kick-off.')
                 penalty = True
         return penalty
@@ -1378,7 +1504,7 @@ class Referee:
 
     def game_interruption_ball_holding(self, team):
         """
-        Applies the associated actions for when a robot does ball holding duing an interruption
+        Applies the associated actions for when a robot does ball holding during an interruption
 
         1. If opponent commits ball holding, RETAKE is sent
         2. If team with game_interruption does ball holding game interruption continues
@@ -1644,7 +1770,7 @@ class Referee:
             self.logger.info('Starting extended penalty shootout without a goalkeeper and goal area entrance allowed.')
         # Only prepare next penalty if team has a kicker available
         self.flip_sides()
-        self.logger.info(f'fliped sides: game.side_left = {self.game.side_left}')
+        self.logger.info(f'Flipped sides: game.side_left = {self.game.side_left}')
         if self.penalty_kicker_player():
             self.game_controller_send('STATE:SET')
             self.set_penalty_positions()
@@ -1807,25 +1933,25 @@ class Referee:
 
     def get_alternative_ball_locations(self, original_pos):
         if (self.game.interruption_team == self.game.red.id) ^ (self.game.side_left == self.game.blue.id):
-            prefered_x_dir = 1
+            preferred_x_dir = 1
         else:
-            prefered_x_dir = -1
-        prefered_y_dir = -1 if original_pos[1] > 0 else 1
-        offset_x = prefered_x_dir * self.field.place_ball_safety_dist * np.array([1, 0, 0])
-        offset_y = prefered_y_dir * self.field.place_ball_safety_dist * np.array([0, 1, 0])
+            preferred_x_dir = -1
+        preferred_y_dir = -1 if original_pos[1] > 0 else 1
+        offset_x = preferred_x_dir * self.field.place_ball_safety_dist * np.array([1, 0, 0])
+        offset_y = preferred_y_dir * self.field.place_ball_safety_dist * np.array([0, 1, 0])
         locations = []
         if self.game.interruption == "DIRECT_FREEKICK" or self.game.interruption == "INDIRECT_FREEKICK":
             # TODO If indirect free kick in opponent penalty area on line parallel to goal line, move it along this line
-            for dist_mult in range(1, self.config.GAME_INTERRUPTION_PLACEMENT_NB_STEPS+1):
-                locations.append(original_pos + offset_x * dist_mult)
-                locations.append(original_pos + offset_y * dist_mult)
-                locations.append(original_pos - offset_y * dist_mult)
-                locations.append(original_pos - offset_x * dist_mult)
+            for dist_multiplier in range(1, self.config.GAME_INTERRUPTION_PLACEMENT_NB_STEPS+1):
+                locations.append(original_pos + offset_x * dist_multiplier)
+                locations.append(original_pos + offset_y * dist_multiplier)
+                locations.append(original_pos - offset_y * dist_multiplier)
+                locations.append(original_pos - offset_x * dist_multiplier)
         elif self.game.interruption == "THROWIN":
-            for dist_mult in range(1, self.config.GAME_INTERRUPTION_PLACEMENT_NB_STEPS+1):
-                locations.append(original_pos + offset_x * dist_mult)
-            for dist_mult in range(1, self.config.GAME_INTERRUPTION_PLACEMENT_NB_STEPS+1):
-                locations.append(original_pos - offset_x * dist_mult)
+            for dist_multiplier in range(1, self.config.GAME_INTERRUPTION_PLACEMENT_NB_STEPS+1):
+                locations.append(original_pos + offset_x * dist_multiplier)
+            for dist_multiplier in range(1, self.config.GAME_INTERRUPTION_PLACEMENT_NB_STEPS+1):
+                locations.append(original_pos - offset_x * dist_multiplier)
         return locations
 
     def get_obstacles_positions(self, team, number):
@@ -1853,9 +1979,9 @@ class Referee:
                         player_2_ball = [1, 0, 0]
                         dist = 1
                     offset = player_2_ball / dist * self.field.place_ball_safety_dist
-                    for dist_mult in range(1, self.config.GAME_INTERRUPTION_PLACEMENT_NB_STEPS+1):
+                    for dist_multiplier in range(1, self.config.GAME_INTERRUPTION_PLACEMENT_NB_STEPS+1):
                         allowed = True
-                        pos = target_location + offset * dist_mult
+                        pos = target_location + offset * dist_multiplier
                         for o in obstacles:
                             if distance2(o, pos) < self.field.place_ball_safety_dist:
                                 allowed = False
@@ -1902,6 +2028,208 @@ class Referee:
         self.game.ball_set_kick = False
         self.game.reset_ball_touched()
         self.logger.info(f'Ball respawned at {target_location[0]} {target_location[1]} {target_location[2]}.')
+
+    def gather_data_collection_frame_nodes(self):
+        """Collects the nodes of the ball's and team player's frames."""
+
+        def get_player_frame_nodes(team, number) -> Dict[str, Node]:
+            """Returns the nodes of frames from a player.
+
+            :param team: team of the player
+            :param number: number of the player
+            :return: a dictionary of nodes indexed by frame id
+            :rtype: Dict[str, Node]
+            """
+            frame_ids = [
+                "base_link",
+                "l_sole",
+                "r_sole",
+                "l_gripper",
+                "r_gripper",
+                "camera_frame",
+                "l_camera_frame",
+                "r_camera_frame",
+            ]
+            robot = team.players[number]["robot"]
+            nodes = {}
+            for frame_id in frame_ids:
+                node = robot.getFromProtoDef(frame_id)
+                if node is None:
+                    continue
+                #node.enablePoseTracking(self.time_step)
+                nodes[frame_id] = node
+            return nodes
+
+        self.data_collection_frame_nodes = {
+            "ball": {},
+            "teams": {},
+        }
+
+        # Ball
+        node = self.ball
+        #node.enablePoseTracking(self.time_step)
+        self.data_collection_frame_nodes["ball"] = {"BALL": node}
+
+        # Teams
+        for color, team in {"blue": self.blue_team, "red": self.red_team}.items():
+            self.data_collection_frame_nodes["teams"][color] = {}
+            for number in team.players.keys():
+                self.data_collection_frame_nodes["teams"][color][number] = get_player_frame_nodes(team, number)
+
+    def data_collection_set_ball_data(self):
+        """Sets the ball data for the data collection."""
+        frame_id = "BALL"
+        affine_pose = self.data_collection_frame_nodes["ball"][frame_id].getPose()
+
+        self.data_collector.current_step().ball = mi.Ball(
+            frame_id,
+            mi.Frame(
+                frame_id,
+                mi.pose_from_affine(np.array(affine_pose)),
+            ),
+        )
+
+    def data_collection_set_team_data(self):
+        """Sets the team data for the data collection."""
+
+        def create_player(player_number: str, game_info_team, players: Dict[str, Dict[str, List[float]]]) -> Optional[mi.Player]:
+            """Creates a player for the data collection.
+
+            :param player_number: Number of the player
+            :type player_number: str
+            :param game_info_team: Team info from the game info
+            :type game_info_team: 
+            :param players: Dict of players of poses
+            :type poses: Dict[str, Dict[str, List[float]]]
+            :return: Player object, if the player exists
+            :rtype: Optional[mi.Player]
+            """
+            # Check if player exists
+            if not player_number in players:
+                return None
+
+            # Get GameInfoPlayer from game info
+            game_info_player = game_info_team.players[int(player_number)]
+
+            # Get RobotInfo from game state info
+            if self.game.state is not None:
+                robot_info = mi.RobotInfo(
+                    penalty = game_info_player.penalty,
+                    secs_till_unpenalized = game_info_player.secs_till_unpenalized,
+                    number_of_warnings = game_info_player.number_of_warnings,
+                    number_of_yellow_cards = game_info_player.number_of_yellow_cards,
+                    number_of_red_cards = game_info_player.number_of_red_cards,
+                    goalkeeper = game_info_player.goalkeeper,
+                )
+                self.game.state.teams[0].score
+            else:
+                robot_info = None
+
+            # Get poses
+            poses = players[player_number]
+            try:
+                camera_frame = mi.pose_from_affine(np.array(poses["camera_frame"]))
+            except KeyError:
+                camera_frame = None
+            try:
+                l_camera_frame = mi.pose_from_affine(np.array(poses["l_camera_frame"]))
+            except KeyError:
+                l_camera_frame = None
+            try:
+                r_camera_frame = mi.pose_from_affine(np.array(poses["r_camera_frame"]))
+            except KeyError:
+                r_camera_frame = None
+
+            return mi.Player(
+                id=player_number,
+                base_link=mi.pose_from_affine(np.array(poses["base_link"])),
+                l_sole=mi.pose_from_affine(np.array(poses["l_sole"])),
+                r_sole=mi.pose_from_affine(np.array(poses["r_sole"])),
+                l_gripper=mi.pose_from_affine(np.array(poses["l_gripper"])),
+                r_gripper=mi.pose_from_affine(np.array(poses["r_gripper"])),
+                camera_frame=camera_frame,
+                l_camera_frame=l_camera_frame,
+                r_camera_frame=r_camera_frame,
+                robot_info=robot_info
+            )
+
+        def create_team(game_info_team, players) -> mi.Team:
+            """Create a team for the data collection.
+
+            :param game_info_team: Team info from the game info
+            :type game_info_team:
+            :param players: Dict of players of poses
+            :type poses: Dict[str, Dict[str, List[float]]]
+            """
+            return mi.Team(
+                id=game_info_team.team_number,
+                player1=create_player("1", game_info_team, players),
+                player2=create_player("2", game_info_team, players),
+                player3=create_player("3", game_info_team, players),
+                player4=create_player("4", game_info_team, players),
+                score=game_info_team.score,
+                penalty_shots=game_info_team.penalty_shot,
+                single_shots=game_info_team.single_shots
+            )
+
+        def get_team_player_poses() -> Dict[str, Dict[int, Dict[str, List[float]]]]:
+            """Returns the pose of the team players.
+
+            :return: Dictionary of poses (List of 16 floats to be interpreted as 4x4 matrix),
+                indexed by team color, player number and frame id
+            :rtype: Dict[str, Dict[int, Dict[str, List[float]]]]
+            """
+            poses = {}
+            for team, players in self.data_collection_frame_nodes["teams"].items():
+                poses[team] = {}
+                for number, nodes in players.items():
+                    poses[team][number] = {}
+                    for frame_id, node in nodes.items():
+                        poses[team][number][frame_id] = node.getPose()
+            return poses
+
+        # Get teams
+        game_info_team_blue = game_info_team_red = None
+        for team in self.game.state.teams:
+            if team.team_color == "BLUE":
+                game_info_team_blue = team
+            elif team.team_color == "RED":
+                game_info_team_red = team
+        if game_info_team_blue is None or game_info_team_red is None:
+            return
+
+        # Get poses
+        poses = get_team_player_poses()
+        players_blue = poses["blue"]
+        players_red = poses["red"]
+
+        # Team1 is always blue
+        team1 = create_team(game_info_team_blue, players_blue)
+        # Team2 is always red
+        team2 = create_team(game_info_team_red, players_red)
+
+        teams = mi.Teams(team1=team1, team2=team2)
+        self.data_collector.current_step().teams = teams
+
+    def data_collection_set_game_control_data(self) -> None:
+        """Sets the game control data for the data collection."""
+        gamestate = self.game.state
+        if gamestate is None:
+            return
+        
+        # Set new game control data object
+        self.data_collector.current_step().game_control_data = mi.GameControlData(
+            game_state = mi.GameControlData.GameState(int(gamestate.game_state)),
+            first_half = gamestate.first_half,
+            kickoff_team = gamestate.kickoff_team,
+            secondary_state = mi.GameControlData.SecondaryGameState(int(gamestate.secondary_state)),
+            secondary_state_info_team = gamestate.secondary_state_info[0],
+            secondary_state_info_sub_state = gamestate.secondary_state_info[1],
+            drop_in_team = gamestate.drop_in_team,
+            drop_in_time = gamestate.drop_in_time,
+            seconds_remaining = gamestate.seconds_remaining,
+            secondary_seconds_remaining = gamestate.secondary_seconds_remaining,
+        )
 
     def setup(self):
         # check game type
@@ -1977,21 +2305,21 @@ class Referee:
         children = self.supervisor.getRoot().getField('children')
         if (hasattr(self.game, "texture_seed")):
             random.seed(self.game.texture_seed)
-        bg = random.choice(['stadium_dry', 'shanghai_riverside', 'ulmer_muenster', 'sunset_jhbcentral',
+        self.background = random.choice(['stadium_dry', 'shanghai_riverside', 'ulmer_muenster', 'sunset_jhbcentral',
                             'sepulchral_chapel_rotunda', 'paul_lobe_haus', 'kiara_1_dawn'])
-        luminosity = random.random() * 0.5 + 0.75  # random value between 0.75 and 1.25
-        ball_texture = random.choice(['telstar', 'teamgeist', 'europass', 'jabulani', 'tango'])
+        self.luminosity = random.random() * 0.5 + 0.75  # random value between 0.75 and 1.25
+        self.ball_texture = random.choice(['telstar', 'teamgeist', 'europass', 'jabulani', 'tango'])
         random.seed()
-        children.importMFNodeFromString(-1, f'RoboCupBackground {{ texture "{bg}" luminosity {luminosity}}}')
-        children.importMFNodeFromString(-1, f'RoboCupMainLight {{ texture "{bg}" luminosity {luminosity}}}')
-        children.importMFNodeFromString(-1, f'RoboCupOffLight {{ texture "{bg}" luminosity {luminosity}}}')
-        children.importMFNodeFromString(-1, f'RoboCupTopLight {{ texture "{bg}" luminosity {luminosity}}}')
+        children.importMFNodeFromString(-1, f'RoboCupBackground {{ texture "{self.background}" luminosity {self.luminosity}}}')
+        children.importMFNodeFromString(-1, f'RoboCupMainLight {{ texture "{self.background}" luminosity {self.luminosity}}}')
+        children.importMFNodeFromString(-1, f'RoboCupOffLight {{ texture "{self.background}" luminosity {self.luminosity}}}')
+        children.importMFNodeFromString(-1, f'RoboCupTopLight {{ texture "{self.background}" luminosity {self.luminosity}}}')
         children.importMFNodeFromString(-1, f'RobocupSoccerField {{ size "{self.game.field_size}" }}')
         ball_size = 1 if self.game.field_size == 'kid' else 5
 
         # the ball is initially very far away from the field
         children.importMFNodeFromString(-1, f'DEF BALL RobocupTexturedSoccerBall'
-                                            f'{{ translation 100 100 0.5 size {ball_size} texture "{ball_texture}" }}')
+                                            f'{{ translation 100 100 0.5 size {ball_size} texture "{self.ball_texture}" }}')
         self.ball = self.blackboard.supervisor.getFromDef('BALL')
         self.game.ball_translation = self.blackboard.supervisor.getFromDef('BALL').getField('translation')
 
@@ -2089,6 +2417,8 @@ class Referee:
 
         if hasattr(self.game, 'record_simulation'):
             try:
+                # Create the directory if it does not exist
+                os.makedirs(os.path.dirname(os.path.abspath(self.game.record_simulation)), exist_ok=True)
                 if self.game.record_simulation.endswith(".html"):
                     self.supervisor.animationStartRecording(self.game.record_simulation)
                 elif self.game.record_simulation.endswith(".mp4"):
@@ -2101,11 +2431,18 @@ class Referee:
             except Exception:
                 self.logger.error(f"Failed to start recording with exception: {traceback.format_exc()}")
                 self.clean_exit()
+        self.logger.info("Setup complete.")
 
     def main_loop(self):
+        def should_run_data_collection(current_step_count: int) -> bool:
+            return self.game.data_collection["enabled"] and self.game.data_collection["step_interval"] > 0 and current_step_count % self.game.data_collection["step_interval"] == 0
+
         previous_real_time = time.time()
+        step_count: int = 0
         while self.supervisor.step(self.time_step) != -1 and not self.game.over:
-            if hasattr(self.game, 'max_duration') and (time.time() - self.blackboard.start_real_time) > self.game.max_duration:
+            step_start_time = time.time()  # Also gets used for data collection
+            step_count += 1
+            if hasattr(self.game, 'max_duration') and (step_start_time - self.blackboard.start_real_time) > self.game.max_duration:
                 self.logger.info(f'Interrupting game automatically after {self.game.max_duration} seconds')
                 break
             self.print_status()
@@ -2118,6 +2455,20 @@ class Referee:
             send_play_state_after_penalties = False
             previous_position = copy.deepcopy(self.game.ball_position)
             self.game.ball_position = self.game.ball_translation.getSFVec3f()
+
+            # Collect data of step
+            if should_run_data_collection(step_count):
+                try:
+                    self.data_collector.create_new_step(self.sim_time.get_sec())
+                    self.data_collection_set_ball_data()
+
+                    if self.game.state is not None:
+                        self.data_collection_set_game_control_data()
+                        self.data_collection_set_team_data()
+                except Exception:
+                    self.game.data_collection["enabled"] = False  # Disable data collection
+                    self.logger.error(f"Failed to collect data: {traceback.format_exc()}")
+
             if self.game.ball_position != previous_position:
                 self.game.ball_last_move = self.sim_time.get_ms()
             self.update_contacts()  # check for collisions with the ground and ball
@@ -2403,7 +2754,13 @@ class Referee:
                         self.game_controller_send('STATE:SET')
                 elif self.game.ready_real_time is not None:
                     # initial kick-off (1st, 2nd half, extended periods, penalty shootouts)
-                    if self.game.ready_real_time <= time.time():
+                    if self.first_step_done and self.game.ready_real_time <= time.time():
+                        # The first step done check is necessary in case the ready real time has
+                        # already passed before the first step is done.
+                        # This can happen if setting up the game (and spawning robots) takes a lot of time.
+                        # If we send the ready state before the first step is done, the game controller
+                        # will skip the ready state and go directly to the set state.
+                        # This messes up the referee and it is stuck listening for the game controller... :(
                         self.logger.info('Real-time to wait elapsed, moving to READY')
                         self.game.ready_real_time = None
                         self.check_start_position()
@@ -2468,7 +2825,18 @@ class Referee:
                 wait_time = min_step_time - step_time_until_now
                 if wait_time > 0:  # wait only if the step was completed faster than the minimum required time
                     time.sleep(wait_time)  # wait for the remaining time
-            previous_real_time = time.time()  # update the previous real time
+
+            step_end_time = time.time()
+
+            if should_run_data_collection(step_count):
+                try:
+                    delta = step_end_time - step_start_time
+                    self.data_collector.current_step().delta_real_time = delta
+                except Exception:
+                    self.logger.error(f"Failure during step time calculation: {traceback.format_exc()}")
+
+            self.first_step_done = True
+            previous_real_time = time.time()  # update the previous real time for the next step
 
         # for some reason, the simulation was terminated before the end of the match (may happen during tests)
         if not self.game.over:
@@ -2486,7 +2854,7 @@ class Referee:
                 self.logger.info(f'The winner is the {self.game.state.teams[winner].team_color.lower()} team.')
             elif self.game.penalty_shootout_count < 20:
                 self.logger.info('This is a draw.')
-            else:  # extended penatly shoutout rules to determine the winner
+            else:  # extended penalty shootout rules to determine the winner
                 count = [0, 0]
                 for i in range(5):
                     if self.game.penalty_shootout_time_to_reach_goal_area[2 * i] is not None:
@@ -2584,9 +2952,9 @@ class Referee:
                                 else:
                                     self.logger.info('Tossing a coin to determine the winner.')
                                     if bool(random.getrandbits(1)):
-                                        self.logger.info('The winer is the red team.')
+                                        self.logger.info('The winner is the red team.')
                                     else:
-                                        self.logger.info('The winer is the blue team.')
+                                        self.logger.info('The winner is the blue team.')
 
 
 if __name__ == '__main__':

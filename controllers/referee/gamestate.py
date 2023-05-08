@@ -24,15 +24,15 @@ except ImportError:
 Short = Int16ul
 
 RobotInfo = "robot_info" / Struct(
-    # NONE                                        0
-    # PENALTY_HL_KID_BALL_MANIPULATION            1
-    # PENALTY_HL_KID_PHYSICAL_CONTACT             2
-    # PENALTY_HL_KID_ILLEGAL_ATTACK               3
-    # PENALTY_HL_KID_ILLEGAL_DEFENSE              4
-    # PENALTY_HL_KID_REQUEST_FOR_PICKUP           5
-    # PENALTY_HL_KID_REQUEST_FOR_SERVICE          6
-    # PENALTY_HL_KID_REQUEST_FOR_PICKUP_2_SERVICE 7
-    # MANUAL                                      15
+    # Updated from https://github.com/RoboCup-Humanoid-TC/GameController/blob/master/src/data/values/Penalties.java
+    # UNKNOWN                   255
+    # NONE                      0
+    # SUBSTITUTE                14
+    # MANUAL                    15
+    # HL_BALL_MANIPULATION      30
+    # HL_PHYSICAL_CONTACT       31
+    # HL_PICKUP_OR_INCAPABLE    34
+    # HL_SERVICE                35
     "penalty" / Byte,
     "secs_till_unpenalized" / Byte,
     "number_of_warnings" / Byte,

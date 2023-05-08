@@ -7,21 +7,31 @@ This folder contains the simulation setup for the Robocup Virtual Humanoid Leagu
 In order to run this simulation, you will need to have a [fairly powerful](https://cyberbotics.com/doc/guide/system-requirements) Linux, Windows or macOS computer.
 You will also need to get familiar with Webots by reading the [Webots User Guide](https://cyberbotics.com/doc/guide/) and following the [Tutorials](https://cyberbotics.com/doc/guide/tutorials).
 
-## Installation
+## Installation for Ubuntu (tested with 22.04)
 
-1. Install Webots 2022b from https://cyberbotics.com/
+1. Install Webots 2022b from <https://cyberbotics.com/>
 2. Build the latest version of the official RoboCup Humanoid TC fork of the [GameController](https://github.com/RoboCup-Humanoid-TC/GameController).
+
    ```
    apt-get install ant
    git clone https://github.com/RoboCup-Humanoid-TC/GameController
    cd GameController
    ant
    ```
+
 3. Install Python dependencies:
-   ```
-   pip3 install -r controllers/referee/requirements.txt
-   ```
+
+  - Main dependencies:
+     ```
+     pip3 install -r controllers/referee/requirements/common.txt
+     ```
+  - Optional development dependencies:
+      ```
+      pip3 install -r controllers/referee/requirements/dev.txt
+      ```
+
 4. Build the controllers:
+
    ```
    apt-get install protobuf-compiler libprotobuf-dev libjpeg9-dev
    export WEBOTS_HOME=/usr/local/webots # Set WEBOTS_HOME. This might be a different location, depending on your installation type
@@ -31,9 +41,11 @@ You will also need to get familiar with Webots by reading the [Webots User Guide
 ## Run the Demo
 
 1. Open the [robocup.wbt](worlds/robocup.wbt) world file in Webots and run it until you see the GameController window showing up.
+
    ```
    GAME_CONTROLLER_HOME=/path/to/GameController JAVA_HOME=/usr webots ./worlds/robocup.wbt
    ```
+
    You have to pass the environment variables `GAME_CONTROLLER_HOME` which points to the `GameController` folder and `JAVA_HOME` which points to your Java installation (which might be under `/usr`).
 2. You can manually move the robots and the ball using the mouse (<kbd>Shift</kbd>-right-click-and-drag).
 3. Launch the sample robot controller [client.cpp](controllers/player/client.cpp) by typing `./client` in the [controllers/player](controllers/player) folder.
@@ -42,13 +54,13 @@ You will also need to get familiar with Webots by reading the [Webots User Guide
 ## Modify the Game and Teams Configuration
 
 1. Quit Webots.
-2. Edit the [game.json](controllers/referee/game.json) file to change the game configuration. The ports in this file are where the API server will open ports and the API servers will only accept traffic from the whitelisted IP, i.e. you might want to change the IPs to 127.0.0.1 for a local setup.
+2. Edit the [game.json](controllers/referee/game.json) (see [here](#configuration-of-gamejson) for details on configuration) file to change the game configuration. The ports in this file are where the API server will open ports and the API servers will only accept traffic from the whitelisted IP, i.e. you might want to change the IPs to 127.0.0.1 for a local setup.
 3. Edit the [team_1.json](controllers/referee/team_1.json) and [team_2.json](controllers/referee/team_2.json) files to change the teams configuration.
 4. Restart the simulation.
 
 ## Program your Own Robot Controllers
 
-1. Update the [game.json](controllers/referee/game.json) configuration file and create your own team configuration files, taking inspiration from [team_1.json](controllers/referee/team_1.json) and [team_2.json](controllers/referee/team_2.json).
+1. Update the [game.json](controllers/referee/game.json) configuration file (see [here](#configuration-of-gamejson) and create your own team configuration files, taking inspiration from [team_1.json](controllers/referee/team_1.json) and [team_2.json](controllers/referee/team_2.json).
 2. Create your own robot controllers, taking inspiration from the sample [client.cpp](controllers/player/client.cpp).
 
 ## Create your Own Robot Model
@@ -133,23 +145,50 @@ A semi-automated tool allowing to check if a robot respects the rules is availab
 the `controllers/model_verifier` directory.
 The available scripts are documented in a dedicated [README](controllers/model_verifier/README.md).
 
-## game.json settings
+## Configuration of `game.json`
 
-Multiple variables can be set to influence the behavior of the simulation.
+Configuration that is game-specific is defined in the `game.json` file.
+This configuration is used by the referee (and by the udp_bouncer if it is used).
 
-`record_simulation:` a file path to where the simulation should be recorded. If it ends in `.html` a 3D recording is made. If it ends in `.mp4` a video from the default perspective is generated.
+### Required fields
 
-`press_a_key_to_terminate`: true or false, allows pressing a key to cleanly end the simulation and save the recording (used for testing)
+- `type`: Type of the game [`NORMAL`, `KNOCKOUT`. `PENALTY`]
+- `class`: Subleague of the game [`kid`, `adult`]
+- `kickoff`: Color of the team that has kickoff at the start of the game [`red`, `blue`]
+- `side_left`: Color of the team that starts on the left field side [`red`, `blue`]
+- `host`: IP of the machine the referee is running on [LAN IP, or `127.0.0.1` for local]
+- `maximum_real_time_factor`: Referee guarantees that the simulation is not running faster. Values <= 0.0 mean, the simulation can run as fast as possible [float]
+- `data_collection`: Configuration for data collection
+    - `enabled`: Whether to enable the data collection [`true` or `false`]
+    - `directory`: Path to directory where to store data collection files
+    - `step_interval`: Interval between data collection steps, so it only runs every `step_interval` steps [integer]
+    - `autosave_interval`: Automatically saves collected data every `autosave_interval` seconds during the game. Set to -1 to disable auto save [integer]
+- `red`: Configuration for the red team
+  - `id`: ID of the red team
+  - `config`: (Relative) Path to the configuration file of the red team
+  - `hosts`: List of IPs of the red team robots' machines
+  - `ports`: List of ports of the red team robots' machines
+- `blue`: Configuration for the blue team
+  - `id`: ID of the blue team
+  - `config`: (Relative) Path to the configuration file of the blue team
+  - `hosts`: List of IPs of the blue team robots' machines
+  - `ports`: List of ports of the blue team robots' machines
 
-`game_controller_extra_args`: used to pass arguments to the game controller, for example 
-```json
-  "game_controller_extra_args": [
-    "--halftimeduration",
-    "120",
-    "--overtimeduration",
-    "60"
-  ],
-```
-can be used to reduce halftime duration.
+### Optional fields
 
-`texture_seed`: can be set to an integer to set the random seed used for texture (background, background luminosity, and ball)
+Some fields are optional, but can be used to influence the behavior of the simulation.
+
+- `press_a_key_to_terminate`: Allows pressing a key to cleanly end the simulation and save the recording (used for testing) [`true` or `false`]
+- `use_bouncing_server`: Whether to use the udp_bouncer [`true` or `false`]
+- `record_simulation:` File path to where the simulation should be recorded. If it ends in `.html` a 3D recording is made. If it ends in `.mp4` a video from the default perspective is generated.
+- `max_duration`: Maximum duration of the game in real-time seconds [integer]
+- `texture_seed`: Seed used for pseudo-random selection of textures (background, background luminosity, and ball) [integer]
+- `game_controller_extra_args`: Pass arguments to the game controller, for example
+  ```json
+    "game_controller_extra_args": [
+      "--halftimeduration",
+      "120",
+      "--overtimeduration",
+      "60"
+    ],
+  ```
