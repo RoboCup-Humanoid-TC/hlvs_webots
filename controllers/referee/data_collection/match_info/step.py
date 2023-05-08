@@ -87,7 +87,7 @@ class Step(DataClassJsonMixin):
     :type time: float
     :param delta_real_time: Time to calculate step in realtime in seconds, defaults to None
     :type delta_real_time: Optional[float], optional
-    :param game_control_data: Game controler data, defaults to None
+    :param game_control_data: Game controller data, defaults to None
     :type game_control_data: Optional[GameControlData], optional
     :param ball: Ball data, defaults to None
     :type ball: Optional[Ball], optional
