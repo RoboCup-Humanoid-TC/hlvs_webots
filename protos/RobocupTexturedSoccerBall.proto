@@ -18,33 +18,36 @@ PROTO RobocupTexturedSoccerBall [
     const mass_array = {1: 0.205, 2: 0.250, 3: 0.310, 4: 0.370, 5: 0.430};
     const radius = radius_array[size];
     const mass = mass_array[size];
-    const scale = radius * 10.4;
   >%
   Solid {
     translation IS translation
     rotation IS rotation
-    scale %<= scale >% %<= scale >% %<= scale >%
     children [
-      DEF BALL_SHAPE Shape {
-        appearance PBRAppearance {
-          baseColor 0.8 0.8 0.8
-          roughness 0.5
-          metalness 0.1
-          baseColorMap ImageTexture{
-			      url [ %<= '"ball_textures/' + fields.texture.value + '.jpg"'>% ]
+      Transform {
+        
+        children [
+          DEF BALL_SHAPE Shape {
+            appearance PBRAppearance {
+              baseColor 0.8 0.8 0.8
+              roughness 0.5
+              metalness 0.1
+              baseColorMap ImageTexture{
+                url [ %<= '"ball_textures/' + fields.texture.value + '.jpg"'>% ]
+              }
+            }
+            geometry Sphere {
+              radius %<= radius >%
+              subdivision 3
+            }
           }
-        }
-        geometry Sphere {
-          radius %<= radius / scale >%
-          subdivision 3
-        }
+        ]
       }
     ]
     name IS name
     model "soccer ball"
     contactMaterial "robocup soccer ball"
     boundingObject Sphere {
-      radius %<= radius / scale >%
+      radius %<= radius  >%
       subdivision 3
     }
     physics Physics {
